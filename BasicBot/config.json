@@ -1,0 +1,380 @@
+{
+    "Bot Info" :
+    {
+        "BotName"                   : "Steamhammer 1.2.3",
+        "Authors"                   : "Jay Scott",
+        "PrintInfoOnStart"          : true
+    },
+    
+    "BWAPI" : 
+    {
+        "SetLocalSpeed"             : 0,
+        "SetFrameSkip"              : 0,
+        "UserInput"                 : true,
+        "CompleteMapInformation"    : false
+    },
+    
+    "Micro" :
+    {
+        "KiteWithRangedUnits"       : true,
+        "KiteLongerRangedUnits"     : ["Mutalisk", "Vulture"],
+        "WorkersDefendRush"         : true,
+        "RetreatMeleeUnitShields"   : 2,
+        "RetreatMeleeUnitHP"        : { "Zerg" : 8, "Protoss" : 18 },
+        "RegroupRadius"             : 600,
+        "UnitNearEnemyRadius"       : 600,
+		"ScoutDefenseRadius"		: { "Terran" : 500 }
+    },
+    
+    "Macro" :
+    {
+        "BOSSFrameLimit"            : 160,
+		"ProductionJamFrameLimit"	: 1440,
+        "WorkersPerRefinery"        : 3,
+		"WorkersPerPatch"			: { "Zerg" : 1.6, "Protoss" : 2.3, "Terran" : 2.6 },
+		"AbsoluteMaxWorkers"		: 75,
+        "BuildingSpacing"           : 1,
+        "PylonSpacing"              : 3
+    },
+
+    "Debug" :
+    {
+        "ErrorLogFilename"          : "bwapi-data/AI/Steamhammer_ErrorLog.txt",
+        "LogAssertToErrorFile"      : true,
+		
+        "DrawGameInfo"              : true,   
+        "DrawStrategySketch"        : false,   
+        "DrawUnitHealthBars"        : false,
+        "DrawProductionInfo"        : true,
+        "DrawBuildOrderSearchInfo"  : false,
+        "DrawScoutInfo"             : false,
+        "DrawEnemyUnitInfo"         : false,
+        "DrawModuleTimers"          : false,
+        "DrawResourceInfo"          : false,
+        "DrawCombatSimInfo"         : false,
+        "DrawUnitTargetInfo"        : false,
+		"DrawUnitOrders"			: false,
+        "DrawBWTAInfo"              : false,
+        "DrawMapGrid"               : false,
+		"DrawMapDistances"			: false,
+		"DrawBaseInfo"				: false,
+		"DrawStrategyBossInfo"		: false,
+        "DrawSquadInfo"             : false,
+        "DrawWorkerInfo"            : false,
+        "DrawMouseCursorInfo"       : false,
+        "DrawBuildingInfo"          : false,
+        "DrawReservedBuildingTiles" : false,
+        "DrawBOSSStateInfo"         : false
+    },
+    
+    "Modules" :
+    {
+        "UseStrategyIO"             : false
+    },
+    
+    "Tools" :
+    {
+        "MapGridSize"               : 320
+    },
+    
+    "Strategy" :
+    {
+        "ScoutHarassEnemy"          : false,
+		"SurrenderWhenHopeIsLost"   : true,
+        
+        "ReadDirectory"             : "bwapi-data/read/",
+        "WriteDirectory"            : "bwapi-data/write/",
+
+		"TvT" :
+			{ "StrategyMix" : [
+				{ "Weight" : 15, "Strategy" : "11Rax" },
+				{ "Weight" : 50, "Strategy" : "Vultures" },
+				{ "Weight" : 20, "Strategy" : "Tanks", "Weight4" : 25 },
+				{ "Weight" : 10, "Strategy" : "VultureDrop", "Weight4" : 15 }
+			]},
+
+		"TvP" :
+			{ "StrategyMix" : [
+				{ "Weight" : 15, "Strategy" : "11Rax" },
+				{ "Weight" : 50, "Strategy" : "Vultures" },
+				{ "Weight" : 15, "Strategy" : "Tanks", "Weight4" : 25 },
+				{ "Weight" : 10, "Strategy" : "VultureDrop", "Weight4" : 15 }
+			]},
+
+		"TvZ" :
+			{ "StrategyMix" : [
+				{ "Weight" : 10, "Strategy" : "8RaxDefense" },
+				{ "Weight" : 10, "Strategy" : "8RaxAttack", "Weight2" : 20 },
+				{ "Weight" : 50, "Strategy" : "11Rax" },
+				{ "Weight" : 20, "Strategy" : "Vultures" },
+				{ "Weight" : 10, "Strategy" : "VultureDrop", "Weight4" : 15 }
+			]},
+
+		"TvU" :
+			{ "StrategyMix" : [
+				{ "Weight" : 30, "Strategy" : "8RaxDefense" },
+				{ "Weight" : 20, "Strategy" : "8RaxAttack" },
+				{ "Weight" : 15, "Strategy" : "11Rax" },
+				{ "Weight" : 25, "Strategy" : "Vultures" },
+				{ "Weight" :  5, "Strategy" : "Tanks" },
+				{ "Weight" :  5, "Strategy" : "VultureDrop" }
+			]},
+
+		"PvT" :
+			{ "StrategyMix" : [
+				{ "Weight" : 10, "Strategy" : "9-9Gate" },
+				{ "Weight" :  5, "Strategy" : "10-12Gate" },
+				{ "Weight" : 15, "Strategy" : "1ZealotCore" },
+				{ "Weight" : 35, "Strategy" : "DTRush" },
+				{ "Weight" : 15, "Strategy" : "DTDrop", "Weight4" : 20 },
+				{ "Weight" : 15, "Strategy" : "12Nexus", "Weight2" : 5 },
+				{ "Weight" :  5, "Strategy" : "13Nexus", "Weight2" : 0 }
+			]},
+
+		"PvP" :
+			{ "StrategyMix" : [
+				{ "Weight" :  5, "Strategy" : "9-9Gate" },
+				{ "Weight" : 15, "Strategy" : "10-12Gate" },
+				{ "Weight" : 45, "Strategy" : "1ZealotCore" },
+				{ "Weight" : 20, "Strategy" : "DTRush" },
+				{ "Weight" : 15, "Strategy" : "DTDrop", "Weight4" : 20 }
+			]},
+			
+		"PvZ" :
+			{ "StrategyMix" : [
+				{ "Weight" : 30, "Strategy" : "9-9Gate" },
+				{ "Weight" : 25, "Strategy" : "10-12Gate" },
+				{ "Weight" : 10, "Strategy" : "1ZealotCore" },
+				{ "Weight" :  5, "Strategy" : "DTRush" },
+				{ "Weight" :  5, "Strategy" : "CorsairDT" },
+				{ "Weight" : 15, "Strategy" : "DTDrop" },
+				{ "Weight" : 10, "Strategy" : "ForgeExpand" }
+			]},
+
+		"PvU" :
+			{ "StrategyMix" : [
+				{ "Weight" : 60, "Strategy" : "9-9Gate" },
+				{ "Weight" : 20, "Strategy" : "10-12Gate" },
+				{ "Weight" : 10, "Strategy" : "1ZealotCore" },
+				{ "Weight" : 10, "Strategy" : "DTRush", "Weight4" : 15 }
+			]},
+
+		"ZvT" :
+			{ "StrategyMix" : [
+				{ "Weight" :  5, "Strategy" : "FastPool", "Weight2" : 10 },
+				{ "Weight" : 10, "Strategy" : "9PoolSpeed", "Weight2" : 15 },
+				{ "Weight" :  5, "Strategy" : "9HatchExpo9Pool9Gas" },
+				{ "Weight" : 20, "Strategy" : "ZvT_12Pool" },
+				{ "Weight" : 20, "Strategy" : "ZvT_13Pool" },
+				{ "Weight" : 20, "Strategy" : "ZvT_2HatchMuta", "Weight4" : 25 },
+				{ "Weight" : 15, "Strategy" : "ZvT_3HatchMuta", "Weight2" : 0, "Weight4" : 25 }
+			]},
+
+		"ZvP" :
+			{ "StrategyMix" : [
+				{ "Weight" :  5, "Strategy" : "FastPool", "Weight2" : 10 },
+				{ "Weight" : 10, "Strategy" : "9PoolSpeed" },
+				{ "Weight" :  5, "Strategy" : "9HatchExpo9Pool9Gas" },
+				{ "Weight" : 30, "Strategy" : "OverpoolSpeedling" },
+				{ "Weight" :  5, "Strategy" : "ZvP_Overpool3Hatch", "Weight2" : 0 },
+				{ "Weight" : 30, "Strategy" : "3HatchLingExpo", "Weight2" : 0 },
+				{ "Weight" :  0, "Strategy" : "3HatchLing", "Weight2" : 30 },
+				{ "Weight" : 10, "Strategy" : "OverhatchLing" },
+				{ "Weight" : 10, "Strategy" : "OverhatchMuta" }
+			]},
+
+		"ZvZ" :
+			{ "StrategyMix" : [
+				{ "Weight" :  5, "Strategy" : "FastPool" },
+				{ "Weight" : 10, "Strategy" : "9PoolSpeed" },
+				{ "Weight" : 15, "Strategy" : "9HatchMain9Pool9Gas" },
+				{ "Weight" :  5, "Strategy" : "OverpoolSpeedling" },
+				{ "Weight" :  1, "Strategy" : "ZvZ_Overpool9Gas" },
+				{ "Weight" :  3, "Strategy" : "ZvZ_Overpool11Gas" },
+				{ "Weight" :  1, "Strategy" : "ZvZ_Overgas11Pool" },
+				{ "Weight" : 25, "Strategy" : "OverhatchLing", "Weight2" : 10 },
+				{ "Weight" : 25, "Strategy" : "OverhatchMuta", "Weight2" : 10 },
+				{ "Weight" :  7, "Strategy" : "11Gas10Pool", "Weight4" : 10 },
+				{ "Weight" :  3, "Strategy" : "ZvZ_12Pool", "Weight2" : 1 }
+			]},
+
+		"ZvU" :
+			{ "StrategyMix" : [
+				{ "Weight" :  5, "Strategy" : "FastPool", "Weight2" : 15 },
+				{ "Weight" : 20, "Strategy" : "9PoolHatch" },
+				{ "Weight" :  5, "Strategy" : "9PoolExpo" },
+				{ "Weight" : 20, "Strategy" : "9PoolSpeed" },
+				{ "Weight" : 20, "Strategy" : "OverpoolSpeedling" },
+				{ "Weight" : 15, "Strategy" : "OverhatchMuta", "Weight2" : 5 },
+				{ "Weight" : 15, "Strategy" : "OverhatchLing", "Weight2" : 5 }
+			]},
+
+		"UseEnemySpecificStrategy"  : true,
+        "EnemySpecificStrategy"     :
+        {
+			"Tomas Vajda"		: { "Zerg" : "ZvP_3HatchPoolHydra", "Protoss" : "13Nexus", "Terran" : "Tanks" },
+
+			"krasi0" : {
+				"Zerg" : [
+					{ "Weight" :  3, "Strategy" : "FastPool" },
+					{ "Weight" : 17, "Strategy" : "9PoolSpeed" },
+					{ "Weight" : 15, "Strategy" : "ZvT_12Pool" },
+					{ "Weight" : 20, "Strategy" : "ZvT_2HatchMuta" },
+					{ "Weight" : 25, "Strategy" : "ZvT_3HatchMuta", "Weight2" : 0 },
+					{ "Weight" : 20, "Strategy" : "3HatchPoolMuta", "Weight2" : 0 }
+				],
+				"Protoss" : [
+					{ "Weight" : 10, "Strategy" : "1ZealotCore" },
+					{ "Weight" :  5, "Strategy" : "DTRush" },
+					{ "Weight" : 25, "Strategy" : "DTDrop" },
+					{ "Weight" : 10, "Strategy" : "12Nexus" },
+					{ "Weight" : 50, "Strategy" : "13Nexus" }
+				]
+			},
+
+			"Marian Devecka" : {
+				"Zerg" : [
+					{ "Weight" : 50, "Strategy" : "OverhatchLing" },
+					{ "Weight" : 50, "Strategy" : "OverhatchMuta" }
+				]
+			},
+
+			"Oleg Ostroumov" : {
+				"Zerg" : [
+					{ "Weight" : 30, "Strategy" : "OverpoolSpeedling" },
+					{ "Weight" : 30, "Strategy" : "OverhatchLing" },
+					{ "Weight" : 40, "Strategy" : "OverhatchMuta" }
+				]
+			},
+
+			"5 Pool"			: "AntiRush",
+			"Dave Churchill"	: "AntiRush",
+			"Dawid Loranc"		: "AntiRush",
+			"Marcin Bartnicki"	: "AntiRush",
+			"Marek Suppa"		: "AntiRush",
+			"Neo Edmund Zerg"	: "AntiRush",
+			"PeregrineBot"		: "AntiRush",
+			"UPStarCraftAI 2016": "AntiRush",
+
+			"Jakub Trancik"		: "AntiFastCheese",
+			"Stone"				: "AntiFastCheese",
+
+			"PurpleCheese"		: "AntiSlowerCheese",
+			"Woantrik Pouni"	: "AntiSlowerCheese"
+        },
+        
+		"StrategyCombos" :
+		{
+
+			"FastPool" : {
+				"Zerg" : [
+					{ "Weight" :  0, "Strategy" : "4PoolHard", "Weight2" :  5 },
+					{ "Weight" :  0, "Strategy" : "4PoolSoft", "Weight2" : 15 },
+					{ "Weight" : 80, "Strategy" : "5Pool" }
+				]
+			},
+
+			"AntiRush" : {
+				"Zerg" : [
+					{ "Weight" :  8, "Strategy" : "9PoolSpeed" },
+					{ "Weight" : 12, "Strategy" : "9PoolHatch" },
+					{ "Weight" : 15, "Strategy" : "OverpoolSpeedling" },
+					{ "Weight" : 15, "Strategy" : "OverpoolHatch" },
+					{ "Weight" : 30, "Strategy" : "OverhatchLing", "Weight2" : 0 },
+					{ "Weight" : 20, "Strategy" : "OverhatchMuta", "Weight2" : 0 }
+				],
+				"Protoss" : "9-9Gate",
+				"Terran" : "8RaxDefense"
+			},
+
+			"AntiFastCheese" : { "Zerg" : "9PoolExpo" , "Protoss" : "9-9Gate", "Terran" : "8RaxAttack" },
+
+			"AntiSlowerCheese" : {
+				"Zerg" : [
+					{ "Weight" : 30, "Strategy" : "OverpoolSpeedling" },
+					{ "Weight" : 70, "Strategy" : "OverhatchLing" }
+				],
+				"Protoss" : "9-9Gate",
+				"Terran" : [
+					{ "Weight" : 30, "Strategy" : "8RaxDefense" },
+					{ "Weight" : 40, "Strategy" : "8RaxAttack" },
+					{ "Weight" : 30, "Strategy" : "11Rax" }
+				]
+			}
+
+		},
+
+        "Strategies" :
+        {
+
+			"8RaxDefense"			: { "Race" : "Terran", "OpeningGroup" : "anti-rush", "OpeningBuildOrder" :
+				["go defensive", "4 x SCV", "barracks", "3 x SCV", "marine", "bunker", "SCV", "marine", "go scout location", "SCV", "marine", "SCV", "marine", "SCV", "marine"]},
+            "8RaxAttack"			: { "Race" : "Terran", "OpeningGroup" : "bio", "OpeningBuildOrder" :
+				["4 x SCV", "barracks", "SCV", "supply depot", "2 x SCV", "go scout location", "marine", "barracks", "SCV", "marine", "SCV", "marine", "refinery", "go gas until 250", "supply depot", "SCV", "2 x marine", "academy", "SCV", "2 x marine", "SCV"]},
+            "11Rax"					: { "Race" : "Terran", "OpeningGroup" : "bio", "OpeningBuildOrder" :
+				["go defensive", "5 x SCV", "supply depot", "2 x SCV", "barracks", "go scout location", "2 x SCV", "barracks", "SCV", "supply depot", "SCV", "marine", "SCV", "marine", "SCV", "2 x marine", "SCV", "refinery", "go gas until 350", "supply depot", "2 x marine", "SCV", "marine", "go aggressive", "academy", "SCV", "2 x marine", "barracks", "SCV", "supply depot", "2 x marine", "stim packs", "3 x medic", "2 x firebat"]},
+            "Vultures"				: { "Race" : "Terran", "OpeningGroup" : "vultures", "OpeningBuildOrder" :
+				["go defensive", "5 x SCV", "supply depot", "2 x SCV", "barracks", "go scout location", "refinery", "5 x SCV", "factory", "supply depot", "marine", "SCV", "factory", "SCV", "vulture", "marine", "SCV", "vulture", "go aggressive", "machine shop", "vulture", "SCV", "vulture", "ion thrusters", "SCV", "2 x vulture"]},
+            "Tanks"					: { "Race" : "Terran", "OpeningGroup" : "tanks", "OpeningBuildOrder" :
+				["go defensive", "5 x SCV", "supply depot", "2 x SCV", "barracks", "go scout location", "refinery", "5 x SCV", "factory", "supply depot", "marine", "SCV", "factory", "SCV", "marine", "SCV", "marine", "machine shop", "SCV", "tank siege mode", "SCV", "siege tank tank mode", "SCV", "vulture", "marine", "machine shop", "2 x siege tank tank mode", "SCV", "siege tank tank mode"]},
+            "VultureDrop"			: { "Race" : "Terran", "OpeningGroup" : "drop", "OpeningBuildOrder" :
+				["go defensive", "5 x SCV", "supply depot", "3 x SCV", "barracks", "go scout location", "refinery", "4 x SCV", "factory", "marine", "supply depot", "SCV", "marine", "SCV", "marine", "SCV", "starport", "vulture", "SCV", "marine", "vulture", "3 x SCV", "control tower", "vulture", "factory", "SCV", "dropship", "3 x vulture"]},
+
+            "9-9Gate"				: { "Race" : "Protoss", "OpeningGroup" : "zealots", "OpeningBuildOrder" :
+				["4 x probe", "pylon", "probe", "go scout location", "2 x gateway", "2 x probe", "zealot", "pylon", "2 x zealot",  "probe", "2 x zealot", "probe", "pylon", "zealot", "gateway", "probe", "pylon", "probe", "zealot", "probe", "4 x zealot", "pylon", "probe", "3 x zealot" ]},
+            "10-12Gate"				: { "Race" : "Protoss", "OpeningGroup" : "zealots", "OpeningBuildOrder" :
+				["4 x probe", "pylon", "probe", "go scout location", "probe", "gateway", "2 x probe", "gateway", "probe", "zealot", "probe", "pylon", "2 x probe", "2 x zealot", "probe", "pylon", "probe", "gateway", "zealot", "probe", "zealot", "probe", "zealot", "probe", "pylon", "3 x zealot", "probe"]},
+            "1ZealotCore"			: { "Race" : "Protoss", "OpeningGroup" : "dragoons", "OpeningBuildOrder" :
+				["4 x probe", "pylon", "probe", "go scout location", "probe", "gateway", "2 x probe", "assimilator", "probe", "zealot", "probe", "pylon", "probe", "cybernetics core", "probe", "zealot", "2 x probe", "dragoon", "singularity charge", "pylon"]},
+            "DTRush"				: { "Race" : "Protoss", "OpeningGroup" : "dark templar", "OpeningBuildOrder" :
+				["go defensive", "4 x probe", "pylon", "probe", "go scout location", "probe", "gateway", "2 x probe", "assimilator", "2 x probe", "cybernetics core", "zealot", "pylon", "2 x probe", "citadel of adun", "dragoon", "3 x probe", "pylon", "probe", "templar archives", "gateway", "probe", "2 x dark templar"]},
+            "CorsairDT"				: { "Race" : "Protoss", "OpeningGroup" : "dark templar", "OpeningBuildOrder" :
+				["go defensive", "4 x probe", "pylon", "probe", "go scout location", "probe", "gateway", "2 x probe", "assimilator", "probe", "zealot", "cybernetics core", "probe", "pylon", "zealot", "probe", "stargate", "probe", "citadel of adun", "probe", "zealot", "corsair", "2 x probe", "templar archives", "gateway"]},
+            "DTDrop"				: { "Race" : "Protoss", "OpeningGroup" : "drop", "OpeningBuildOrder" :
+				["go defensive", "4 x probe", "pylon", "2 x probe", "gateway", "go scout location", "2 x probe", "assimilator", "2 x probe", "cybernetics core", "zealot", "pylon", "2 x probe", "citadel of adun", "dragoon", "2 x probe", "dragoon", "probe", "robotics facility", "probe", "zealot", "templar archives", "gateway", "shuttle", "probe", "pylon", "2 x dark templar", "gateway", "2 x dark templar", "zealot", "dark templar", "nexus", "dark templar"]},
+            "12Nexus"				: { "Race" : "Protoss", "OpeningGroup" : "dragoons", "OpeningBuildOrder" :
+				["4 x probe", "pylon", "4 x probe", "nexus", "go scout", "2 x probe", "gateway", "probe", "assimilator", "zealot", "cybernetics core", "gateway"]},
+            "13Nexus"				: { "Race" : "Protoss", "OpeningGroup" : "dragoons", "OpeningBuildOrder" :
+				["4 x probe", "pylon", "5 x probe", "nexus", "go scout", "probe", "gateway", "probe", "assimilator", "2 x probe", "cybernetics core", "gateway", "2 x probe", "2 x dragoon", "singularity charge"]},
+            "ForgeExpand"			: { "Race" : "Protoss", "OpeningGroup" : "zealots", "OpeningBuildOrder" :
+				["4 x probe", "pylon @ natural", "2 x probe", "forge @ natural", "go scout location", "probe", "photon cannon @ natural", "probe", "photon cannon @ natural", "nexus", "pylon @ macro", "3 x probe", "gateway", "gateway", "pylon"]},
+
+            "4PoolHard"				: { "Race" : "Zerg",    "OpeningBuildOrder" : ["spawning pool", "go scout location", "20 x zergling"] },
+            "4PoolSoft"				: { "Race" : "Zerg",    "OpeningBuildOrder" : ["spawning pool", "go scout location", "drone", "20 x zergling"] },
+            "5Pool"					: { "Race" : "Zerg",    "OpeningBuildOrder" : ["drone", "spawning pool", "go scout location", "2 x drone", "10 x zergling", "hatchery", "drone", "10 x zergling"] },
+
+            "9PoolSpeed"			: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "spawning pool", "go scout location", "drone", "extractor", "go gas until 100", "overlord", "drone", "3 x zergling", "metabolic boost", "5 x zergling", "hatchery", "zergling", "drone", "hatchery @ macro", "3 x zergling", "drone", "4 x zergling", "go start gas", "3 x drone"] },
+            "9PoolHatch"			: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "spawning pool", "drone", "creep colony", "overlord", "drone", "go scout location", "sunken colony", "5 x zergling", "drone", "hatchery @ macro", "5 x zergling", "drone", "extractor", "5 x zergling", "drone", "metabolic boost", "3 x zergling", "lair"] },
+            "9PoolExpo"				: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "spawning pool", "drone", "creep colony", "overlord", "drone", "go scout location", "sunken colony", "6 x zergling", "hatchery @ hidden", "4 x zergling"] },
+
+			"ZvZ_Overpool9Gas"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "overlord", "spawning pool", "go scout location", "drone", "extractor", "go gas until 850", "2 x drone", "3 x zergling", "lair", "zergling", "creep colony", "drone", "sunken colony", "2 x zergling", "drone", "spire", "creep colony", "drone", "sunken colony", "overlord", "zergling", "6 x mutalisk"] },
+			"ZvZ_Overpool11Gas"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "overlord", "spawning pool", "go scout location", "3 x drone", "extractor", "go gas until 750", "3 x zergling", "metabolic boost", "2 x zergling", "lair", "overlord", "drone", "2 x zergling", "spire", "creep colony", "creep colony", "sunken colony", "sunken colony", "2 x zergling", "4 x mutalisk"] },
+			"OverpoolHatch"			: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "overlord", "spawning pool", "go scout location", "3 x drone", "3 x zergling", "hatchery @ macro", "extractor", "go gas until 850", "3 x zergling", "metabolic boost", "2 x zergling", "lair", "drone", "5 x zergling", "spire", "drone", "creep colony", "drone", "sunken colony"] },
+            "OverpoolSpeedling"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "overlord", "spawning pool", "go scout if needed", "2 x drone", "extractor", "go gas until 100", "drone", "4 x zergling", "metabolic boost", "2 x zergling", "hatchery @ natural", "3 x zergling"] },
+			"ZvP_Overpool3Hatch"	: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "overlord", "spawning pool", "go scout if needed", "3 x drone", "3 x zergling", "hatchery @ natural", "hatchery @ min only"] },
+
+			"ZvZ_Overgas11Pool"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["5 x drone", "overlord", "extractor", "go gas until 200", "go scout if needed", "3 x drone", "spawning pool", "3 x drone", "lair", "2 x zergling", "metabolic boost", "go gas until 750", "3 x zergling", "SPIRE", "creep colony", "zergling", "sunken colony", "2 x zergling", "overlord", "6 x mutalisk", "hatchery @ expo", "drone", "2 x zergling", "go start gas"] },
+
+			"9HatchMain9Pool9Gas"	: { "Race" : "Zerg",	"OpeningBuildOrder" : ["5 x drone", "hatchery @ macro", "go scout if needed", "drone", "spawning pool", "drone", "extractor", "go gas until 100", "overlord", "drone", "3 x zergling", "metabolic boost", "3 x zergling", "drone", "9 x zergling"]},
+			"9HatchExpo9Pool9Gas"	: { "Race" : "Zerg",	"OpeningBuildOrder" : ["5 x drone", "hatchery", "go scout location", "drone", "spawning pool", "drone", "extractor", "go gas until 100", "overlord", "drone", "3 x zergling", "metabolic boost", "drone", "9 x zergling"]},
+
+			"OverhatchLing"			: { "Race" : "Zerg",	"OpeningBuildOrder" : ["5 x drone", "overlord", "hatchery @ macro", "drone", "spawning pool", "2 x drone", "go scout location", "extractor", "go gas until 100", "drone", "5 x zergling", "metabolic boost", "12 x zergling", "hatchery", "3 x zergling", "drone", "go start gas"]},
+			"OverhatchMuta"			: { "Race" : "Zerg",	"OpeningBuildOrder" : ["5 x drone", "overlord", "hatchery @ macro", "drone", "spawning pool", "2 x drone", "go scout location", "extractor", "go gas until 350", "drone", "5 x zergling", "metabolic boost", "7 x zergling", "lair", "4 x zergling", "drone", "4 x zergling", "drone", "spire", "go start gas"]},
+
+            "11Gas10Pool"			: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "3 x drone", "extractor", "go gas until 950", "spawning pool", "go scout location", "2 x drone", "Lair", "3 x zergling", "drone", "metabolic boost", "zergling", "overlord", "Spire", "zergling", "drone", "creep colony", "zergling", "sunken colony", "zergling", "6 x mutalisk", "hatchery @ macro", "drone", "2 x zergling", "drone", "2 x zergling", "drone", "2 x zergling", "drone", "2 x zergling", "hatchery", "go start gas"] },
+
+		    "ZvZ_12Pool"		    : { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "spawning pool", "go scout location", "drone", "extractor", "go gas until 950", "hatchery", "3 x zergling", "Lair", "5 x zergling", "SPIRE", "drone", "5 x zergling", "metabolic boost", "overlord", "6 x mutalisk"]},
+		    "ZvT_12Pool"		    : { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "spawning pool", "go scout if needed", "drone", "extractor", "drone", "hatchery", "zergling", "zergling", "Lair", "zergling", "5 x drone", "SPIRE", "6 x drone", "2 x overlord", "extractor", "9 x mutalisk", "4 x drone"]},
+		    "ZvT_13Pool"		    : { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "5 x drone", "go scout location", "spawning pool", "extractor", "2 x drone", "hatchery @ natural", "Lair", "drone", "2 x zergling", "3 x drone", "SPIRE", "drone", "creep colony @ natural", "drone", "sunken colony", "3 x drone", "2 x overlord", "extractor", "12 x mutalisk", "6 x drone"]},
+
+			"ZvT_2HatchMuta"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "go scout if needed", "hatchery", "spawning pool", "extractor", "4 x drone", "3 x zergling", "Lair", "drone", "metabolic boost", "2 x drone", "spire", "3 x drone", "hatchery", "drone", "extractor", "2 x overlord", "12 x mutalisk", "6 x drone"] },
+
+            "3HatchLing"			: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "go scout if needed", "hatchery", "spawning pool", "3 x drone", "3 x zergling", "hatchery @ macro"   , "extractor", "go gas until 100", "5 x zergling",          "metabolic boost", "9 x zergling"]},
+            "3HatchLingExpo"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "go scout if needed", "hatchery", "spawning pool", "3 x drone", "3 x zergling", "hatchery @ min only", "extractor", "go gas until 100", "4 x zergling", "drone", "metabolic boost", "9 x zergling"]},
+            "ZvT_3HatchMuta"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "go scout if needed", "hatchery", "spawning pool", "2 x drone", "hatchery @ min only", "3 x zergling", "2 x drone", "extractor", "5 x drone", "Lair", "3 x drone", "metabolic boost", "3 x zergling", "drone", "extractor", "2 x drone", "Spire", "7 x drone", "3 x zergling", "2 x overlord", "12 x mutalisk", "6 x drone"]},
+
+            "ZvP_3HatchPoolHydra"	: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "hatchery", "3 x drone", "hatchery @ min only", "spawning pool", "extractor", "go scout location", "6 x drone", "zergling", "hydralisk den", "4 x drone", "muscular augments", "4 x drone", "4 x hydralisk"]},
+            "3HatchPoolMuta"		: { "Race" : "Zerg",    "OpeningBuildOrder" : ["4 x drone", "overlord", "4 x drone", "hatchery", "3 x drone", "go scout location", "hatchery", "extractor", "spawning pool", "5 x drone", "lair", "zergling", "7 x drone", "SPIRE", "2 x drone", "extractor", "6 x drone", "2 x overlord", "12 x mutalisk", "extractor", "6 x drone"]}
+		}
+	}
+}
