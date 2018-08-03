@@ -1244,8 +1244,7 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			/ 4);
 
 		//std::cout << "indexFirstChokePoint_OrderPosition : " << indexFirstChokePoint_OrderPosition << ", firstChokePoint_OrderPositionPath" << firstChokePoint_OrderPositionPath.size() << std::endl;
-		//std::cout << endCP->getCenter() << ", " << startCP->getCenter() << ", " << InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() << ", " <<
-			InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition() << std::endl;
+		//std::cout << endCP->getCenter() << ", " << startCP->getCenter() << ", " << InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() << ", " << InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition() << std::endl;
 			
 		std::vector<BWAPI::TilePosition> tileList =
 			BWTA::getShortestPath(BWAPI::TilePosition(startCP->getCenter())
