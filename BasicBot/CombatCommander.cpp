@@ -30,7 +30,7 @@ CombatCommander::CombatCommander()
 	strftime(buf, sizeof(buf), "%Y%m%d%H%M%S_combat", &tstruct);
 
 	log_file_path = Config::Strategy::WriteDir + std::string(buf) + ".log";
-	//std::cout << "log_file_path:" << log_file_path << std::endl;
+	////std::cout << "log_file_path:" << log_file_path << std::endl;
 	/////////////////////////////////////////////////////////////////////////
 	
 }
@@ -63,7 +63,7 @@ void CombatCommander::initializeSquads()
 	float dx = 0, dy = 0;
 	if (targetDepot == nullptr)
 		return;
-	////std::cout << "targetDepot " << targetDepot->getPosition().x/ 32 << " " << targetDepot->getPosition().y/32 << std::endl;
+	//////std::cout << "targetDepot " << targetDepot->getPosition().x/ 32 << " " << targetDepot->getPosition().y/32 << std::endl;
 	dx = (targetDepot->getPosition().x - rDefence_OrderPosition.x)*0.7f;
 	dy = (targetDepot->getPosition().y - rDefence_OrderPosition.y)*0.7f;
 	rDefence_OrderPosition = rDefence_OrderPosition + BWAPI::Position(dx, dy);// (mineralPosition + closestDepot->getPosition()) / 2;
@@ -85,11 +85,11 @@ void CombatCommander::initializeSquads()
 	in_1st_chock_side.first = BWAPI::Position(im.getFirstChokePoint(BWAPI::Broodwar->self())->getSides().first.x + (int)(vecBase2Choke.first*tmpRatio), im.getFirstChokePoint(BWAPI::Broodwar->self())->getSides().first.y + (int)(vecBase2Choke.second*tmpRatio));
 	in_1st_chock_side.second = BWAPI::Position(im.getFirstChokePoint(BWAPI::Broodwar->self())->getSides().second.x + (int)(vecBase2Choke.first*tmpRatio), im.getFirstChokePoint(BWAPI::Broodwar->self())->getSides().second.y + (int)(vecBase2Choke.second*tmpRatio));
 	
-	//std::cout << "base:" << tmpBase << std::endl;
-	//std::cout << "choke:" << tmpChoke << std::endl;
-	//std::cout << "vecBase2Choke:" << vecBase2Choke.first << "," << vecBase2Choke.second << std::endl;
-	//std::cout << "in_1st_chock_center:" << in_1st_chock_center.x / 32 << "," << in_1st_chock_center.y / 32 << std::endl;
-	//std::cout << "in_1st_chock_side:" << in_1st_chock_side.first.x / 32 << "," << in_1st_chock_side.first.y / 32 << "/" << in_1st_chock_side.second.x / 32 << "," << in_1st_chock_side.second.y / 32 << std::endl;
+	////std::cout << "base:" << tmpBase << std::endl;
+	////std::cout << "choke:" << tmpChoke << std::endl;
+	////std::cout << "vecBase2Choke:" << vecBase2Choke.first << "," << vecBase2Choke.second << std::endl;
+	////std::cout << "in_1st_chock_center:" << in_1st_chock_center.x / 32 << "," << in_1st_chock_center.y / 32 << std::endl;
+	////std::cout << "in_1st_chock_side:" << in_1st_chock_side.first.x / 32 << "," << in_1st_chock_side.first.y / 32 << "/" << in_1st_chock_side.second.x / 32 << "," << in_1st_chock_side.second.y / 32 << std::endl;
 	
 
 	SquadOrder defcon1Order(SquadOrderTypes::Idle, rDefence_OrderPosition
@@ -163,7 +163,7 @@ void CombatCommander::update()
     }
 
 	InformationManager & im = InformationManager::Instance();
-
+	//std::cout << "1" << std::endl;
 	if (im.nowCombatStatus == InformationManager::combatStatus::DEFCON1 ||
 		im.nowCombatStatus == InformationManager::combatStatus::DEFCON2 ||
 		im.nowCombatStatus == InformationManager::combatStatus::DEFCON3 ||
@@ -171,10 +171,14 @@ void CombatCommander::update()
 		){
 
 		if (im.changeConmgeStatusFrame == BWAPI::Broodwar->getFrameCount()){
+			//std::cout << "updateIdleSquad" << std::endl;
 			updateIdleSquad();
+			//std::cout << "updateIdleSquad e" << std::endl;
 		}
 		else{
+			//std::cout << "supplementSquad 1" << std::endl;
 			supplementSquad();
+			//std::cout << "supplementSquad 1 e" << std::endl;
 		}
 		
 	}
@@ -182,32 +186,42 @@ void CombatCommander::update()
 		im.nowCombatStatus == InformationManager::combatStatus::MainAttack ||
 		im.nowCombatStatus == InformationManager::combatStatus::EnemyBaseAttack){
 		if (im.changeConmgeStatusFrame == BWAPI::Broodwar->getFrameCount()){
+			//std::cout << "updateAttackSquads" << std::endl;
 			updateAttackSquads();
+			//std::cout << "updateAttackSquads e" << std::endl;
 		}
 		else{
 			//추가병력 세팅
+			//std::cout << "supplementSquad 2" << std::endl;
 			supplementSquad();
+			//std::cout << "supplementSquad 2 e" << std::endl;
 		}
 	}
-
+	//std::cout << "2" << std::endl;
 	//드롭스쿼드는 별도로 운영 : 우리 전장 상태와 무관
 	if (isSquadUpdateFrame())
 	{
+		//std::cout << "3" << std::endl;
 		if (im.nowCombatStatus == InformationManager::combatStatus::DEFCON4)
 		{
 			Squad & defcon4Squad = _squadData.getSquad("DEFCON4");
-			if (getPoint_DEFCON4() == im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter())
-			{
-				SquadOrder defcon4Order(SquadOrderTypes::Idle, im.getSecondChokePoint(im.selfPlayer)->getCenter(),
-					BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + 60, im.getSecondChokePoint(im.selfPlayer)->getSides(), "DEFCON4");
-				defcon4Squad.setSquadOrder(defcon4Order);
-			}
-			else
-			{
-				
-				SquadOrder defcon4Order(SquadOrderTypes::Idle, getPoint_DEFCON4(),
-					BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + defcon4Squad.getUnits().size() * 3  , "DEFCON4");
-				defcon4Squad.setSquadOrder(defcon4Order);
+
+			BWAPI::Position positionDefcon4 = getPoint_DEFCON4();
+
+			if (positionDefcon4 != BWAPI::Position(-1, -1)) {
+				if (getPoint_DEFCON4() == im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter())
+				{
+					SquadOrder defcon4Order(SquadOrderTypes::Idle, im.getSecondChokePoint(im.selfPlayer)->getCenter(),
+						BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + 60, im.getSecondChokePoint(im.selfPlayer)->getSides(), "DEFCON4");
+					defcon4Squad.setSquadOrder(defcon4Order);
+				}
+				else
+				{
+
+					SquadOrder defcon4Order(SquadOrderTypes::Idle, getPoint_DEFCON4(),
+						BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + defcon4Squad.getUnits().size() * 3, "DEFCON4");
+					defcon4Squad.setSquadOrder(defcon4Order);
+				}
 			}
 		}
 		//어택포지션 변경
@@ -232,18 +246,19 @@ void CombatCommander::update()
 				}
 			}
 		}
-
+		//std::cout << "4" << std::endl;
 		updateScoutSquads();
-
+		//std::cout << "5" << std::endl;
 		if (im.nowCombatStatus < InformationManager::combatStatus::DEFCON4)//초반에만 벙커를 설치한다고 가정하고,
 			updateBunkertSquads();
-
+		//std::cout << "6" << std::endl;
 		updateSmallAttackSquad();
-
+		//std::cout << "7" << std::endl;
 		updateDropSquads();
 	}
-	
+	//std::cout << "8" << std::endl;
 	_squadData.update();
+	//std::cout << "9" << std::endl;
 	drawSquadInformation(20, 200);
 	Micro::drawAPM(10, 150);
 }
@@ -346,7 +361,7 @@ void CombatCommander::updateIdleSquad()
 			if (candidateS4D != nullptr)
 			{
 				if (_squadData.canAssignUnitToSquad(candidateS4D, s4dSquad)){
-					//std::cout << "set S4D:" << candidateS4D->getID() << std::endl;
+					////std::cout << "set S4D:" << candidateS4D->getID() << std::endl;
 					_squadData.assignUnitToSquad(candidateS4D, s4dSquad);
 				}
 					
@@ -606,7 +621,7 @@ void CombatCommander::updateDefenseSquadUnits(Squad & defenseSquad, const size_t
 	const BWAPI::Unitset & squadUnits = defenseSquad.getUnits();
     size_t flyingDefendersInSquad = std::count_if(squadUnits.begin(), squadUnits.end(), UnitUtils::CanAttackAir);
     size_t groundDefendersInSquad = std::count_if(squadUnits.begin(), squadUnits.end(), UnitUtils::CanAttackGround);
-	////std::cout << "flyingDefendersInSquad " << flyingDefendersInSquad << " groundDefendersInSquad " << groundDefendersInSquad << std::endl;
+	//////std::cout << "flyingDefendersInSquad " << flyingDefendersInSquad << " groundDefendersInSquad " << groundDefendersInSquad << std::endl;
 
     // add flying defenders if we still need them
     size_t flyingDefendersAdded = 0;
@@ -1143,7 +1158,7 @@ void CombatCommander::updateComBatStatus(const BWAPI::Unitset & combatUnits)
 
 			if (BWTA::getRegion(BWAPI::TilePosition(unit->getPosition())) == myRegion)
 			{
-				////std::cout << "enemyUnits In My Region " << std::endl;
+				//////std::cout << "enemyUnits In My Region " << std::endl;
 				enemyUnitsInRegion.insert(unit);
 			}
 		}
@@ -1228,10 +1243,15 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			+ InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition())
 			/ 4);
 
+		//std::cout << "indexFirstChokePoint_OrderPosition : " << indexFirstChokePoint_OrderPosition << ", firstChokePoint_OrderPositionPath" << firstChokePoint_OrderPositionPath.size() << std::endl;
+		//std::cout << endCP->getCenter() << ", " << startCP->getCenter() << ", " << InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() << ", " <<
+			InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition() << std::endl;
+			
 		std::vector<BWAPI::TilePosition> tileList =
 			BWTA::getShortestPath(BWAPI::TilePosition(startCP->getCenter())
 			, BWAPI::TilePosition(newTargetPosition));
-		indexFirstChokePoint_OrderPosition = 0;
+		// index 문제로 주석처리
+		//indexFirstChokePoint_OrderPosition = 0;
 		for (auto & t : tileList) {
 			BWAPI::Position tp(t.x * 32, t.y * 32);
 			if (!tp.isValid())
@@ -1267,7 +1287,14 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			return firstChokePoint_OrderPositionPath[indexFirstChokePoint_OrderPosition];
 		}
 	}
-	return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() / 2];
+
+	if (firstChokePoint_OrderPositionPath.size() == 0) {
+		return BWAPI::Position(-1, -1);
+	}
+	else {
+		return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() / 2];
+	}
+	
 }
 
 void CombatCommander::supplementSquad(){
