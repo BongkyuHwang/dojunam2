@@ -40,6 +40,14 @@ void Squad::update()
 		std::vector<BWAPI::Unitset> ud = _units_divided(2);
 		int tmpCnt = 0;
 		BWAPI::Unitset bak_units = _units;
+
+		std::vector<BWAPI::Position> unitPositions;
+
+		for (auto wallUnit : InformationManager::Instance().getWallUnits()) {
+			if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Supply_Depot) {
+				unitPositions.push_back(wallUnit->getPosition());
+			}
+		}
 		for (auto u : ud){
 			_units = u;
 
@@ -49,7 +57,9 @@ void Squad::update()
 					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
 					{
 						{
-							_order.setPosition(BWAPI::Position(InformationManager::Instance().getWallPositions()[0]));
+							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
+							//_order.setPosition(BWAPI::Position(InformationManager::Instance().getWallPositions()[0]));
+							_order.setPosition(BWAPI::Position(unitPositions[0]));
 						}
 					}
 					else
@@ -61,7 +71,8 @@ void Squad::update()
 					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
 					{
 						{
-							_order.setPosition(BWAPI::Position(InformationManager::Instance().getWallPositions()[1]));
+							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
+							_order.setPosition(BWAPI::Position(unitPositions[1]));
 						}
 					}
 					else
