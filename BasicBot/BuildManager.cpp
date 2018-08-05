@@ -532,12 +532,12 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 		case BuildOrderItem::SeedPositionStrategy::SecondChokePoint:
 			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation;
 			break;
-		case BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation:
-		case BuildOrderItem::SeedPositionStrategy::SeedPositionSpecified:
-		case BuildOrderItem::SeedPositionStrategy::MainBaseOppositeChock:
 		case BuildOrderItem::SeedPositionStrategy::LowComplexityExpansionLocation:
 			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::MainBaseLocation;
 			break;
+		case BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation:
+		case BuildOrderItem::SeedPositionStrategy::SeedPositionSpecified:
+		case BuildOrderItem::SeedPositionStrategy::MainBaseOppositeChock:
 		default:
 			findAnotherPlace = false;
 			break;
