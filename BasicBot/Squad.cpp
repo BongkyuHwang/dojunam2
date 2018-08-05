@@ -33,7 +33,7 @@ void Squad::update()
 			return;
 		}
 		// update all necessary unit information within this squad
-		_order.setCenterPosition(BWAPI::Position(0, 0));
+		_order.setCenterPosition(BWAPI::Positions::None);
 		
 		BWAPI::Broodwar->drawCircleMap(_order.getPosition(), _order.getRadius(), BWAPI::Colors::Cyan, false);
 
@@ -54,7 +54,7 @@ void Squad::update()
 			if (tmpCnt == 0){
 				
 				if (_order.getLine().first != BWAPI::Positions::None){
-					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus() && unitPositions.size() > 0)
+					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
 					{
 						{
 							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
@@ -68,7 +68,7 @@ void Squad::update()
 			}
 			else{
 				if (_order.getLine().second != BWAPI::Positions::None){
-					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus() && unitPositions.size() > 1)
+					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
 					{
 						{
 							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
@@ -133,7 +133,7 @@ void Squad::update()
 	}
 	else{
 		// update all necessary unit information within this squad
-		_order.setCenterPosition(BWAPI::Position(0, 0));
+		_order.setCenterPosition(BWAPI::Positions::None);
 		updateUnits();
 
 		// determine whether or not we should regroup
@@ -182,14 +182,12 @@ void Squad::updateUnits()
 	}
 	setNearEnemyUnits();
 	addUnitsToMicroManagers();
-	// calcCenter 함수 중복호출 제거
-	BWAPI::Position center = calcCenter();
-	if (center == BWAPI::Position(0, 0))
+	if (calcCenter() == BWAPI::Positions::None)
 	{
 		_order.setCenterPosition(_order.getPosition());
 	}
 	else
-		_order.setCenterPosition(center);
+		_order.setCenterPosition(calcCenter());
 }
 
 void Squad::setAllUnits()
@@ -239,7 +237,7 @@ void Squad::setAllUnits()
 		_order.setOrganicUnits(organicUnits);
 
 	if (organicUnits.size() != 0)
-		_order.setClosestUnit(unitClosestToEnemyForOrder());
+		_order.setClosestUnit(unitClosestToEnemy());
 	if (_order.getClosestUnit() == nullptr)
 		_order.setClosestUnit(nullptr);
 }
@@ -473,34 +471,44 @@ BWAPI::Unit Squad::unitClosestToEnemy()
 	BWAPI::Unit closest = nullptr;
 	int closestDist = 100000;
 
-	for (auto & unit : _units)
+	//if (!closest)
+	if (BWAPI::Broodwar->enemy()->getStartLocation() == BWAPI::TilePositions::Invalid
+		|| BWAPI::Broodwar->enemy()->getStartLocation() == BWAPI::TilePositions::None
+		|| BWAPI::Broodwar->enemy()->getStartLocation() == BWAPI::TilePositions::Unknown)
 	{
-		if (unit->getType() == BWAPI::UnitTypes::Protoss_Observer)
-		{
-			continue;
-		}
-
-		// the distance to the order position
-		int dist = MapTools::Instance().getGroundDistance(unit->getPosition(), _order.getPosition());
-
-		if (dist != -1 && (!closest || dist < closestDist))
-		{
-			closest = unit;
-			closestDist = dist;
-		}
+		closest = nullptr;
 	}
-
-	if (!closest)
+	else
 	{
+
 		for (auto & unit : _units)
 		{
-			if (unit->getType() == BWAPI::UnitTypes::Protoss_Observer)
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel)
 			{
 				continue;
 			}
 
 			// the distance to the order position
 			int dist = unit->getDistance(BWAPI::Position(BWAPI::Broodwar->enemy()->getStartLocation()));
+
+			if (dist != -1 && (!closest || dist < closestDist))
+			{
+				closest = unit;
+				closestDist = dist;
+			}
+		}
+	}
+	if (closest == nullptr)
+	{
+		for (auto & unit : _units)
+		{
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel)
+			{
+				continue;
+			}
+
+			// the distance to the order position
+			int dist = MapTools::Instance().getGroundDistance(unit->getPosition(), _order.getPosition());
 
 			if (dist != -1 && (!closest || dist < closestDist))
 			{

@@ -34,12 +34,20 @@ void VultureManager::miningPositionSetting()
 			continue;
 		chokePointForVulture.push_back(chokepoint->getCenter());
 	}
+
+	chokePointCount = chokePointForVulture.size();
+	for (BWTA::BaseLocation * startLocation : BWTA::getStartLocations())
+	{
+		if (startLocation != InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()))
+			chokePointForVulture.push_back(startLocation->getPosition());
+	}
+
 	float offset = 0.4f;
 	if (InformationManager::Instance().getMapName() == 'H')
 	{
 		offset = 0.65;
 	}
-	BWAPI::Position marker = BWAPI::Position(tileList[(int)(tileList.size()*offset)]);
+	/*BWAPI::Position marker = BWAPI::Position(tileList[(int)(tileList.size()*offset)]);
 	if (marker.isValid())
 	{
 		float mx = marker.x - enemySecChokePoint->getCenter().x;
@@ -56,9 +64,8 @@ void VultureManager::miningPositionSetting()
 				}
 			}
 		}
-	}
+	}*/
 
-	chokePointCount = chokePointForVulture.size();
 	
 	for (auto & t : tileList) {
 		BWAPI::Position tp(t.x*32, t.y*32);
@@ -68,7 +75,32 @@ void VultureManager::miningPositionSetting()
 			continue;
 		if (tp.getDistance(mysecChokePoint->getCenter()) < 300)
 			continue;		
-		chokePointForVulture.push_back(tp);
+		BWAPI::Position nt = tp + BWAPI::Position(32, 0);
+		if (nt.isValid())
+		{
+			chokePointForVulture.push_back(nt);
+		}
+		nt = tp + BWAPI::Position(-32, 0);
+		if (nt.isValid())
+		{
+			chokePointForVulture.push_back(nt);
+		}
+		nt = tp + BWAPI::Position(32, 32);
+		if (nt.isValid())
+		{
+			chokePointForVulture.push_back(nt);
+		}
+		nt = tp + BWAPI::Position(0, 32);
+		if (nt.isValid())
+		{
+			chokePointForVulture.push_back(nt);
+		}
+		nt = tp + BWAPI::Position(0, -32);
+		if (nt.isValid())
+		{
+			chokePointForVulture.push_back(nt);
+		}
+		//chokePointForVulture.push_back(tp);
 	}
 
 	miningOn = true;
@@ -157,13 +189,23 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				// find the best target for this zealot
 				BWAPI::Unit target = getTarget(vultureUnit, vultureUnitTargets);
 				////std::cout << " vulture target distance " << target->getDistance(order.getPosition()) << " / order Radius : " << order.getRadius() << std::endl;
-				//if (target->getDistance(order.getPosition()) > order.getRadius() )
-				//{					
-				//	vultureUnit->move(order.getPosition());
-				//}
-				//else
+				if (target->getType().isBuilding() && target->getDistance(vultureUnit) > vultureUnit->getType().groundWeapon().maxRange() *0.4)
+				{	
+					if (vultureUnit->getSpiderMineCount() > 0)
+						Micro::SmartLaySpiderMine(vultureUnit, vultureUnit->getPosition());
+					else
+						vultureUnit->move(order.getPosition());
+					continue;
+				}
+				else if (target->getType().isBuilding())
+				{
+					Micro::SmartAttackUnit(vultureUnit, target);
+					continue;
+				}
+				else
 				{
 					Micro::MutaDanceTarget(vultureUnit, target);
+					continue;
 				}
 			}
 			// if there are no targets
@@ -178,52 +220,99 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 							Micro::SmartAttackMove(vultureUnit, order.getPosition());
 							continue;
 						}
+						else
+						{
+							if (vultureUnit->getSpiderMineCount() > 1)
+							{
+								Micro::SmartLaySpiderMine(vultureUnit, vultureUnit->getPosition());
+								continue;
+							}
+						}
 					}
-
-					if (vultureUnit->getSpiderMineCount() > 0 && chokePointForVulture.size() > 0 && !vultureUnit->isStuck() && InformationManager::Instance().rushState == 0)//&& (miningUnit == nullptr || miningUnit == vultureUnit) && !vultureUnit->isStuck())
+					else if (vultureUnit->getSpiderMineCount() > 0 && chokePointForVulture.size() > 0 
+						&& !vultureUnit->isStuck() && InformationManager::Instance().rushState == 0)//&& (miningUnit == nullptr || miningUnit == vultureUnit) && !vultureUnit->isStuck())
 					{
 						BWAPI::Position mineSetPosition = vultureUnit->getPosition();
 						//@도주남 김지훈 스파이더마인 설치를 지나가는 패스에 우선적으로 설치한다.
-						if (chokePointForVulture.size() <= chokePointCount)
-							mineSetPosition = chokePointForVulture[(vultureUnit->getID() + vultureUnit->getSpiderMineCount()) % chokePointForVulture.size()];
-						else
-						{	
-							mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1 - vultureUnit->getID() % 3];
-							if (vultureUnit->isUnderAttack())
-							{
-								chokePointForVulture.pop_back();
-								Micro::SmartMove(vultureUnit, order.getPosition());
-								continue;
-							}
+						//if (chokePointForVulture.size() <= chokePointCount)
+						//	mineSetPosition = chokePointForVulture[(vultureUnit->getID() + vultureUnit->getSpiderMineCount()) % chokePointForVulture.size()];
+						//else
+						//{	
+						//	mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1 - vultureUnit->getID() % 3];
+						//	if (vultureUnit->isUnderAttack())
+						//	{
+						//		chokePointForVulture.pop_back();
+						//		Micro::SmartMove(vultureUnit, order.getPosition());
+						//		continue;
+						//	}
 
+						//	for (auto & ifmine : BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)))
+						//	{
+						//		if (ifmine->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine)
+						//		{
+						//			chokePointForVulture.pop_back();
+						//			break;
+						//		}
+						//	}
+						//}
+
+						//while (!vultureUnit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, mineSetPosition) || BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)).size() > 1)
+						//{
+						//	if (vultureUnit->getID() % 4 == 0)
+						//		mineSetPosition += BWAPI::Position(1, 1);
+						//	else if (vultureUnit->getID() % 4 == 1)
+						//		mineSetPosition += BWAPI::Position(0, -1);
+						//	else if (vultureUnit->getID() % 4 == 2)
+						//		mineSetPosition += BWAPI::Position(-2, 0);
+						//	else if (vultureUnit->getID() % 4 == 3)
+						//		mineSetPosition += BWAPI::Position(-1, -1);
+						//	if (!mineSetPosition.isValid())
+						//	{
+						//		mineSetPosition = vultureUnit->getPosition();
+						//		//break;
+						//	}
+						//}
+						mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1];
+						// 벌처가 마인을 설치해야 하는 위치중 제일 마지막 위치를 가져오고, 해당위치가 유효 한 경우에만 마인을 설치한다.
+						bool position_invalid = true;
+						while (position_invalid)
+						{
+							if (chokePointForVulture.size() <= 0)
+							{
+								position_invalid = true;
+								break;
+							}
+							position_invalid = false;
 							for (auto & ifmine : BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)))
 							{
-								if (ifmine->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine)
+								if (ifmine->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine || ifmine->getType().isBuilding())
 								{
-									chokePointForVulture.pop_back();
+									if (chokePointForVulture.size() > 1)
+									{
+										mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 2];
+										chokePointForVulture.pop_back();
+									}
+									else if (chokePointForVulture.size() > 0)
+										chokePointForVulture.pop_back();
+									position_invalid = true;
 									break;
 								}
 							}
 						}
-
-						while (!vultureUnit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, mineSetPosition) || BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)).size() > 1)
+						//만약 벌처가 공격을 받고 있으면 // 마인 설치를 포기하고 부대 위치로 복귀한다.
+						if (vultureUnit->isUnderAttack())
 						{
-							if (vultureUnit->getID() % 4 == 0)
-								mineSetPosition += BWAPI::Position(1, 1);
-							else if (vultureUnit->getID() % 4 == 1)
-								mineSetPosition += BWAPI::Position(0, -1);
-							else if (vultureUnit->getID() % 4 == 2)
-								mineSetPosition += BWAPI::Position(-2, 0);
-							else if (vultureUnit->getID() % 4 == 3)
-								mineSetPosition += BWAPI::Position(-1, -1);
-							if (!mineSetPosition.isValid())
-							{
-								mineSetPosition = vultureUnit->getPosition();
-								//break;
-							}
+							if (chokePointForVulture.size() > 0)
+								chokePointForVulture.pop_back();
+							Micro::SmartMove(vultureUnit, order.getPosition());
+							position_invalid = true;
+							continue;
 						}
-						Micro::SmartLaySpiderMine(vultureUnit, mineSetPosition);
-						continue;
+						if (!position_invalid)
+						{
+							Micro::SmartLaySpiderMine(vultureUnit, mineSetPosition);
+							continue;
+						}
 					}
 				}
 

@@ -40,19 +40,24 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	for (auto & detectorUnit : detectorUnits)
 	{
 		BWAPI::Unit target = closestCloakedUnit(cloakedUnits, detectorUnit);
+
+		if (detectorUnit->isUnderAttack())
+			detectorUnitInBattle = true;
+
 		if (target)
 		{
 			double nearLTD = UnitUtils::getNearByLTD(BWAPI::Broodwar->enemy(), detectorUnit, target->getType().airWeapon().maxRange());
 			if (nearLTD >= detectorUnit->getHitPoints())
 			{
-				detectorUnit->move(order.getPosition());
+				detectorUnit->move(order.getCenterPosition());
+				//Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
 				continue;
 			}
 		}
 
-		if (target && target->getDistance(order.getPosition()) > order.getRadius() + target->getType().airWeapon().maxRange() - 32 && target->getPosition().isValid())
+		if (target && target->getDistance(detectorUnit->getPosition()) > target->getType().airWeapon().maxRange() - 32 && target->getPosition().isValid())
 		{
-			detectorUnit->move(order.getPosition());
+			detectorUnit->move(target->getPosition());
 			continue;
 		}
 		else if (target)
@@ -61,19 +66,22 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss)
 			{
 				detectorUnit->useTech(BWAPI::TechTypes::EMP_Shockwave, target);
+				continue;
 			}
 			else if (detectorUnit->canUseTechUnit(BWAPI::TechTypes::Irradiate, target)
 				&& BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Zerg)
 			{
 				detectorUnit->useTech(BWAPI::TechTypes::Irradiate, target);
+				continue;
 			}
 		}
 	
 		// if we need to regroup, move the detectorUnit to that location
 		if (!detectorUnitInBattle && unitClosestToEnemy && unitClosestToEnemy->getPosition().isValid())
 		{
-			Micro::SmartMove(detectorUnit, order.getPosition());
+			Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
 			detectorUnitInBattle = true;
+			continue;
 		}
 		// otherwise there is no battle or no closest to enemy so we don't want our detectorUnit to die
 		// send him to scout around the map
@@ -81,18 +89,26 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 		{
 			BWAPI::Position explorePosition = MyBot::MapGrid::Instance().getLeastExplored();
 			Micro::SmartMove(detectorUnit, explorePosition);
+			continue;
 		}
-		if (detectorUnitInBattle && unitClosestToEnemy && detectorUnit->canUseTechUnit(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy) && unitClosestToEnemy->isAttackFrame())
+
+		if (unitClosestToEnemy && detectorUnit->canUseTechUnit(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy) 
+			&& (unitClosestToEnemy->isAttackFrame() || unitClosestToEnemy->isUnderAttack() || detectorUnit->isUnderAttack()))
 		{
 			if (!detectorUnit->useTech(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy))
+			{
 				detectorUnit->move(order.getClosestUnit()->getPosition());
+				continue;
+			}
 			else
 			{
 				detectorUnit->useTech(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy);
+				continue;
 			}
 		}
-		if (detectorUnit->getPosition().getDistance(order.getPosition()) < 30)
+		if (detectorUnitInBattle && detectorUnit->getPosition().getDistance(order.getPosition()) < 30)
 		{
+			detectorUnit->move(order.getCenterPosition());
 			continue;
 		}
 	}
@@ -103,6 +119,8 @@ BWAPI::Unit DetectorManager::closestCloakedUnit(const BWAPI::Unitset & cloakedUn
 {
 	BWAPI::Unit closestCloaked = nullptr;
 	double closestDist = 100000;
+	double closestDist_normal = 100000;
+	BWAPI::Unit closestTarget = nullptr;
 
 	for (auto & unit : cloakedUnits)
 	{
@@ -117,7 +135,20 @@ BWAPI::Unit DetectorManager::closestCloakedUnit(const BWAPI::Unitset & cloakedUn
 				closestDist = dist;
 			}
 		}
+		else
+		{
+			double dist = unit->getDistance(detectorUnit);
+
+			if (!closestTarget || (dist < closestDist_normal))
+			{
+				closestTarget = unit;
+				closestDist_normal = dist;
+			}
+		}
 	}
+
+	if (closestCloaked == nullptr)
+		return closestTarget;
 
 	return closestCloaked;
 }

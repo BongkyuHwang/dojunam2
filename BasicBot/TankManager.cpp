@@ -31,7 +31,10 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 		{
 			if (tank->getDistance(order.getPosition()) > 32)
 			{
-				tank->move(order.getPosition());
+				if (tank->isSieged())
+					tank->unsiege();
+				else
+					tank->move(order.getPosition());
 			}
 			else
 			{
