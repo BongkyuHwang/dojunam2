@@ -29,6 +29,7 @@ Squad::~Squad()
 void Squad::update()
 {
 	if (_name == "DEFCON2" || _name == "DEFCON4"){
+		
 		if (_units.size() == 0){
 			return;
 		}
@@ -59,7 +60,7 @@ void Squad::update()
 						{
 							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
 							//_order.setPosition(BWAPI::Position(InformationManager::Instance().getWallPositions()[0]));
-							_order.setPosition(BWAPI::Position(unitPositions[0]));
+							_order.setPosition(unitPositions[0]);
 						}
 					}
 					else
@@ -72,7 +73,7 @@ void Squad::update()
 					{
 						{
 							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
-							_order.setPosition(BWAPI::Position(unitPositions[1]));
+							_order.setPosition(unitPositions[1]);
 						}
 					}
 					else
@@ -81,19 +82,28 @@ void Squad::update()
 			}
 
 			tmpCnt++;
-
 			updateUnits();
-
 			// determine whether or not we should regroup
 			// if we do need to regroup, do it
+
 			_meleeManager.execute(_order);
 			_rangedManager.execute(_order);
 			_vultureManager.execute(_order);
 			_medicManager.execute(_order);
 			_tankManager.execute(_order);
+
 			_transportManager.update();
-			_detectorManager.setUnitClosestToEnemy(unitClosestToEnemy());
-			_detectorManager.execute(_order);
+
+			//std::cout << "s if 3" << std::endl;
+			// unitClosestToEnemy nullptr 리턴할경우 예외처리
+
+			BWAPI::Unit cloesetUnit = unitClosestToEnemy();
+			if (cloesetUnit != nullptr) {
+				_detectorManager.setUnitClosestToEnemy(unitClosestToEnemy());
+				_detectorManager.execute(_order);
+			}
+
+			//std::cout << "s if 4" << std::endl;
 		}
 
 		_units = bak_units;
@@ -132,6 +142,7 @@ void Squad::update()
 		}
 	}
 	else{
+		
 		// update all necessary unit information within this squad
 		_order.setCenterPosition(BWAPI::Positions::None);
 		updateUnits();
@@ -153,8 +164,14 @@ void Squad::update()
 		_medicManager.execute(_order);
 		_tankManager.execute(_order);
 		_transportManager.update();
-		_detectorManager.setUnitClosestToEnemy(unitClosestToEnemy());
-		_detectorManager.execute(_order);
+		//std::cout << "s else 3" << std::endl;
+		// unitClosestToEnemy nullptr 리턴할경우 예외처리
+		BWAPI::Unit cloesetUnit = unitClosestToEnemy();
+		if (cloesetUnit != nullptr) {
+			_detectorManager.setUnitClosestToEnemy(unitClosestToEnemy());
+			_detectorManager.execute(_order);
+		}
+		//std::cout << "s else 4" << std::endl;
 	}
 }
 
