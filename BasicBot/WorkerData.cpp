@@ -201,6 +201,9 @@ void WorkerData::setWorkerJob(BWAPI::Unit unit, enum WorkerJob job, BWAPI::Unit 
 		workerDepotMap[unit] = jobUnit;
 
         BWAPI::Unit mineralToMine = getMineralToMine(unit);
+		if (mineralToMine == nullptr) {
+			std::cout << "mineral null" << std::endl;
+		}
         workerMineralAssignment[unit] = mineralToMine;
         addToMineralPatch(mineralToMine, 1);
 
