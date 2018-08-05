@@ -195,7 +195,6 @@ void CombatCommander::update()
 		//std::cout << "3" << std::endl;
 		if (im.nowCombatStatus == InformationManager::combatStatus::DEFCON4)
 		{
-			std::cout << "DEFCON4" << std::endl;
 			Squad & defcon4Squad = _squadData.getSquad("DEFCON4");
 
 			BWAPI::Position positionDefcon4 = getPoint_DEFCON4();
