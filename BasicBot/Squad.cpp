@@ -54,7 +54,7 @@ void Squad::update()
 			if (tmpCnt == 0){
 				
 				if (_order.getLine().first != BWAPI::Positions::None){
-					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
+					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus() && unitPositions.size() > 0)
 					{
 						{
 							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
@@ -68,7 +68,7 @@ void Squad::update()
 			}
 			else{
 				if (_order.getLine().second != BWAPI::Positions::None){
-					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
+					if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus() && unitPositions.size() > 1)
 					{
 						{
 							// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
@@ -182,12 +182,14 @@ void Squad::updateUnits()
 	}
 	setNearEnemyUnits();
 	addUnitsToMicroManagers();
-	if (calcCenter() == BWAPI::Position(0, 0))
+	// calcCenter 함수 중복호출 제거
+	BWAPI::Position center = calcCenter();
+	if (center == BWAPI::Position(0, 0))
 	{
 		_order.setCenterPosition(_order.getPosition());
 	}
 	else
-		_order.setCenterPosition(calcCenter());
+		_order.setCenterPosition(center);
 }
 
 void Squad::setAllUnits()
