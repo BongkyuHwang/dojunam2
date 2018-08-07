@@ -130,7 +130,7 @@ namespace MyBot
 		/// 모든 Combat 일꾼 유닛에 대해 임무를 해제합니다
 		void        stopCombat();
 	
-		void		setScoutCombatWorker(BWAPI::Unit worker);
+		void		setScoutCombatWorker(BWAPI::Unit worker, BWAPI::Unit unitToAttack);
 
 		double		getGroundDistance(BWAPI::Position from, BWAPI::Position to);
 	};

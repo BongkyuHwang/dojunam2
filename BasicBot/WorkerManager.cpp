@@ -131,7 +131,8 @@ void WorkerManager::updateWorkerStatus()
 				&& (workerData.getWorkerJob(worker) != WorkerData::Move)
 				&& (workerData.getWorkerJob(worker) != WorkerData::Scout)
 				&& (workerData.getWorkerJob(worker) != WorkerData::BunkerReapir)
-				&& (workerData.getWorkerJob(worker) != WorkerData::ScoutCombat))
+				&& (workerData.getWorkerJob(worker) != WorkerData::ScoutCombat)
+				)
 			{
 				workerData.setWorkerJob(worker, WorkerData::Idle, nullptr);
 			}
@@ -192,8 +193,18 @@ void WorkerManager::handleGasWorkers()
 				targetNumGasWorker = Config::Macro::WorkersPerRefinery;
 			}
 
-			if (getNumMineralWorkers() < 4) {
+			int numMineralWorkers = getNumMineralWorkers();
+			if (numMineralWorkers < 7) {
 				targetNumGasWorker = 0;
+			}
+			else if (numMineralWorkers == 7) {
+				targetNumGasWorker = 1;
+			}
+			else if (numMineralWorkers == 8){
+				targetNumGasWorker = 2;
+			}
+			else {
+				targetNumGasWorker = 3;
 			}
 
 			if (numAssigned > targetNumGasWorker) {
@@ -358,16 +369,17 @@ void WorkerManager::handleCombatWorkers()
 }
 void WorkerManager::handleScoutCombatWorker() {
 	BWTA::BaseLocation * selfBaseLocation = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self());
-	
+	BWAPI::Unitset currentEnemyWorker;
 
 	//일꾼처리 
-	
 	for (auto & unit : BWAPI::Broodwar->enemy()->getUnits())
 	{
 		if (unit->getType().isWorker())
 		{
-			if (_enemyworkerUnits.contains(unit))
+			if (_enemyworkerUnits.contains(unit)) {
+				currentEnemyWorker.insert(unit);
 				continue;
+			}
 			
 			if (BWTA::getRegion(BWAPI::TilePosition(unit->getPosition())) == InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getRegion())
 			{
@@ -378,14 +390,49 @@ void WorkerManager::handleScoutCombatWorker() {
 					if (WorkerManager::Instance().getWorkerData().getWorkerJob(worker) == WorkerData::Minerals && worker->isCompleted() == true)
 					{
 						_enemyworkerUnits.insert(unit);
-						setScoutCombatWorker(unit);
-						CommandUtil::attackUnit(worker, unit);
-						return;
+						currentEnemyWorker.insert(unit);
+						setScoutCombatWorker(worker, unit);
+						
+						break;
 					}
 				}
 			}
 		}
 	}
+	for (auto it = _enemyworkerUnits.begin(); it != _enemyworkerUnits.end();) {
+		
+		if (*it == nullptr) {
+			it = _enemyworkerUnits.erase(it);
+		}
+		else {
+			bool flag = false;
+			for (auto it2 = currentEnemyWorker.begin(); it2 != currentEnemyWorker.end();) {
+				if (*it2 == nullptr) {
+					it2++;
+					continue;
+				}
+				if ((*it)->getID() == (*it2)->getID()) {
+					flag = true;
+					break;
+				}
+				else {
+					it2++;
+				}
+			}
+			if (flag == false) {
+				BWAPI::Unit worker = workerData.getScoutCombatWorkerAssignedUnit(*it);
+				if (worker != nullptr) {
+					setMineralWorker(worker);
+				}
+				
+				it = _enemyworkerUnits.erase(it);
+			}
+			else {
+				it++;
+			}
+		}
+	}
+	
 }
 
 
@@ -1042,11 +1089,11 @@ void WorkerManager::setCombatWorker(BWAPI::Unit worker)
 	workerData.setWorkerJob(worker, WorkerData::Combat, nullptr);
 }
 
-void WorkerManager::setScoutCombatWorker(BWAPI::Unit worker)
+void WorkerManager::setScoutCombatWorker(BWAPI::Unit worker, BWAPI::Unit unitToAttack)
 {
 	if (!worker) return;
 
-	workerData.setWorkerJob(worker, WorkerData::ScoutCombat, nullptr);
+	workerData.setWorkerJob(worker, WorkerData::ScoutCombat, unitToAttack);
 }
 
 void WorkerManager::setRepairWorker(BWAPI::Unit worker, BWAPI::Unit unitToRepair)

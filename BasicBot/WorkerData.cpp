@@ -236,13 +236,10 @@ void WorkerData::setWorkerJob(BWAPI::Unit unit, enum WorkerJob job, BWAPI::Unit 
 			}
 		}
     }
-	else if (job == Scout)
-	{
-
+	else if (job == ScoutCombat) {
+		workerScoutCombatMap[unit] = jobUnit;
+		CommandUtil::attackUnit(unit, jobUnit);
 	}
-    else if (job == Build)
-    {
-    }
 	else if (job == BunkerReapir)
 	{
 		// only SCV can repair
@@ -336,6 +333,10 @@ void WorkerData::clearPreviousJob(BWAPI::Unit unit)
 	else if (previousJob == Move)
 	{
 		workerMoveMap.erase(unit);
+	}
+	// scout combat worker 삭제
+	else if (previousJob == ScoutCombat) {
+		workerScoutCombatMap.erase(unit);
 	}
 
 	workerJobMap.erase(unit);
@@ -734,6 +735,7 @@ char WorkerData::getJobCode(BWAPI::Unit unit)
 	if (j == WorkerData::BunkerReapir) return 'U';
 	if (j == WorkerData::Move) return 'O';
 	if (j == WorkerData::Scout) return 'S';
+	if (j == WorkerData::Scout) return 'T';
 	if (j == WorkerData::Block) return 'K';
 	return 'X';
 }
@@ -753,4 +755,14 @@ int WorkerData::getDepotWorkerCount(BWAPI::Unit &u){
 		return -1;
 	}
 
+}
+
+BWAPI::Unit WorkerData::getScoutCombatWorkerAssignedUnit(BWAPI::Unit enemy) {
+
+	for (auto & it : workerScoutCombatMap) {
+		if (it.second->getID() == enemy->getID()) {
+			return it.first;
+		}
+	}
+	return nullptr;
 }

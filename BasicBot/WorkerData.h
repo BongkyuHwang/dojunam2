@@ -56,9 +56,10 @@ namespace MyBot
 		std::map<BWAPI::Unit, BWAPI::Unit>			  workerRefineryMap;
 		std::map<BWAPI::Unit, BWAPI::Unit>			  workerRepairMap;
 		std::map<BWAPI::Unit, BWAPI::Unit>			  workerBunkerRepairMap;
+		std::map<BWAPI::Unit, BWAPI::Unit>			  workerScoutCombatMap;
 		std::map<BWAPI::Unit, WorkerMoveData>         workerMoveMap;
 		std::map<BWAPI::Unit, BWAPI::UnitType>        workerBuildingTypeMap;
-
+		
 		std::map<BWAPI::Unit, int>                    depotWorkerCount;
 		std::map<BWAPI::Unit, int>                    refineryWorkerCount;
 
@@ -122,5 +123,6 @@ namespace MyBot
 		void                    addToMineralPatch(BWAPI::Unit unit, int num);
 		int getDepotWorkerCount(BWAPI::Unit &u);
 		int getRepairUnitCountOneTarget(BWAPI::Unit unit);
+		BWAPI::Unit WorkerData::getScoutCombatWorkerAssignedUnit(BWAPI::Unit enemy);
 	};
 }
