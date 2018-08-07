@@ -307,10 +307,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 				goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Facility, 1));
 			}
 		}
-		if (numUnits["Science_Facility"] >= 1) {
-			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Irradiate, 1));
-			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Vessel, numUnits["Science_Vessel"] + 1));
-		}
+
 		if (!hasTech(BWAPI::TechTypes::Stim_Packs)) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Stim_Packs, 1));
 		}
@@ -432,11 +429,6 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Facility, 1));
 		}
 
-		if (numUnits["Science_Facility"] >= 1) {
-			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Vessel, 1));
-			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::EMP_Shockwave, 1));
-		}
-
 		if (_main_strategy == Strategy::main_strategies::Mechanic) {
 			if (BWAPI::Broodwar->self()->gas() < 500) {
 				goal_num_vultures += numUnits["Factorys"];
@@ -552,6 +544,21 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Factory, numUnits["Starports"] + 1));
 		}
 	}
+
+	// 사이언스베슬 생산을 현재 전략에 따라서가 아닌 상대 종족에 따라 생산하고 기술개발 하도록 변경
+	if (numUnits["Science_Facility"] >= 1) {
+		if (InformationManager::Instance().enemyRace == BWAPI::Races::Zerg) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Vessel, numUnits["Science_Vessel"] + 1));
+			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Irradiate, 1));
+		}
+		else if (InformationManager::Instance().enemyRace == BWAPI::Races::Protoss) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Vessel, 1));
+			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::EMP_Shockwave, 1));
+		}
+
+	}
+
+	
 
 	return goal;
 }
