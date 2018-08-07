@@ -777,34 +777,36 @@ BWAPI::Position StrategyManager::getPositionForDefenceChokePoint(BWTA::Chokepoin
 
 void StrategyManager::liftBarrackFromWall() {
 
-	for (auto wallUnit : InformationManager::Instance().getWallUnits()) {
-		
-		if (wallUnit == nullptr) {
-			continue;
-		}
+	if (InformationManager::Instance().nowCombatStatus == InformationManager::combatStatus::DEFCON4 || InformationManager::Instance().nowCombatStatus > InformationManager::combatStatus::MainAttack) {
+		for (auto wallUnit : InformationManager::Instance().getWallUnits()) {
 
-		if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Barracks && wallUnit->isCompleted() == true) {
-			int maxDist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter());
-			for (auto enemyUnit : BWAPI::Broodwar->enemy()->getUnits()) {
-						
-				if (enemyUnit == nullptr) {
-					continue;
+			if (wallUnit == nullptr) {
+				continue;
+			}
+
+			if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Barracks && wallUnit->isCompleted() == true) {
+				int maxDist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter());
+				for (auto enemyUnit : BWAPI::Broodwar->enemy()->getUnits()) {
+
+					if (enemyUnit == nullptr) {
+						continue;
+					}
+
+					if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false && enemyUnit->getType().isWorker() == false){
+
+						int dist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), enemyUnit->getPosition());
+						dist = dist < 0 ? 1000000 : dist;
+						if (dist < maxDist && wallUnit->isLifted() == true && wallUnit->canLand() == true) {
+							wallUnit->land(InformationManager::Instance().getWallBarackPosition());
+						}
+						return;
+					}
 				}
 
-				if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false && enemyUnit->getType().isWorker() == false){
-
-					int dist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), enemyUnit->getPosition());
-					dist = dist < 0 ? 1000000 : dist;
-					if (dist < maxDist && wallUnit->isLifted() == true && wallUnit->canLand() == true) {
-						wallUnit->land(InformationManager::Instance().getWallBarackPosition());
-					}
+				if (wallUnit->isLifted() == false && wallUnit->canLift() == true) {
+					wallUnit->lift();
 					return;
 				}
-			}
-				
-			if (wallUnit->isLifted() == false && wallUnit->canLift() == true) {
-				wallUnit->lift();
-				return;
 			}
 		}
 	}
