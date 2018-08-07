@@ -532,10 +532,10 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 		case BuildOrderItem::SeedPositionStrategy::SecondChokePoint:
 			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation;
 			break;
-		case BuildOrderItem::SeedPositionStrategy::LowComplexityExpansionLocation:
-			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::MainBaseLocation;
-			break;
+			// SecondExpansionLocation에서 찾을 공간이 없어지만 타임아웃 발생하여 LowComplexityExpansionLocation로 변경하는 로직 추가
 		case BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation:
+			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::LowComplexityExpansionLocation;
+		case BuildOrderItem::SeedPositionStrategy::LowComplexityExpansionLocation:
 		case BuildOrderItem::SeedPositionStrategy::SeedPositionSpecified:
 		case BuildOrderItem::SeedPositionStrategy::MainBaseOppositeChock:
 		default:
