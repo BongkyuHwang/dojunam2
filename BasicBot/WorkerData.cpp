@@ -54,6 +54,9 @@ void WorkerData::workerDestroyed(BWAPI::Unit unit)
 				if (workerBunkerRepairMap.find(worker) != workerBunkerRepairMap.end()) {
 					workerBunkerRepairMap.erase(worker);
 				}
+				if (workerScoutCombatMap.find(worker) != workerScoutCombatMap.end()) {
+					workerScoutCombatMap.erase(worker);
+				}
 				if (workerMoveMap.find(worker) != workerMoveMap.end()) {
 					workerMoveMap.erase(worker);
 				}
@@ -189,6 +192,9 @@ void WorkerData::setWorkerJob(BWAPI::Unit unit, enum WorkerJob job, BWAPI::Unit 
 	}
 	*/
 	
+	if ((job == Minerals || job == Gas || job == Repair || job == ScoutCombat || job == BunkerReapir) && jobUnit == nullptr) {
+		std::cout << " worker job : " << job << std::endl;
+	}
 	clearPreviousJob(unit);
 	workerJobMap[unit] = job;
 
@@ -238,7 +244,7 @@ void WorkerData::setWorkerJob(BWAPI::Unit unit, enum WorkerJob job, BWAPI::Unit 
     }
 	else if (job == ScoutCombat) {
 		workerScoutCombatMap[unit] = jobUnit;
-		CommandUtil::attackUnit(unit, jobUnit);
+		Micro::SmartAttackMove(unit, jobUnit->getPosition());
 	}
 	else if (job == BunkerReapir)
 	{

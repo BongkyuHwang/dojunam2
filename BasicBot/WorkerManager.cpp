@@ -349,8 +349,8 @@ void WorkerManager::handleCombatWorkers()
 					if (WorkerManager::Instance().getWorkerData().getWorkerJob(worker) == WorkerData::Minerals){
 						if (worker->getHitPoints() > _freeHP) {
 							workerData.setWorkerJob(worker, WorkerData::Combat, nullptr);
-							//Micro::SmartAttackMove(worker, unit->getPosition());
-							CommandUtil::attackUnit(worker, unit);
+							Micro::SmartAttackMove(worker, unit->getPosition());
+							//CommandUtil::attackUnit(worker, unit);
 							maxCombatWorker--;
 						}
 					}
@@ -419,8 +419,9 @@ void WorkerManager::handleScoutCombatWorker() {
 					it2++;
 				}
 			}
-			if (flag == false) {
-				BWAPI::Unit worker = workerData.getScoutCombatWorkerAssignedUnit(*it);
+			BWAPI::Unit worker = workerData.getScoutCombatWorkerAssignedUnit(*it);
+			if (flag == false || worker->getHitPoints() < 20) {
+				
 				if (worker != nullptr) {
 					setMineralWorker(worker);
 				}
@@ -550,7 +551,7 @@ void WorkerManager::handleRepairWorkers()
 			}
 			
 			if (flag) {
-				if (unit->getHitPoints() < unit->getType().maxHitPoints() && workerData.getRepairUnitCountOneTarget(unit) < 2) {
+				if (unit->getHitPoints() < unit->getType().maxHitPoints() && workerData.getRepairUnitCountOneTarget(unit) < 3) {
 					BWAPI::Unit repairWorker = chooseRepairWorkerClosestTo(unit->getPosition(), 30 * TILE_SIZE, true);
 					
 					setRepairWorker(repairWorker, unit);
