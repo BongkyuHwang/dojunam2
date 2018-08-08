@@ -47,6 +47,8 @@ InformationManager::InformationManager()
 	// wall position
 	initPositionsForWall();
 	_wallStatus = false;
+	// 터렛위치 설치여부
+	_turretStatus = false;
 }
 
 //kyj
@@ -1131,6 +1133,7 @@ void InformationManager::initPositionsForWall() {
 			_supPositionsForWall.push(BWAPI::TilePosition(22, 118));
 			_supPositionsForWall.push(BWAPI::TilePosition(27, 121));
 			_barPositionForWall = BWAPI::TilePosition(23, 120);
+			_turretPosition = BWAPI::TilePosition(21, 117);
 		}
 		else if (base->getTilePosition().x == 7 && base->getTilePosition().y == 6) {
 			// 11
@@ -1138,8 +1141,8 @@ void InformationManager::initPositionsForWall() {
 			// 8, 27
 			_supPositionsForWall.push(BWAPI::TilePosition(10, 26));
 			_supPositionsForWall.push(BWAPI::TilePosition(7, 26));
-
 			_barPositionForWall = BWAPI::TilePosition(4, 28);
+			_turretPosition = BWAPI::TilePosition(10, 25);
 		}
 		else if (base->getTilePosition().x == 117 && base->getTilePosition().y == 117) {
 			// 5
@@ -1148,6 +1151,7 @@ void InformationManager::initPositionsForWall() {
 			_supPositionsForWall.push(BWAPI::TilePosition(118, 98));
 			_supPositionsForWall.push(BWAPI::TilePosition(118, 100));
 			_barPositionForWall = BWAPI::TilePosition(114, 101);
+			_turretPosition = BWAPI::TilePosition(119, 98);
 		}
 		else {
 			// 1
@@ -1155,8 +1159,8 @@ void InformationManager::initPositionsForWall() {
 			// 101, 8
 			_supPositionsForWall.push(BWAPI::TilePosition(97, 5));
 			_supPositionsForWall.push(BWAPI::TilePosition(100, 7));
-
 			_barPositionForWall = BWAPI::TilePosition(102, 9);
+			_turretPosition = BWAPI::TilePosition(97, 4);
 		}
 	}
 	else if (getMapName() == 'H') {
@@ -1246,6 +1250,7 @@ void InformationManager::initPositionsForWall() {
 			_supPositionsForWall.push(BWAPI::TilePosition(122, 23));
 			_supPositionsForWall.push(BWAPI::TilePosition(125, 23));
 			_barPositionForWall = BWAPI::TilePosition(118, 23);
+			_turretPosition = BWAPI::TilePosition(125, 22);
 		}
 		// 5
 		else if (base->getTilePosition().x >= 64 && base->getTilePosition().y >= 64) {
@@ -1255,6 +1260,7 @@ void InformationManager::initPositionsForWall() {
 			_supPositionsForWall.push(BWAPI::TilePosition(122, 101));
 			_supPositionsForWall.push(BWAPI::TilePosition(125, 101));
 			_barPositionForWall = BWAPI::TilePosition(118, 102);
+			_turretPosition = BWAPI::TilePosition(125, 102);
 		}
 		// 7
 		else if (base->getTilePosition().x < 64 && base->getTilePosition().y >= 64) {
@@ -1264,6 +1270,7 @@ void InformationManager::initPositionsForWall() {
 			_supPositionsForWall.push(BWAPI::TilePosition(4, 102));
 			_supPositionsForWall.push(BWAPI::TilePosition(7, 102));
 			_barPositionForWall = BWAPI::TilePosition(0, 101);
+			_turretPosition = BWAPI::TilePosition(7, 103);
 		}
 		// 11
 		else {
@@ -1273,6 +1280,7 @@ void InformationManager::initPositionsForWall() {
 			_supPositionsForWall.push(BWAPI::TilePosition(4, 24));
 			_supPositionsForWall.push(BWAPI::TilePosition(7, 24));
 			_barPositionForWall = BWAPI::TilePosition(0, 24);
+			_turretPosition = BWAPI::TilePosition(7, 23);
 		}
 	}
 }
@@ -1424,4 +1432,16 @@ int InformationManager::needTurret(std::string mode){
 	}
 
 	return warning_level;
+}
+
+BWAPI::TilePosition InformationManager::getTurretPosition() {
+	return _turretPosition;
+}
+
+bool InformationManager::getTurretStatus() {
+	return _turretStatus;
+}
+
+void InformationManager::setTurretStatus(bool flag) {
+	_turretStatus = flag;
 }

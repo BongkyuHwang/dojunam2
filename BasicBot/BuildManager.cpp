@@ -1330,7 +1330,38 @@ void BuildManager::defenceFlyingAndDetect(){
 		if (addBuildings(eb, 1, BuildOrderItem::SeedPositionStrategy::MainBaseLocation)){
 			justAddEngineeringBay = true;
 		}
-	
+		
+		if (!justAddEngineeringBay){
+
+			MetaType u(BWAPI::UnitTypes::Terran_Missile_Turret);
+
+			std::vector<BuildOrderItem::SeedPositionStrategy> seedPositionStrategies;
+			seedPositionStrategies.push_back(BuildOrderItem::SeedPositionStrategy::MissileTurret);
+			int totalNum = 1;
+
+			//본진에 대한 터렛 세팅
+			if (ExpansionManager::Instance().getExpansions().size() > 0){
+				seedPositionStrategies.push_back(BuildOrderItem::SeedPositionStrategy::MainBaseLocation);
+				totalNum += 1;
+			}
+
+			//첫번째 멀티에 대한 터렛 세팅
+			if (ExpansionManager::Instance().getExpansions().size() > 1){
+				seedPositionStrategies.push_back(BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation);
+				totalNum += 1;
+			}
+
+
+			//두번째 멀티에 대한 터렛 세팅
+			if (ExpansionManager::Instance().getExpansions().size() > 2){
+				seedPositionStrategies.push_back(BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation);
+				totalNum += 1;
+			}
+
+			addBuildings(u, totalNum, seedPositionStrategies);
+		}
+		// 기존에 작성한 로직 일단 주석처리
+		/*
 		if (!justAddEngineeringBay){
 			MetaType u(BWAPI::UnitTypes::Terran_Missile_Turret);
 			if (turret_warning_level > 2){
@@ -1342,7 +1373,8 @@ void BuildManager::defenceFlyingAndDetect(){
 			else{
 				addBuildings(u, 2, BuildOrderItem::SeedPositionStrategy::MissileTurret);
 			}
-		}	
+		}
+		*/
 
 	}
 

@@ -49,6 +49,10 @@ namespace MyBot
 		BWAPI::Unitset _wallUnits;
 		bool _wallStatus;
 
+		// 다템, 럴커 상대 터렛 위치
+		BWAPI::TilePosition _turretPosition;
+		bool _turretStatus;
+
 		/// 전체 unit 의 정보를 업데이트 합니다 (UnitType, lastPosition, HitPoint 등)
 		void                    updateUnitsInfo();
 
@@ -227,6 +231,11 @@ namespace MyBot
 		BWAPI::TilePosition getWallBarackPosition();
 
 		int needTurret(std::string mode);
+
+		// 다템, 럴커용 터렛위치 리턴
+		BWAPI::TilePosition getTurretPosition();
+		bool getTurretStatus();
+		void setTurretStatus(bool flag);
 
 		std::string unitTypeString(int ut){
 			if (ut == BWAPI::UnitTypes::Terran_Marine) return"Terran_Marine";
