@@ -41,4 +41,10 @@ void Kyj::onSendText(std::string text){
 		}
 		*/
 	}
+	if (text.find("draw y") == 0){
+		Config::Debug::Draw = true;
+	}
+	if (text.find("draw n") == 0){
+		Config::Debug::Draw = false;
+	}
 }

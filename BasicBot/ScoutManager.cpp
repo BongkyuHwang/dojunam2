@@ -95,12 +95,12 @@ void ScoutManager::drawScoutInformation(int x, int y)
 		return;
 	}
 
-	BWAPI::Broodwar->drawTextScreen(x, y, "ScoutInfo: %s", _scoutStatus.c_str());
-	//BWAPI::Broodwar->drawTextScreen(x, y + 10, "GasSteal: %s", _gasStealStatus.c_str());
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "ScoutInfo: %s", _scoutStatus.c_str());
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10, "GasSteal: %s", _gasStealStatus.c_str());
 	for (size_t i(0); i < _enemyRegionVertices.size(); ++i)
 	{
-		BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 4, BWAPI::Colors::Green, false);
-		BWAPI::Broodwar->drawTextMap(_enemyRegionVertices[i], "%d", i);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 4, BWAPI::Colors::Green, false);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_enemyRegionVertices[i], "%d", i);
 	}
 }
 
@@ -122,7 +122,7 @@ void ScoutManager::moveScouts()
 
 	/*if (_workerScout->isCarryingGas())
 	{
-	BWAPI::Broodwar->drawCircleMap(_workerScout->getPosition(), 10, BWAPI::Colors::Purple, true);
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_workerScout->getPosition(), 10, BWAPI::Colors::Purple, true);
 	}
 
 	// if we initiated a gas steal and the worker isn't idle,
@@ -315,7 +315,7 @@ void ScoutManager::followPerimeter()
 
 	if (Config::Debug::DrawScoutInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(fleeTo, 5, BWAPI::Colors::Red, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(fleeTo, 5, BWAPI::Colors::Red, true);
 	}
 
 	Micro::SmartMove(_workerScout, fleeTo);
@@ -569,8 +569,8 @@ void ScoutManager::calculateEnemyRegionVertices()
 				int x2 = (tp.x + 1) * 32 - 2;
 				int y2 = (tp.y + 1) * 32 - 2;
 
-				BWAPI::Broodwar->drawTextMap(x1 + 3, y1 + 2, "%d", MapTools::Instance().getGroundDistance(BWAPI::Position(tp), basePosition));
-				BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Green, false);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(x1 + 3, y1 + 2, "%d", MapTools::Instance().getGroundDistance(BWAPI::Position(tp), basePosition));
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Green, false);
 			}
 
 			unsortedVertices.insert(BWAPI::Position(tp) + BWAPI::Position(16, 16));

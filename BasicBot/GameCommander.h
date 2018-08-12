@@ -109,6 +109,7 @@ namespace MyBot
 
 			if (log_file.is_open()){
 				log_file << s;
+				log_file << std::endl;
 				if (end) log_file << std::endl;
 			}
 			log_file.close();

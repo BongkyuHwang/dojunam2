@@ -19,7 +19,7 @@ void moveAway(BWAPI::Unit unit, BWAPI::TilePosition targetTilePosition)
 		BWAPI::Position tp(t.x * 32, t.y * 32);
 		if (!tp.isValid())
 			continue;
-		BWAPI::Broodwar->drawCircleMap( tp , 7, BWAPI::Colors::Red, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap( tp , 7, BWAPI::Colors::Red, true);
 		for (auto & onTileUnit : BWAPI::Broodwar->getUnitsOnTile(t))
 		{			
 			if (unit->getDistance(onTileUnit->getPosition()) < 80 && !onTileUnit->isFlying() && !onTileUnit->isMoving() && !onTileUnit->isAttackFrame())

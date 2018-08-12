@@ -80,7 +80,7 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 			//	if (!medic->isHoldingPosition())
 			//	{
 			//		medic->holdPosition();
-			//		//BWAPI::Broodwar->drawTextMap(medic->getPosition() + BWAPI::Position(0, 30), "%s", "Hold on Position ");
+			//		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(medic->getPosition() + BWAPI::Position(0, 30), "%s", "Hold on Position ");
 			//	}
 			//}
 			//else

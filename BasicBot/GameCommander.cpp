@@ -389,7 +389,7 @@ void GameCommander::setCombatUnits()
 		//임시삭제요망
 		if (unit->getType().isBuilding())
 		{
-			BWAPI::Broodwar->drawTextMap(BWAPI::Position(unit->getPosition().x, unit->getPosition().y + 25), "Building : (%d, %d)", (unit->getTilePosition().x, unit->getTargetPosition().y));
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(BWAPI::Position(unit->getPosition().x, unit->getPosition().y + 25), "Building : (%d, %d)", (unit->getTilePosition().x, unit->getTargetPosition().y));
 		}
 
 		if (UnitUtils::IsValidUnit(unit))

@@ -87,10 +87,10 @@ void SquadData::drawSquadInformation(int x, int y)
     //    return;
     //}
 
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04Squads");
-	BWAPI::Broodwar->drawTextScreen(x, y+20, "\x04NAME");
-	BWAPI::Broodwar->drawTextScreen(x+150, y+20, "\x04SIZE");
-	BWAPI::Broodwar->drawTextScreen(x+200, y+20, "\x04LOCATION");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04Squads");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y+20, "\x04NAME");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x+150, y+20, "\x04SIZE");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x+200, y+20, "\x04LOCATION");
 
 	int yspace = 0;
 
@@ -101,17 +101,17 @@ void SquadData::drawSquadInformation(int x, int y)
 		const BWAPI::Unitset & units = squad.getUnits();
 		const SquadOrder & order = squad.getSquadOrder();
 
-		BWAPI::Broodwar->drawTextScreen(x, y+40+((yspace)*10), "\x03%s", squad.getName().c_str());
-		BWAPI::Broodwar->drawTextScreen(x+150, y+40+((yspace)*10), "\x03%d", units.size());
-		BWAPI::Broodwar->drawTextScreen(x+200, y+40+((yspace++)*10), "\x03(%d,%d)", order.getPosition().x, order.getPosition().y);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y+40+((yspace)*10), "\x03%s", squad.getName().c_str());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x+150, y+40+((yspace)*10), "\x03%d", units.size());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x+200, y+40+((yspace++)*10), "\x03(%d,%d)", order.getPosition().x, order.getPosition().y);
 
-		BWAPI::Broodwar->drawCircleMap(order.getPosition(), 10, BWAPI::Colors::Green, true);
-        BWAPI::Broodwar->drawCircleMap(order.getPosition(), order.getRadius(), BWAPI::Colors::Red, false);
-        BWAPI::Broodwar->drawTextMap(order.getPosition() + BWAPI::Position(0, 20), "%s", squad.getName().c_str());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(order.getPosition(), 10, BWAPI::Colors::Green, true);
+        if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(order.getPosition(), order.getRadius(), BWAPI::Colors::Red, false);
+        if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(order.getPosition() + BWAPI::Position(0, 20), "%s", squad.getName().c_str());
 
         for (const BWAPI::Unit unit : units)
         {
-            BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 30), "%s", squad.getName().c_str());
+            if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 30), "%s", squad.getName().c_str());
         }
 	}
 }

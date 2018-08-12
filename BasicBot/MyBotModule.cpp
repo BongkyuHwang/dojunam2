@@ -458,9 +458,9 @@ void MyBotModule::checkGameLostConditionAndLeaveGame()
 		}
 	}
 
-	//BWAPI::Broodwar->drawTextScreen(250, 120, "canProduce Building Count        : %d", canProduceBuildingCount);
-	//BWAPI::Broodwar->drawTextScreen(250, 130, "canAttack Building Count         : %d", canAttackBuildingCount);
-	//BWAPI::Broodwar->drawTextScreen(250, 140, "canDoSomeThing NonBuilding Count : %d", canDoSomeThingNonBuildingUnitCount);
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(250, 120, "canProduce Building Count        : %d", canProduceBuildingCount);
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(250, 130, "canAttack Building Count         : %d", canAttackBuildingCount);
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(250, 140, "canDoSomeThing NonBuilding Count : %d", canDoSomeThingNonBuildingUnitCount);
 
 	// 자동 패배조건 만족하게 된 프레임 기록
 	if (canDoSomeThingNonBuildingUnitCount == 0 && canProduceBuildingCount == 0 && canAttackBuildingCount == 0 && isGameLostConditionSatisfied == false) {
@@ -479,8 +479,8 @@ void MyBotModule::checkGameLostConditionAndLeaveGame()
 	// 자동 패배조건 만족 상황이 일정시간 동안 지속되었으면 게임 패배로 처리
 	if (isGameLostConditionSatisfied) {
 
-		BWAPI::Broodwar->drawTextScreen(250, 100, "I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
-		BWAPI::Broodwar->drawTextScreen(250, 115, "I will leave game in %d frames", maxDurationForGameLostCondition - (BWAPI::Broodwar->getFrameCount() - gameLostConditionSatisfiedFrame));
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(250, 100, "I lost because I HAVE NO UNIT TO DEFEAT ENEMY PLAYER");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(250, 115, "I will leave game in %d frames", maxDurationForGameLostCondition - (BWAPI::Broodwar->getFrameCount() - gameLostConditionSatisfiedFrame));
 
 		if (BWAPI::Broodwar->getFrameCount() - gameLostConditionSatisfiedFrame >= maxDurationForGameLostCondition) {
 			BWAPI::Broodwar->leaveGame();
@@ -517,9 +517,9 @@ void MyBotModule::checkTimeOutConditionAndLeaveGame()
 		long long timeElapsedAtLastFrame = timeElapsedAtFrame[BWAPI::Broodwar->getFrameCount() - 1];
 
 		// 현재 시각 표시
-		BWAPI::Broodwar->drawTextScreen(260, 5, "FrameCount :");
-		BWAPI::Broodwar->drawTextScreen(340, 5, "%d", BWAPI::Broodwar->getFrameCount());
-		BWAPI::Broodwar->drawTextScreen(370, 5, "(%3d:%2d)", (int)(BWAPI::Broodwar->getFrameCount() / (23.8 * 60)), (int)((int)(BWAPI::Broodwar->getFrameCount() / 23.8) % 60));
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(260, 5, "FrameCount :");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(340, 5, "%d", BWAPI::Broodwar->getFrameCount());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(370, 5, "(%3d:%2d)", (int)(BWAPI::Broodwar->getFrameCount() / (23.8 * 60)), (int)((int)(BWAPI::Broodwar->getFrameCount() / 23.8) % 60));
 
 		// 타임아웃 체크 현황을 화면에 표시
 		int y = 15;

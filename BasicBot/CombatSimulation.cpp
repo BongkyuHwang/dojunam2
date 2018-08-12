@@ -13,7 +13,7 @@
 //{
 //	SparCraft::GameState s;
 //
-//	BWAPI::Broodwar->drawCircleMap(center.x, center.y, 10, BWAPI::Colors::Red, true);
+//	if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(center.x, center.y, 10, BWAPI::Colors::Red, true);
 //
 //	BWAPI::Unitset ourCombatUnits;
 //	std::vector<UnitInfo> enemyCombatUnits;
@@ -150,10 +150,10 @@
 //            ss2 << "Predicted Outcome: " << eval << "\n";
 //            ss2 << g.getState().toStringCompact() << "\n";
 //
-//            BWAPI::Broodwar->drawTextScreen(150,200,"%s", ss1.str().c_str());
-//            BWAPI::Broodwar->drawTextScreen(300,200,"%s", ss2.str().c_str());
+//            if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(150,200,"%s", ss1.str().c_str());
+//            if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(300,200,"%s", ss2.str().c_str());
 //
-//	        BWAPI::Broodwar->drawTextScreen(240, 280, "Combat Sim : %d", eval);
+//	        if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(240, 280, "Combat Sim : %d", eval);
 //        }
 //        
 //	    return eval;

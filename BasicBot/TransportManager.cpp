@@ -105,18 +105,23 @@ void TransportManager::drawTransportInformation(int x = 0, int y = 0)
 
 	if (x && y)
 	{
-		//BWAPI::Broodwar->drawTextScreen(x, y, "ScoutInfo: %s", _scoutStatus.c_str());
-		//BWAPI::Broodwar->drawTextScreen(x, y + 10, "GasSteal: %s", _gasStealStatus.c_str());
+		//if (Config::Debug::Draw) if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "ScoutInfo: %s", _scoutStatus.c_str());
+		//if (Config::Debug::Draw) if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10, "GasSteal: %s", _gasStealStatus.c_str());
 	}
 	for (size_t i(0); i < _mapEdgeVertices.size(); ++i)
 	{
-		BWAPI::Broodwar->drawCircleMap(_mapEdgeVertices[i], 4, BWAPI::Colors::Green, false);
-		BWAPI::Broodwar->drawTextMap(_mapEdgeVertices[i], "%d", i);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_mapEdgeVertices[i], 4, BWAPI::Colors::Green, false);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_mapEdgeVertices[i], "%d", i);
 	}
 }
 
 void TransportManager::update()
 {
+	if (getUnits().size() == 0)
+	{
+		_transportShip = nullptr;
+		return;
+	}
     if (!_transportShip && getUnits().size() > 0)
     {
         _transportShip = *getUnits().begin();
@@ -139,66 +144,48 @@ void TransportManager::update()
 	//		}
 	//	}
 	//}
-	
+	/*if (_transportShip != nullptr&& _transportShip->getSpaceRemaining() > 0 )
+	{
+		if (_transportShip->isUnderAttack())
+		{
+			_transportShip->unloadAll(true);
+			printf("is Under Attak unloading (%d) \n", 8 - _transportShip->getSpaceRemaining() );
+		}
+	}
+	else */
 	if (_transportShip != nullptr && _transportShip->getSpaceRemaining() == 0)
 	{
-		if (InformationManager::Instance().getMapName() == 'L')
-		{
-			BWAPI::Player enemy = InformationManager::Instance().enemyPlayer;
-			if (InformationManager::Instance().getMainBaseLocation(enemy) != nullptr)
-			{
-				if (InformationManager::Instance().getMainBaseLocation(enemy)->getTilePosition().x == 57)//12
-				{
-					BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Go Drop");
-					setFrom(_transportShip->getPosition());
-					//setTo(BWAPI::Position(3480 * 32, 56 * 32));
-					setTo(BWAPI::Position(3479, 56));
-					//if (_transportShip->getSpaceRemaining() != 0)
-					{
-						moveTroops();
-						moveTransport();
-					}
+		//if (_transportShip->isUnderAttack())
+		//{
+		//	_transportShip->unloadAll();
+		//	_transportShip->unloadAll(true);
+		//	BWAPI::Position unloadPosition = _transportShip->getPosition();
+		//	int closeDistance = 99999;
+		//	for (int dx = -10; dx < 10; dx++)
+		//	{
+		//		for (int dy = -10; dy < 10; dy++)
+		//		{
+		//			BWAPI::Position unloadCandidatePosition(unloadPosition + BWAPI::Position(dx * 32, dy * 32));
+		//			if (_transportShip->getPosition().getDistance(unloadCandidatePosition) < 99999 && _transportShip->canUnloadAtPosition(unloadCandidatePosition))
+		//			{
+		//				closeDistance = _transportShip->getPosition().getDistance(unloadCandidatePosition);
+		//				unloadPosition = unloadCandidatePosition;
+		//			}
+		//		}
+		//	}
+		//	if (unloadPosition == _transportShip->getPosition())
+		//	{
+		//		_transportShip->unloadAll();
+		//		//_transportShip->unloadAll(true);
+		//	}
+		//	BWAPI::Broodwar->drawCircleMap(unloadPosition, 30, BWAPI::Colors::Green, false);
+		//	BWAPI::Broodwar->drawCircleMap(_transportShip->getPosition(), 3, BWAPI::Colors::Red, true);
+		//	_transportShip->unloadAll(unloadPosition);
 
-				}
-				else if (InformationManager::Instance().getMainBaseLocation(enemy)->getTilePosition().x == 117)//3
-				{
-					BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Go Drop");
-					setFrom(_transportShip->getPosition());
-					setTo(BWAPI::Position(3855, 2489));
-					//if (_transportShip->getSpaceRemaining() != 0)
-					{
-						moveTroops();
-						moveTransport();
-					}
-
-				}
-				else if (InformationManager::Instance().getMainBaseLocation(enemy)->getTilePosition().x == 7)//9
-				{
-					BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Go Drop");
-					setFrom(_transportShip->getPosition());
-					setTo(BWAPI::Position(65, 1230));
-					//if (_transportShip->getSpaceRemaining() != 0)
-					{
-						moveTroops();
-						moveTransport();
-					}
-
-				}
-				else if (InformationManager::Instance().getMainBaseLocation(enemy)->getTilePosition().x == 27)//6
-				{
-					BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Go Drop");
-					setFrom(_transportShip->getPosition());
-					setTo(BWAPI::Position(2580, 4002));
-					//if (_transportShip->getSpaceRemaining() != 0)
-					{
-						moveTroops();
-						moveTransport();
-					}
-
-				}
-			}
-		}
-		else if (InformationManager::Instance().getMapName() != 'L')
+		//printf("is Under Attak unloading (%d , %d ) (%d) \n", _transportShip->getPosition().x, _transportShip->getPosition().y, 8 - _transportShip->getSpaceRemaining());
+		//	//BWAPI::Broodwar->drawCircleMap(_transportShip->getPosition(), 7, BWAPI::Colors::Green, false);
+		//}
+		//else
 		{
 			BWAPI::Player enemy = InformationManager::Instance().enemyPlayer;
 			if (InformationManager::Instance().getMainBaseLocation(enemy) != nullptr)
@@ -208,8 +195,7 @@ void TransportManager::update()
 			}
 
 		}
-	}
-	
+	}	
 	else if (_transportShip != nullptr && _transportShip->getSpaceRemaining() == 8)
 	{
 		BWAPI::UnitCommand currentCommand(_transportShip->getLastCommand());
@@ -278,7 +264,7 @@ void TransportManager::moveTroops()
 	//	&& _transportShip->canUnloadAtPosition(_transportShip->getPosition()))
 	if (InformationManager::Instance().getMapName() == 'L' && _to.getDistance(_transportShip->getPosition()) <400)
 	{
-		BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Can Drop");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Can Drop");
 		//unload troops 
 		//and return? 
 
@@ -288,7 +274,7 @@ void TransportManager::moveTroops()
 		// if we've already told this unit to unload, wait
 		if (currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All || currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All_Position)
 		{
-			BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Odered Drop");
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Odered Drop");
 			return;
 		}
 		////std::cout << "_transportShip->unloadAll(_to) :" << _to.x << " " << _to.y << std::endl;
@@ -302,7 +288,7 @@ void TransportManager::moveTroops()
 		if (enemyBaseLocation && _transportShip->getDistance(enemyBaseLocation->getPosition()) < 400)
 		{
 		
-			BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Can Drop");
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Can Drop");
 			//unload troops 
 			//and return? 
 
@@ -312,7 +298,7 @@ void TransportManager::moveTroops()
 			// if we've already told this unit to unload, wait
 			if (currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All || currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All_Position)
 			{
-				BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Odered Drop");
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_transportShip->getPosition() + BWAPI::Position(0, 30), "%s", "Odered Drop");
 				return;
 			}
 					////std::cout << "wow" << std::endl;
@@ -335,7 +321,7 @@ void TransportManager::followPerimeter(int clockwise)
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(goTo, 5, BWAPI::Colors::Red, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(goTo, 5, BWAPI::Colors::Red, true);
 	}
 
 	Micro::SmartMove(_transportShip, goTo);

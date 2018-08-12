@@ -132,32 +132,32 @@ void UXManager::update()
 	{
 		int mouseX = BWAPI::Broodwar->getMousePosition().x + BWAPI::Broodwar->getScreenPosition().x;
 		int mouseY = BWAPI::Broodwar->getMousePosition().y + BWAPI::Broodwar->getScreenPosition().y;
-		BWAPI::Broodwar->drawTextMap(mouseX + 20, mouseY, "(%d, %d)", (int)(mouseX / TILE_SIZE), (int)(mouseY / TILE_SIZE));
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(mouseX + 20, mouseY, "(%d, %d)", (int)(mouseX / TILE_SIZE), (int)(mouseY / TILE_SIZE));
 	}
 }
 
 void UXManager::drawGameInformationOnScreen(int x, int y)
 {
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04Players:");
-	BWAPI::Broodwar->drawTextScreen(x + 50, y, "%c%s(%s) \x04vs. %c%s(%s)",
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04Players:");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 50, y, "%c%s(%s) \x04vs. %c%s(%s)",
 		BWAPI::Broodwar->self()->getTextColor(), BWAPI::Broodwar->self()->getName().c_str(), InformationManager::Instance().selfRace.c_str(),
 		BWAPI::Broodwar->enemy()->getTextColor(), BWAPI::Broodwar->enemy()->getName().c_str(), InformationManager::Instance().enemyRace.c_str());
 	y += 12;
 
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04Map:");
-	BWAPI::Broodwar->drawTextScreen(x + 50, y, "\x03%s (%d x %d size)", BWAPI::Broodwar->mapFileName().c_str(), BWAPI::Broodwar->mapWidth(), BWAPI::Broodwar->mapHeight());
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04Map:");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 50, y, "\x03%s (%d x %d size)", BWAPI::Broodwar->mapFileName().c_str(), BWAPI::Broodwar->mapWidth(), BWAPI::Broodwar->mapHeight());
 	BWAPI::Broodwar->setTextSize();
 	y += 12;
 
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04Time:");
-	BWAPI::Broodwar->drawTextScreen(x + 50, y, "\x04%d", BWAPI::Broodwar->getFrameCount());
-	BWAPI::Broodwar->drawTextScreen(x + 90, y, "\x04%4d:%3d", (int)(BWAPI::Broodwar->getFrameCount() / (23.8 * 60)), (int)((int)(BWAPI::Broodwar->getFrameCount() / 23.8) % 60));
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04Time:");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 50, y, "\x04%d", BWAPI::Broodwar->getFrameCount());
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 90, y, "\x04%4d:%3d", (int)(BWAPI::Broodwar->getFrameCount() / (23.8 * 60)), (int)((int)(BWAPI::Broodwar->getFrameCount() / 23.8) % 60));
 }
 
 void UXManager::drawAPM(int x, int y)
 {
 	int bwapiAPM = BWAPI::Broodwar->getAPM();
-	BWAPI::Broodwar->drawTextScreen(x, y, "APM : %d", bwapiAPM);
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "APM : %d", bwapiAPM);
 }
 
 void UXManager::drawPlayers()
@@ -202,8 +202,8 @@ void UXManager::drawUnitExtendedInformationOnMap()
 		// 적 유닛이면 주위에 박스 표시
 		if (!BWAPI::Broodwar->isVisible(BWAPI::TilePosition(ui.lastPosition)))
 		{
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, top), BWAPI::Position(right, bottom), BWAPI::Colors::Grey, false);
-			BWAPI::Broodwar->drawTextMap(BWAPI::Position(left + 3, top + 4), "%s", ui.type.getName().c_str());
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, top), BWAPI::Position(right, bottom), BWAPI::Colors::Grey, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(BWAPI::Position(left + 3, top + 4), "%s", ui.type.getName().c_str());
 		}
 
 		// 유닛의 HitPoint 남아있는 비율 표시
@@ -219,15 +219,15 @@ void UXManager::drawUnitExtendedInformationOnMap()
 			int hpTop = top + verticalOffset;
 			int hpBottom = top + 4 + verticalOffset;
 
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), hpColor, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), hpColor, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
 
 			int ticWidth = 3;
 
 			for (int i(left); i < right - 1; i += ticWidth)
 			{
-				BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
 			}
 		}
 
@@ -240,15 +240,15 @@ void UXManager::drawUnitExtendedInformationOnMap()
 			int hpTop = top - 3 + verticalOffset;
 			int hpBottom = top + 1 + verticalOffset;
 
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), BWAPI::Colors::Blue, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), BWAPI::Colors::Blue, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
 
 			int ticWidth = 3;
 
 			for (int i(left); i < right - 1; i += ticWidth)
 			{
-				BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
 			}
 		}
 
@@ -269,7 +269,7 @@ void UXManager::drawUnitExtendedInformationOnMap()
 		int top = pos.y - unit->getType().dimensionUp();
 		int bottom = pos.y + unit->getType().dimensionDown();
 
-		//BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, top), BWAPI::Position(right, bottom), BWAPI::Colors::Grey, false);
+		//if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, top), BWAPI::Position(right, bottom), BWAPI::Colors::Grey, false);
 
 		// 유닛의 HitPoint 남아있는 비율 표시
 		if (!unit->getType().isResourceContainer() && unit->getType().maxHitPoints() > 0)
@@ -284,15 +284,15 @@ void UXManager::drawUnitExtendedInformationOnMap()
 			int hpTop = top + verticalOffset;
 			int hpBottom = top + 4 + verticalOffset;
 
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), hpColor, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), hpColor, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
 
 			int ticWidth = 3;
 
 			for (int i(left); i < right - 1; i += ticWidth)
 			{
-				BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
 			}
 		}
 
@@ -305,15 +305,15 @@ void UXManager::drawUnitExtendedInformationOnMap()
 			int hpTop = top - 3 + verticalOffset;
 			int hpBottom = top + 1 + verticalOffset;
 
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), BWAPI::Colors::Blue, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), BWAPI::Colors::Blue, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
 
 			int ticWidth = 3;
 
 			for (int i(left); i < right - 1; i += ticWidth)
 			{
-				BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
 			}
 		}
 
@@ -327,15 +327,15 @@ void UXManager::drawUnitExtendedInformationOnMap()
 			int hpTop = top + verticalOffset;
 			int hpBottom = top + 4 + verticalOffset;
 
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), BWAPI::Colors::Cyan, true);
-			BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Grey, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(ratioRight, hpBottom), BWAPI::Colors::Cyan, true);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(BWAPI::Position(left, hpTop), BWAPI::Position(right, hpBottom), BWAPI::Colors::Black, false);
 
 			int ticWidth = 3;
 
 			for (int i(left); i < right - 1; i += ticWidth)
 			{
-				BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(BWAPI::Position(i, hpTop), BWAPI::Position(i, hpBottom), BWAPI::Colors::Black);
 			}
 		}
 	}
@@ -347,46 +347,46 @@ void UXManager::drawUnitStatisticsOnScreen(int x, int y)
 	int currentY = y;
 
 	// 아군이 입은 피해 누적값
-	BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 Self Loss:\x04 Minerals: \x1f%d \x04Gas: \x07%d",
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 Self Loss:\x04 Minerals: \x1f%d \x04Gas: \x07%d",
 		InformationManager::Instance().getUnitData(BWAPI::Broodwar->self()).getMineralsLost(),
 		InformationManager::Instance().getUnitData(BWAPI::Broodwar->self()).getGasLost());
 	currentY += 10;
 
 	// 아군 모든 유닛 숫자 합계
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 allUnitCount: %d", BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::AllUnits));
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 allUnitCount: %d", BWAPI::Broodwar->self()->allUnitCount(BWAPI::UnitTypes::AllUnits));
 	//currentY += 10;
 
 	// 아군 건설/훈련 완료한 유닛 숫자 합계
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 completedUnitCount: %d", BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::AllUnits));
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 completedUnitCount: %d", BWAPI::Broodwar->self()->completedUnitCount(BWAPI::UnitTypes::AllUnits));
 	//currentY += 10;
 
 	// 아군 건설/훈련중인 유닛 숫자 합계
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 incompleteUnitCount: %d", BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::AllUnits));
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 incompleteUnitCount: %d", BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::AllUnits));
 	//currentY += 10;
 
 	// 아군 유닛 파괴/사망 숫자 누적값
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 deadUnitCount: %d", BWAPI::Broodwar->self()->deadUnitCount(BWAPI::UnitTypes::AllUnits));
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 deadUnitCount: %d", BWAPI::Broodwar->self()->deadUnitCount(BWAPI::UnitTypes::AllUnits));
 	//currentY += 10;
 
 	// 상대방 유닛을 파괴/사망 시킨 숫자 누적값
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 killedUnitCount: %d", BWAPI::Broodwar->self()->killedUnitCount(BWAPI::UnitTypes::AllUnits));
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 killedUnitCount: %d", BWAPI::Broodwar->self()->killedUnitCount(BWAPI::UnitTypes::AllUnits));
 	//currentY += 10;
 
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 UnitScore: %d", BWAPI::Broodwar->self()->getUnitScore());
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 RazingScore: %d", BWAPI::Broodwar->self()->getRazingScore());
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 BuildingScore: %d", BWAPI::Broodwar->self()->getBuildingScore());
-	//BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 KillScore: %d", BWAPI::Broodwar->self()->getKillScore());
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 UnitScore: %d", BWAPI::Broodwar->self()->getUnitScore());
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 RazingScore: %d", BWAPI::Broodwar->self()->getRazingScore());
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 BuildingScore: %d", BWAPI::Broodwar->self()->getBuildingScore());
+	//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 KillScore: %d", BWAPI::Broodwar->self()->getKillScore());
 
 	// 적군이 입은 피해 누적값
-	BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 Enemy Loss:\x04 Minerals: \x1f%d \x04Gas: \x07%d",
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY, "\x03 Enemy Loss:\x04 Minerals: \x1f%d \x04Gas: \x07%d",
 		InformationManager::Instance().getUnitData(BWAPI::Broodwar->enemy()).getMineralsLost(),
 		InformationManager::Instance().getUnitData(BWAPI::Broodwar->enemy()).getGasLost());
 
 	// 적군의 UnitType 별 파악된 Unit 숫자를 표시
-	BWAPI::Broodwar->drawTextScreen(x, currentY + 20, "\x04 UNIT NAME");
-	BWAPI::Broodwar->drawTextScreen(x + 110, currentY + 20, "\x04 Created");
-	BWAPI::Broodwar->drawTextScreen(x + 150, currentY + 20, "\x04 Dead");
-	BWAPI::Broodwar->drawTextScreen(x + 190, currentY + 20, "\x04 Alive");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY + 20, "\x04 UNIT NAME");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 110, currentY + 20, "\x04 Created");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 150, currentY + 20, "\x04 Dead");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 190, currentY + 20, "\x04 Alive");
 
 	int yspace = 0;
 	for (BWAPI::UnitType t : BWAPI::UnitTypes::allUnitTypes())
@@ -397,10 +397,10 @@ void UXManager::drawUnitStatisticsOnScreen(int x, int y)
 
 		if (numUnits > 0)
 		{
-			BWAPI::Broodwar->drawTextScreen(x, currentY + 30 + ((yspace)* 10), "%s", t.getName().c_str());
-			BWAPI::Broodwar->drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "%d", numCreatedUnits);
-			BWAPI::Broodwar->drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "%d", numDeadUnits);
-			BWAPI::Broodwar->drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "%d", numUnits);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY + 30 + ((yspace)* 10), "%s", t.getName().c_str());
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "%d", numCreatedUnits);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "%d", numDeadUnits);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "%d", numUnits);
 			yspace++;
 		}
 	}
@@ -415,10 +415,10 @@ void UXManager::drawUnitStatisticsOnScreen(int x, int y)
 
 		if (numUnits > 0)
 		{
-			BWAPI::Broodwar->drawTextScreen(x, currentY + 30 + ((yspace)* 10), "%s", t.getName().c_str());
-			BWAPI::Broodwar->drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "%d", numCreatedUnits);
-			BWAPI::Broodwar->drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "%d", numDeadUnits);
-			BWAPI::Broodwar->drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "%d", numUnits);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, currentY + 30 + ((yspace)* 10), "%s", t.getName().c_str());
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 120, currentY + 30 + ((yspace)* 10), "%d", numCreatedUnits);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 160, currentY + 30 + ((yspace)* 10), "%d", numDeadUnits);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 200, currentY + 30 + ((yspace)* 10), "%d", numUnits);
 			yspace++;
 		}
 	}
@@ -433,25 +433,25 @@ void UXManager::drawBWTAResultOnMap()
 		BWAPI::Position c = (*i)->getPosition();
 
 		//draw outline of Base location 
-		BWAPI::Broodwar->drawBoxMap(p.x * 32, p.y * 32, p.x * 32 + 4 * 32, p.y * 32 + 3 * 32, BWAPI::Colors::Blue);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(p.x * 32, p.y * 32, p.x * 32 + 4 * 32, p.y * 32 + 3 * 32, BWAPI::Colors::Blue);
 
 		//draw a circle at each mineral patch
 		for (BWAPI::Unitset::iterator j = (*i)->getStaticMinerals().begin(); j != (*i)->getStaticMinerals().end(); j++)
 		{
 			BWAPI::Position q = (*j)->getInitialPosition();
-			BWAPI::Broodwar->drawCircleMap(q.x, q.y, 30, BWAPI::Colors::Cyan);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(q.x, q.y, 30, BWAPI::Colors::Cyan);
 		}
 
 		//draw the outlines of vespene geysers
 		for (BWAPI::Unitset::iterator j = (*i)->getGeysers().begin(); j != (*i)->getGeysers().end(); j++)
 		{
 			BWAPI::TilePosition q = (*j)->getInitialTilePosition();
-			BWAPI::Broodwar->drawBoxMap(q.x * 32, q.y * 32, q.x * 32 + 4 * 32, q.y * 32 + 2 * 32, BWAPI::Colors::Orange);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(q.x * 32, q.y * 32, q.x * 32 + 4 * 32, q.y * 32 + 2 * 32, BWAPI::Colors::Orange);
 		}
 
 		//if this is an island expansion, draw a yellow circle around the base location
 		if ((*i)->isIsland())
-			BWAPI::Broodwar->drawCircleMap(c, 80, BWAPI::Colors::Yellow);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(c, 80, BWAPI::Colors::Yellow);
 	}
 
 	//we will iterate through all the regions and draw the polygon outline of it in green.
@@ -462,7 +462,7 @@ void UXManager::drawBWTAResultOnMap()
 		{
 			BWAPI::Position point1 = p[j];
 			BWAPI::Position point2 = p[(j + 1) % p.size()];
-			BWAPI::Broodwar->drawLineMap(point1, point2, BWAPI::Colors::Green);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(point1, point2, BWAPI::Colors::Green);
 		}
 	}
 
@@ -473,34 +473,34 @@ void UXManager::drawBWTAResultOnMap()
 		{
 			BWAPI::Position point1 = (*c)->getSides().first;
 			BWAPI::Position point2 = (*c)->getSides().second;
-			BWAPI::Broodwar->drawLineMap(point1, point2, BWAPI::Colors::Red);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(point1, point2, BWAPI::Colors::Red);
 		}
 	}
 
 	if (InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition(), "My MainBaseLocation");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition(), "My MainBaseLocation");
 	}
 	if (InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getCenter(), "My First ChokePoint");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getCenter(), "My First ChokePoint");
 	}
 	if (InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter(), "My Second ChokePoint");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter(), "My Second ChokePoint");
 	}
 	if (InformationManager::Instance().getFirstExpansionLocation(BWAPI::Broodwar->self()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstExpansionLocation(BWAPI::Broodwar->self())->getPosition(), "My First ExpansionLocation");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstExpansionLocation(BWAPI::Broodwar->self())->getPosition(), "My First ExpansionLocation");
 	}
 
 	if (InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition(), "Enemy MainBaseLocation");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition(), "Enemy MainBaseLocation");
 	}
 	if (InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy())->getCenter(), "Enemy First ChokePoint");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy())->getCenter(), "Enemy First ChokePoint");
 	}
 	if (InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy())->getCenter(), "Enemy Second ChokePoint");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy())->getCenter(), "Enemy Second ChokePoint");
 	}
 	if (InformationManager::Instance().getFirstExpansionLocation(BWAPI::Broodwar->enemy()) != nullptr) {
-		BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstExpansionLocation(BWAPI::Broodwar->enemy())->getPosition(), "Enemy First ExpansionLocation");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(InformationManager::Instance().getFirstExpansionLocation(BWAPI::Broodwar->enemy())->getPosition(), "Enemy First ExpansionLocation");
 	}
 
 }
@@ -515,12 +515,12 @@ void UXManager::drawMapGrid()
 
 	for (int i = 0; i<cols; i++)
 	{
-		BWAPI::Broodwar->drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, BWAPI::Colors::Blue);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(i*cellSize, 0, i*cellSize, mapHeight, BWAPI::Colors::Blue);
 	}
 
 	for (int j = 0; j<rows; j++)
 	{
-		BWAPI::Broodwar->drawLineMap(0, j*cellSize, mapWidth, j*cellSize, BWAPI::Colors::Blue);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(0, j*cellSize, mapWidth, j*cellSize, BWAPI::Colors::Blue);
 	}
 
 	for (int r = 0; r < rows; r += 2)
@@ -529,8 +529,8 @@ void UXManager::drawMapGrid()
 		{
 			GridCell & cell = MapGrid::Instance().getCellByIndex(r, c);
 
-			BWAPI::Broodwar->drawTextMap(cell.center.x - cellSize / 2, cell.center.y - cellSize / 2, "%d,%d", c, r);
-			//BWAPI::Broodwar->drawTextMap(cell.center.x, cell.center.y + 10, "Last seen at %d", cell.timeLastVisited);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(cell.center.x - cellSize / 2, cell.center.y - cellSize / 2, "%d,%d", c, r);
+			//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(cell.center.x, cell.center.y + 10, "Last seen at %d", cell.timeLastVisited);
 		}
 	}
 
@@ -539,14 +539,14 @@ void UXManager::drawMapGrid()
 
 void UXManager::drawBuildOrderQueueOnScreen(int x, int y)
 {
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04 <Build Order>");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04 <Build Order>");
 
 	/*
 	std::deque< BuildOrderItem >* queue = BuildManager::Instance().buildQueue.getQueue();
 	size_t reps = queue->size() < 24 ? queue->size() : 24;
 	for (size_t i(0); i<reps; i++) {
 	const MetaType & type = (*queue)[queue->size() - 1 - i].metaType;
-	BWAPI::Broodwar->drawTextScreen(x, y + 10 + (i * 10), " %s", type.getName().c_str());
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + (i * 10), " %s", type.getName().c_str());
 	}
 	*/
 
@@ -555,7 +555,7 @@ void UXManager::drawBuildOrderQueueOnScreen(int x, int y)
 
 	for (std::deque<BuildOrderItem>::reverse_iterator itr = buildQueue->rbegin(); itr != buildQueue->rend(); itr++) {
 		BuildOrderItem & currentItem = *itr;
-		BWAPI::Broodwar->drawTextScreen(x, y + 10 + (itemCount * 10), " %s %d", currentItem.metaType.getName().c_str(), currentItem.blocking);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + (itemCount * 10), " %s %d", currentItem.metaType.getName().c_str(), currentItem.blocking);
 		itemCount++;
 		if (itemCount >= 24) break;
 	}
@@ -577,7 +577,7 @@ void UXManager::drawBuildStatusOnScreen(int x, int y)
 	// sort it based on the time it was started
 	std::sort(unitsUnderConstruction.begin(), unitsUnderConstruction.end(), CompareWhenStarted());
 
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04 <Build Status>");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04 <Build Status>");
 
 	size_t reps = unitsUnderConstruction.size() < 10 ? unitsUnderConstruction.size() : 10;
 
@@ -591,7 +591,7 @@ void UXManager::drawBuildStatusOnScreen(int x, int y)
 			t = unit->getBuildType();
 		}
 
-		BWAPI::Broodwar->drawTextScreen(x, y, " %s%s (%d)", prefix.c_str(), t.getName().c_str(), unit->getRemainingBuildTime());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, " %s%s (%d)", prefix.c_str(), t.getName().c_str(), unit->getRemainingBuildTime());
 	}
 
 	// Tech Research 표시
@@ -617,7 +617,7 @@ void UXManager::drawReservedBuildingTilesOnMap()
 				int x2 = (x + 1) * 32 - 8;
 				int y2 = (y + 1) * 32 - 8;
 
-				BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Yellow, false);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Yellow, false);
 			}
 		}
 	}
@@ -632,13 +632,13 @@ void UXManager::drawTilesToAvoidOnMap()
 		int x2 = (t.x + 1) * 32 - 8;
 		int y2 = (t.y + 1) * 32 - 8;
 
-		BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Orange, false);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Orange, false);
 	}
 }
 
 void UXManager::drawConstructionQueueOnScreenAndMap(int x, int y)
 {
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04 <Construction Status>");
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04 <Construction Status>");
 
 	int yspace = 0;
 
@@ -650,15 +650,15 @@ void UXManager::drawConstructionQueueOnScreenAndMap(int x, int y)
 
 		if (b.status == ConstructionStatus::Unassigned)
 		{
-			BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - No Worker", b.type.getName().c_str());
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - No Worker", b.type.getName().c_str());
 		}
 		else if (b.status == ConstructionStatus::Assigned)
 		{
 			if (b.constructionWorker == nullptr) {
-				BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - Assigned Worker Null", b.type.getName().c_str());
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - Assigned Worker Null", b.type.getName().c_str());
 			}
 			else {
-				BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - Assigned Worker %d, Position (%d,%d)", b.type.getName().c_str(), b.constructionWorker->getID(), b.finalPosition.x, b.finalPosition.y);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - Assigned Worker %d, Position (%d,%d)", b.type.getName().c_str(), b.constructionWorker->getID(), b.finalPosition.x, b.finalPosition.y);
 			}
 
 			int x1 = b.finalPosition.x * 32;
@@ -666,12 +666,12 @@ void UXManager::drawConstructionQueueOnScreenAndMap(int x, int y)
 			int x2 = (b.finalPosition.x + b.type.tileWidth()) * 32;
 			int y2 = (b.finalPosition.y + b.type.tileHeight()) * 32;
 
-			BWAPI::Broodwar->drawLineMap(b.constructionWorker->getPosition().x, b.constructionWorker->getPosition().y, (x1 + x2) / 2, (y1 + y2) / 2, BWAPI::Colors::Orange);
-			BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Red, false);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(b.constructionWorker->getPosition().x, b.constructionWorker->getPosition().y, (x1 + x2) / 2, (y1 + y2) / 2, BWAPI::Colors::Orange);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Red, false);
 		}
 		else if (b.status == ConstructionStatus::UnderConstruction)
 		{
-			BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - Under Construction", b.type.getName().c_str());
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %s - Under Construction", b.type.getName().c_str());
 		}
 		yspace++;
 	}
@@ -682,11 +682,11 @@ void UXManager::drawConstructionQueueOnScreenAndMap(int x, int y)
 void UXManager::drawUnitIdOnMap() {
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		BWAPI::Broodwar->drawTextMap(unit->getPosition().x, unit->getPosition().y + 5, "\x07%d", unit->getID());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(unit->getPosition().x, unit->getPosition().y + 5, "\x07%d", unit->getID());
 	}
 	for (auto & unit : BWAPI::Broodwar->enemy()->getUnits())
 	{
-		BWAPI::Broodwar->drawTextMap(unit->getPosition().x, unit->getPosition().y + 5, "\x07%d", unit->getID());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(unit->getPosition().x, unit->getPosition().y + 5, "\x07%d", unit->getID());
 	}
 }
 
@@ -696,7 +696,7 @@ void UXManager::drawWorkerStateOnScreen(int x, int y)
 {
 	WorkerData  workerData = WorkerManager::Instance().getWorkerData();
 
-	BWAPI::Broodwar->drawTextScreen(x, y, "\x04<Workers : %d>", workerData.getNumMineralWorkers());
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "\x04<Workers : %d>", workerData.getNumMineralWorkers());
 
 	int yspace = 0;
 
@@ -709,14 +709,14 @@ void UXManager::drawWorkerStateOnScreen(int x, int y)
 			continue;
 		}
 
-		BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %d", unit->getID());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10 + ((yspace)* 10), "\x03 %d", unit->getID());
 
 		if (workerData.getJobCode(unit) == 'B') {
-			BWAPI::Broodwar->drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), "\x03 %c %s %c (%d, %d)", workerData.getJobCode(unit),
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), "\x03 %c %s %c (%d, %d)", workerData.getJobCode(unit),
 				unit->getBuildType().c_str(), unit->isConstructing() ? 'Y' : 'N', unit->getTilePosition().x, unit->getTilePosition().y);
 		}
 		else {
-			BWAPI::Broodwar->drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), "\x03 %c", workerData.getJobCode(unit));
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x + 30, y + 10 + ((yspace++) * 10), "\x03 %c", workerData.getJobCode(unit));
 		}
 	}
 }
@@ -731,8 +731,8 @@ void UXManager::drawWorkerCountOnMap()
 		int x = depot->getPosition().x - 64;
 		int y = depot->getPosition().y - 32;
 
-		BWAPI::Broodwar->drawBoxMap(x - 2, y - 1, x + 75, y + 14, BWAPI::Colors::Black, true);
-		BWAPI::Broodwar->drawTextMap(x, y, "\x04 Workers: %d", WorkerManager::Instance().getWorkerData().getNumAssignedWorkers(depot));
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x - 2, y - 1, x + 75, y + 14, BWAPI::Colors::Black, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(x, y, "\x04 Workers: %d", WorkerManager::Instance().getWorkerData().getNumAssignedWorkers(depot));
 	}
 }
 
@@ -746,15 +746,15 @@ void UXManager::drawWorkerMiningStatusOnMap()
 
 		BWAPI::Position pos = worker->getTargetPosition();
 
-		BWAPI::Broodwar->drawTextMap(worker->getPosition().x, worker->getPosition().y - 5, "\x07%c", workerData.getJobCode(worker));
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(worker->getPosition().x, worker->getPosition().y - 5, "\x07%c", workerData.getJobCode(worker));
 
-		BWAPI::Broodwar->drawLineMap(worker->getPosition().x, worker->getPosition().y, pos.x, pos.y, BWAPI::Colors::Cyan);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(worker->getPosition().x, worker->getPosition().y, pos.x, pos.y, BWAPI::Colors::Cyan);
 
 		/*
 		// ResourceDepot ~ Worker 사이에 직선 표시
 		BWAPI::Unit depot = workerData.getWorkerDepot(worker);
 		if (depot) {
-		BWAPI::Broodwar->drawLineMap(worker->getPosition().x, worker->getPosition().y, depot->getPosition().x, depot->getPosition().y, BWAPI::Colors::Orange);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(worker->getPosition().x, worker->getPosition().y, depot->getPosition().x, depot->getPosition().y, BWAPI::Colors::Orange);
 		}
 		*/
 	}
@@ -782,20 +782,20 @@ void UXManager::drawScoutInformation(int x, int y)
 	BWTA::BaseLocation * enemyBaseLocation = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy());
 
 	if (enemyBaseLocation != nullptr) {
-		BWAPI::Broodwar->drawTextScreen(x, y, "Enemy MainBaseLocation : (%d, %d)", enemyBaseLocation->getTilePosition().x, enemyBaseLocation->getTilePosition().y);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "Enemy MainBaseLocation : (%d, %d)", enemyBaseLocation->getTilePosition().x, enemyBaseLocation->getTilePosition().y);
 	}
 	else {
-		BWAPI::Broodwar->drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "Enemy MainBaseLocation : Unknown");
 	}
 
 	if (currentScoutStatus == ScoutStatus::NoScout) {
-		BWAPI::Broodwar->drawTextScreen(x, y + 10, "No Scout Unit");
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10, "No Scout Unit");
 	}
 	else {
 		BWAPI::Unit scoutUnit = ScoutManager::Instance().getScoutUnit();
 		if (!scoutUnit) {
 
-			BWAPI::Broodwar->drawTextScreen(x, y + 10, "Scout Unit : %s %d (%d, %d)", scoutUnit->getType().getName().c_str(), scoutUnit->getID(), scoutUnit->getTilePosition().x, scoutUnit->getTilePosition().y);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 10, "Scout Unit : %s %d (%d, %d)", scoutUnit->getType().getName().c_str(), scoutUnit->getID(), scoutUnit->getTilePosition().x, scoutUnit->getTilePosition().y);
 
 			BWAPI::Position scoutMoveTo = scoutUnit->getTargetPosition();
 
@@ -814,7 +814,7 @@ void UXManager::drawScoutInformation(int x, int y)
 						currentScoutTargetDistance = MapTools::Instance().getGroundDistance(scoutUnit->getPosition(), scoutMoveTo);
 					}
 
-					BWAPI::Broodwar->drawTextScreen(x, y + 20, "Target = (%d, %d) Distance = %4.0f",
+					if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y + 20, "Target = (%d, %d) Distance = %4.0f",
 						scoutMoveTo.x / TILE_SIZE, scoutMoveTo.y / TILE_SIZE,
 						currentScoutTargetDistance);
 
@@ -825,11 +825,11 @@ void UXManager::drawScoutInformation(int x, int y)
 				std::vector<BWAPI::Position> vertices = ScoutManager::Instance().getEnemyRegionVertices();
 				for (size_t i(0); i < vertices.size(); ++i)
 				{
-				BWAPI::Broodwar->drawCircleMap(vertices[i], 4, BWAPI::Colors::Green, false);
-				BWAPI::Broodwar->drawTextMap(vertices[i], "%d", i);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(vertices[i], 4, BWAPI::Colors::Green, false);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(vertices[i], "%d", i);
 				}
 
-				BWAPI::Broodwar->drawCircleMap(scoutMoveTo, 5, BWAPI::Colors::Red, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(scoutMoveTo, 5, BWAPI::Colors::Red, true);
 				}
 				*/
 			}
@@ -845,14 +845,14 @@ void UXManager::drawUnitTargetOnMap()
 		{
 			BWAPI::Unit targetUnit = unit->getTarget();
 			if (targetUnit != nullptr && targetUnit->getPlayer() != BWAPI::Broodwar->self()) {
-				BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Red, true);
-				BWAPI::Broodwar->drawCircleMap(targetUnit->getTargetPosition(), dotRadius, BWAPI::Colors::Red, true);
-				BWAPI::Broodwar->drawLineMap(unit->getPosition(), targetUnit->getTargetPosition(), BWAPI::Colors::Red);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Red, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(targetUnit->getTargetPosition(), dotRadius, BWAPI::Colors::Red, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(unit->getPosition(), targetUnit->getTargetPosition(), BWAPI::Colors::Red);
 			}
 			else if (unit->isMoving()) {
-				BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Orange, true);
-				BWAPI::Broodwar->drawCircleMap(unit->getTargetPosition(), dotRadius, BWAPI::Colors::Orange, true);
-				BWAPI::Broodwar->drawLineMap(unit->getPosition(), unit->getTargetPosition(), BWAPI::Colors::Orange);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Orange, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getTargetPosition(), dotRadius, BWAPI::Colors::Orange, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(unit->getPosition(), unit->getTargetPosition(), BWAPI::Colors::Orange);
 			}
 
 		}
@@ -869,9 +869,9 @@ void UXManager::drawBulletsOnMap()
 		double velocityY = b->getVelocityY();
 
 		// 아군 것이면 녹색, 적군 것이면 빨간색
-		BWAPI::Broodwar->drawLineMap(p, p + BWAPI::Position((int)velocityX, (int)velocityY), b->getPlayer() == BWAPI::Broodwar->self() ? BWAPI::Colors::Green : BWAPI::Colors::Red);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(p, p + BWAPI::Position((int)velocityX, (int)velocityY), b->getPlayer() == BWAPI::Broodwar->self() ? BWAPI::Colors::Green : BWAPI::Colors::Red);
 
-		BWAPI::Broodwar->drawTextMap(p, "%c%s", b->getPlayer() == BWAPI::Broodwar->self() ? BWAPI::Text::Green : BWAPI::Text::Red, b->getType().c_str());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(p, "%c%s", b->getPlayer() == BWAPI::Broodwar->self() ? BWAPI::Text::Green : BWAPI::Text::Red, b->getType().c_str());
 	}
 }
 

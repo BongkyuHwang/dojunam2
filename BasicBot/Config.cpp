@@ -37,7 +37,7 @@ namespace Config
 		bool DrawSquadInfo = false;
 		bool DrawBOSSStateInfo = false;
 		bool PrintModuleTimeout = false;
-		bool createTrackingLog = false;
+		bool createTrackingLog = true;
 
 		std::string ErrorLogFilename = "UAB_ErrorLog.txt";
 		bool LogAssertToErrorFile = false;
@@ -60,7 +60,7 @@ namespace Config
 		bool DrawBWTAInfo = true;
 		bool DrawMapGrid = false;
 		bool DrawUnitTargetInfo = true;
-
+		bool Draw = false;
 
 	}
 	namespace Strategy

@@ -12,7 +12,7 @@ void Micro::drawAPM(int x, int y)
 {
 	int bwapiAPM = BWAPI::Broodwar->getAPM();
 	int myAPM = (int)(TotalCommands / ((double)BWAPI::Broodwar->getFrameCount() / (24 * 60)));
-	BWAPI::Broodwar->drawTextScreen(x, y, "%d %d", bwapiAPM, myAPM);
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y, "%d %d", bwapiAPM, myAPM);
 }
 
 void Micro::SmartAttackUnit(BWAPI::Unit attacker, BWAPI::Unit target)
@@ -46,9 +46,9 @@ void Micro::SmartAttackUnit(BWAPI::Unit attacker, BWAPI::Unit target)
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::Red, true);
-		BWAPI::Broodwar->drawCircleMap(target->getPosition(), dotRadius, BWAPI::Colors::Red, true);
-		BWAPI::Broodwar->drawLineMap(attacker->getPosition(), target->getPosition(), BWAPI::Colors::Red);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::Red, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(target->getPosition(), dotRadius, BWAPI::Colors::Red, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(attacker->getPosition(), target->getPosition(), BWAPI::Colors::Red);
 	}
 }
 
@@ -83,9 +83,9 @@ void Micro::SmartAttackMove(BWAPI::Unit attacker, const BWAPI::Position & target
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::Orange, true);
-		BWAPI::Broodwar->drawCircleMap(targetPosition, dotRadius, BWAPI::Colors::Orange, true);
-		BWAPI::Broodwar->drawLineMap(attacker->getPosition(), targetPosition, BWAPI::Colors::Orange);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::Orange, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(targetPosition, dotRadius, BWAPI::Colors::Orange, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(attacker->getPosition(), targetPosition, BWAPI::Colors::Orange);
 	}
 }
 
@@ -131,9 +131,9 @@ void Micro::SmartMove(BWAPI::Unit attacker, const BWAPI::Position & targetPositi
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::White, true);
-		BWAPI::Broodwar->drawCircleMap(targetPosition, dotRadius, BWAPI::Colors::White, true);
-		BWAPI::Broodwar->drawLineMap(attacker->getPosition(), targetPosition, BWAPI::Colors::White);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::White, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(targetPosition, dotRadius, BWAPI::Colors::White, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(attacker->getPosition(), targetPosition, BWAPI::Colors::White);
 	}
 }
 
@@ -168,9 +168,9 @@ void Micro::SmartRightClick(BWAPI::Unit unit, BWAPI::Unit target)
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
-		BWAPI::Broodwar->drawCircleMap(target->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
-		BWAPI::Broodwar->drawLineMap(unit->getPosition(), target->getPosition(), BWAPI::Colors::Cyan);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(target->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(unit->getPosition(), target->getPosition(), BWAPI::Colors::Cyan);
 	}
 }
 
@@ -184,7 +184,7 @@ void Micro::SmartLaySpiderMine(BWAPI::Unit unit, BWAPI::Position pos)
 
 	if (!unit->canUseTech(BWAPI::TechTypes::Spider_Mines, pos))
 	{
-		//BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 50), "%s", "I can't mining");
+		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 50), "%s", "I can't mining");
 		if (pos.isValid())		
 			return;
 	}
@@ -199,8 +199,8 @@ void Micro::SmartLaySpiderMine(BWAPI::Unit unit, BWAPI::Position pos)
 	// if we've already told this unit to move to this position, ignore this command
 	if ((currentCommand.getType() == BWAPI::UnitCommandTypes::Use_Tech_Position) && (currentCommand.getTargetPosition() == pos))// && unit->isMoving())
 	{
-		//BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 50), "%s", "I'm Going for mining");
-		//BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 60), "%d", BWAPI::Broodwar->getFrameCount() - unit->getLastCommandFrame());
+		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 50), "%s", "I'm Going for mining");
+		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(unit->getPosition() + BWAPI::Position(0, 60), "%d", BWAPI::Broodwar->getFrameCount() - unit->getLastCommandFrame());
 		int count = 0;
 		if ((BWAPI::Broodwar->getFrameCount() - unit->getLastCommandFrame() > 100) && !unit->isMoving())
 		{
@@ -265,9 +265,9 @@ void Micro::SmartRepair(BWAPI::Unit unit, BWAPI::Unit target)
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
-		BWAPI::Broodwar->drawCircleMap(target->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
-		BWAPI::Broodwar->drawLineMap(unit->getPosition(), target->getPosition(), BWAPI::Colors::Cyan);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(target->getPosition(), dotRadius, BWAPI::Colors::Cyan, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(unit->getPosition(), target->getPosition(), BWAPI::Colors::Cyan);
 	}
 }
 
@@ -323,7 +323,7 @@ void Micro::SmartKiteTarget(BWAPI::Unit rangedUnit, BWAPI::Unit target)
 	if (kite)
 	{
 		BWAPI::Position fleePosition(rangedUnit->getPosition() - target->getPosition() + rangedUnit->getPosition());
-		//BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition(), fleePosition, BWAPI::Colors::Cyan);
+		//if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition(), fleePosition, BWAPI::Colors::Cyan);
 
 		//@µµÁÖ³² ±èÁöÈÆ
 		if (!fleePosition.isValid())
@@ -472,8 +472,8 @@ void Micro::SmartAttackMove2(BWAPI::Unit attacker, BWAPI::Position orderCenterPo
 
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
-		BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::Orange, true);
-		BWAPI::Broodwar->drawCircleMap(targetPosition, dotRadius, BWAPI::Colors::Orange, true);
-		BWAPI::Broodwar->drawLineMap(attacker->getPosition(), targetPosition, BWAPI::Colors::Orange);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::Orange, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(targetPosition, dotRadius, BWAPI::Colors::Orange, true);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(attacker->getPosition(), targetPosition, BWAPI::Colors::Orange);
 	}
 }

@@ -43,7 +43,7 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			if ((InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy()) == choke || InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy()) == choke) && choke->getCenter().getDistance(meleeUnit->getPosition()) < 64)
 			{
 				////std::cout << "choke->getWidth() Tank In Choke Point half " << std::endl;
-				//BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
+				//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
 				nearChokepoint = true;
 				break;
 			}
@@ -80,7 +80,7 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				//if (meleeUnit->getStimTimer() > 0
 				//	&& meleeUnit->getType() == BWAPI::UnitTypes::Terran_Firebat)
 				//{
-				//	BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y + 50, "%s", "stimPacks On");
+				//	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y + 50, "%s", "stimPacks On");
 				//
 				//}
 				// attack it
@@ -91,7 +91,7 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			{
 				if (order.getClosestUnit() != nullptr)
 				{
-					//BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y + 50, "%s", "Go Near Medic");
+					//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y + 50, "%s", "Go Near Medic");
 					Micro::SmartAttackMove(meleeUnit, order.getClosestUnit()->getPosition());
 					//Micro::SmartAttackMove2(meleeUnit, order.getCenterPosition() , order.getClosestUnit()->getPosition());
 				}
@@ -108,7 +108,7 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 
 		//if (Config::Debug::DrawUnitTargetInfo)
 		//{
-		//	BWAPI::Broodwar->drawLineMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y,
+		//	if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y,
 		//		meleeUnit->getTargetPosition().x, meleeUnit->getTargetPosition().y, BWAPI::Colors::White);
 		//}
 	}
@@ -351,7 +351,7 @@ void MeleeManager::assignTargetsNew(const BWAPI::Unitset & targets)
 				// move to it
 				Micro::SmartMove(unit, order.getPosition());
 
-				//BWAPI::Broodwar->drawLineMap(unit->getPosition(), order.getPosition(), BWAPI::Colors::Yellow);
+				//if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(unit->getPosition(), order.getPosition(), BWAPI::Colors::Yellow);
 			}
 		}
 	}

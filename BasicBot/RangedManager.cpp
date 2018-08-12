@@ -66,7 +66,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 		//		&& choke->getCenter().getDistance(rangedUnit->getPosition()) < 64)
 		//	{
 		//		////std::cout << "choke->getWidth() Tank In Choke Point half " << std::endl;
-		//		//BWAPI::Broodwar->drawTextMap(rangedUnit->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
+		//		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(rangedUnit->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
 		//		nearChokepoint = true;
 		//		break;
 		//	}
@@ -101,7 +101,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 
 				//if (target && Config::Debug::DrawUnitTargetInfo)
 				//{
-				//	BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition(), rangedUnit->getTargetPosition(), BWAPI::Colors::Purple);
+				//	if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition(), rangedUnit->getTargetPosition(), BWAPI::Colors::Purple);
 				//}
 
 				if (rangedUnit->getStimTimer() == 0
@@ -229,9 +229,14 @@ int RangedManager::getAttackPriority(BWAPI::Unit rangedUnit, BWAPI::Unit target)
 		return 0;
 	}
 
-	if (rangedUnit->isFlying() && target->getType() == BWAPI::UnitTypes::Protoss_Carrier)
+	if (target->getType() == BWAPI::UnitTypes::Protoss_Carrier && rangedUnit->canAttack(target))
 	{
 		return 101;
+	}
+
+	if (rangedType == BWAPI::UnitTypes::Terran_Goliath && target->isFlying())
+	{
+		return 90;
 	}
 
 	// if the target is building something near our base something is fishy

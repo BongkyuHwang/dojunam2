@@ -36,7 +36,7 @@ void Squad::update()
 		// update all necessary unit information within this squad
 		_order.setCenterPosition(BWAPI::Positions::None);
 		
-		BWAPI::Broodwar->drawCircleMap(_order.getPosition(), _order.getRadius(), BWAPI::Colors::Cyan, false);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_order.getPosition(), _order.getRadius(), BWAPI::Colors::Cyan, false);
 
 		std::vector<BWAPI::Unitset> ud = _units_divided(2);
 		int tmpCnt = 0;
@@ -152,7 +152,7 @@ void Squad::update()
 		// draw some debug info
 		if (Config::Debug::DrawSquadInfo && _order.getType() == SquadOrderTypes::Attack)
 		{
-			BWAPI::Broodwar->drawTextScreen(200, 350, "%s", _regroupStatus.c_str());
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(200, 350, "%s", _regroupStatus.c_str());
 
 			BWAPI::Unit closest = unitClosestToEnemy();
 		}
@@ -217,6 +217,7 @@ void Squad::setAllUnits()
 
 	for (auto & unit : _units)
 	{
+
 		if (unit->isCompleted() &&
 			unit->getHitPoints() > 0 &&
 			unit->exists() &&
@@ -224,22 +225,24 @@ void Squad::setAllUnits()
 			unit->getPosition().isValid() &&
 			unit->getType() != BWAPI::UnitTypes::Unknown)
 		{
+			
 			//if (unit->isLoaded() && unit->getType() == BWAPI::UnitTypes::Terran_Marine)
 			//	continue;
 
 			//if (MapTools::Instance().getGroundDistance(unit->getPosition(), _order.getPosition()) < 0)
 			//{
 			//	unit->move(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-			//	//BWAPI::Broodwar->drawCircleMap(unit->getPosition(), 5, BWAPI::Colors::White, true);
+			//	//if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), 5, BWAPI::Colors::White, true);
 			//	////std::cout << "124	 " << unit->getID() << std::endl;
 			//	//continue;
 			//}
+
 			if (unit->isStuck())//|| unit->isIdle())
 			{
 				unit->move(_order.getPosition());
 			}
 			//else
-			//	BWAPI::Broodwar->drawCircleMap(unit->getPosition(), 5, BWAPI::Colors::Blue, true);
+			//	if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), 5, BWAPI::Colors::Blue, true);
 			goodUnits.insert(unit);
 
 			if (unit->getType().isOrganic() && unit->getType() != BWAPI::UnitTypes::Terran_Medic)
@@ -250,6 +253,7 @@ void Squad::setAllUnits()
 	}
 	_units.clear();
 	_units = goodUnits;
+	
 	if (organicUnits.size() > 0)
 		_order.setOrganicUnits(organicUnits);
 
@@ -275,11 +279,11 @@ void Squad::setNearEnemyUnits()
 		_nearEnemy[unit] = unitNearEnemy(unit);
 		if (_nearEnemy[unit])
 		{
-			if (Config::Debug::DrawSquadInfo) BWAPI::Broodwar->drawBoxMap(x - left, y - top, x + right, y + bottom, Config::Debug::ColorUnitNearEnemy);
+			if (Config::Debug::DrawSquadInfo) if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x - left, y - top, x + right, y + bottom, Config::Debug::ColorUnitNearEnemy);
 		}
 		else
 		{
-			if (Config::Debug::DrawSquadInfo) BWAPI::Broodwar->drawBoxMap(x - left, y - top, x + right, y + bottom, Config::Debug::ColorUnitNotNearEnemy);
+			if (Config::Debug::DrawSquadInfo) if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x - left, y - top, x + right, y + bottom, Config::Debug::ColorUnitNotNearEnemy);
 		}
 	}
 }
@@ -376,6 +380,7 @@ void Squad::addUnitsToMicroManagers()
 	BWAPI::Unitset tankUnits;
 	BWAPI::Unitset medicUnits;
 	BWAPI::Unitset vultureUnits;
+
 	// add _units to micro managers
 	for (auto & unit : _units)
 	{

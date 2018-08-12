@@ -40,7 +40,7 @@ void TimerManager::displayTimers(int x, int y)
         return;
     }
 
-	BWAPI::Broodwar->drawBoxScreen(x-5, y-5, x+110+_barWidth, y+5+(10*_timers.size()), BWAPI::Colors::Black, true);
+	if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxScreen(x-5, y-5, x+110+_barWidth, y+5+(10*_timers.size()), BWAPI::Colors::Black, true);
 
 	int yskip = 0;
 	double total = _timers[0].getElapsedTimeInMilliSec();
@@ -54,9 +54,9 @@ void TimerManager::displayTimers(int x, int y)
 
 		int width = (int)((elapsed == 0) ? 0 : (_barWidth * (elapsed / total)));
 
-		BWAPI::Broodwar->drawTextScreen(x, y+yskip-3, "\x04 %s", _timerNames[i].c_str());
-		BWAPI::Broodwar->drawBoxScreen(x+60, y+yskip, x+60+width+1, y+yskip+8, BWAPI::Colors::White);
-		BWAPI::Broodwar->drawTextScreen(x+70+_barWidth, y+yskip-3, "%.4lf", elapsed);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x, y+yskip-3, "\x04 %s", _timerNames[i].c_str());
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxScreen(x+60, y+yskip, x+60+width+1, y+yskip+8, BWAPI::Colors::White);
+		if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(x+70+_barWidth, y+yskip-3, "%.4lf", elapsed);
 		yskip += 10;
 	}
 }

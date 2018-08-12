@@ -81,26 +81,26 @@ void BOSSManager::drawSearchInformation(int x, int y)
     // draw the background
     int width = 155;
     int height = 80;
-    BWAPI::Broodwar->drawBoxScreen(BWAPI::Position(x-5,y), BWAPI::Position(x+width, y+height), BWAPI::Colors::Black, true);
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxScreen(BWAPI::Position(x-5,y), BWAPI::Position(x+width, y+height), BWAPI::Colors::Black, true);
 
     x += 5; y+=3;
 
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y), "%cBuildOrderSearch:", '\x04');
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y), "%cBuildOrderSearch:", '\x04');
     y += 10;
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y), "%s", _previousStatus.c_str());
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y), "%s", _previousStatus.c_str());
 
     for (size_t i(0); i < _previousGoalUnits.size(); ++i)
     {
         if (_previousGoalUnits[i].second > 0)
         {
             y += 10;
-            BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x,y), "%d %s", _previousGoalUnits[i].second, _previousGoalUnits[i].first.getName().c_str());
+            if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x,y), "%d %s", _previousGoalUnits[i].second, _previousGoalUnits[i].first.getName().c_str());
         }
     }
     
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y+25), "Time (ms): %.3lf", _totalPreviousSearchTime);
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y+35), "Nodes: %d", _savedSearchResults.nodesExpanded);
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y+45), "BO Size: %d", (int)_savedSearchResults.buildOrder.size());
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y+25), "Time (ms): %.3lf", _totalPreviousSearchTime);
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y+35), "Nodes: %d", _savedSearchResults.nodesExpanded);
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x, y+45), "BO Size: %d", (int)_savedSearchResults.buildOrder.size());
 }
 
 void BOSSManager::drawStateInformation(int x, int y) 
@@ -111,8 +111,8 @@ void BOSSManager::drawStateInformation(int x, int y)
     }
 
 	BOSS::GameState currentState(BWAPI::Broodwar, BWAPI::Broodwar->self(), ConstructionManager::Instance().buildingsQueued());
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x-100, y+30), "\x04%s", currentState.getBuildingData().toString().c_str());
-    BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x+150, y), "\x04%s", currentState.toString().c_str());
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x-100, y+30), "\x04%s", currentState.getBuildingData().toString().c_str());
+    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(BWAPI::Position(x+150, y), "\x04%s", currentState.toString().c_str());
     
 }
 
@@ -140,7 +140,7 @@ void BOSSManager::update(double timeLimit)
         {
             //UAB_ASSERT_WARNING(false, "BOSS SmartSearch Exception: %s", exception.what());
 			std::cout << exception << std::endl;
-			BWAPI::Broodwar->drawTextScreen(0, 0, "Previous search didn't find a solution, resorting to Naive Build Order");
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(0, 0, "Previous search didn't find a solution, resorting to Naive Build Order");
             _previousStatus = "BOSSExeption";
             caughtException = true;
 		}
@@ -229,7 +229,7 @@ void BOSSManager::update(double timeLimit)
                     _previousStatus += "\x08Naive Exception";
                     if (1)
                     {
-					    BWAPI::Broodwar->drawTextScreen(0, 20, "No legal BuildOrder found, returning empty Build Order");
+					    if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(0, 20, "No legal BuildOrder found, returning empty Build Order");
                     }
 					_previousBuildOrder = BOSS::BuildOrder();
 					return;

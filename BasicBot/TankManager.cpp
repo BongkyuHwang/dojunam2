@@ -58,7 +58,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 			if (choke->getCenter().getDistance(tank->getPosition()) < 80)
 			{
 				////std::cout << "choke->getWidth() Tank In Choke Point half " << std::endl;
-				//BWAPI::Broodwar->drawTextMap(tank->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
+				//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(tank->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
 				tankNearChokepoint = true;
 				break;
 			}
@@ -121,8 +121,8 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
                     Micro::SmartKiteTarget(tank, target);
                 }
 				if (tank->isAttackFrame())
-					BWAPI::Broodwar->drawCircleMap(tank->getPosition(), 3, BWAPI::Colors::White, false);
-				BWAPI::Broodwar->drawLineMap(tank->getPosition(), target->getPosition(), BWAPI::Colors::White);
+					if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(tank->getPosition(), 3, BWAPI::Colors::White, false);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(tank->getPosition(), target->getPosition(), BWAPI::Colors::White);
 
 				if (cadidateRemoveTarget)
 					tankTargets.erase(cadidateRemoveTarget);

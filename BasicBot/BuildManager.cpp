@@ -54,7 +54,7 @@ void BuildManager::update()
 	if (buildQueue.isEmpty()) {
 		if ((buildQueue.size() == 0) && (BWAPI::Broodwar->getFrameCount() > 10))
 		{
-			BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, new search!");
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(150, 10, "Nothing left to build, new search!");
 
 			performBuildOrderSearch();
 		}

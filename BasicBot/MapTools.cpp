@@ -143,16 +143,16 @@ void MapGrid::update()
 		for (size_t i(0); i < _enemyRegionVertices.size(); ++i)
 		{
 			if (j.getOppositeChock() == _enemyRegionVertices[i]){
-				BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 8, BWAPI::Colors::Red, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 8, BWAPI::Colors::Red, true);
 			}
 			else if (j.getSiegeDefence() == _enemyRegionVertices[i]){
-				BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 8, BWAPI::Colors::Blue, true);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 8, BWAPI::Colors::Blue, true);
 			}
 			else{
-				BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 4, BWAPI::Colors::Green, false);
+				if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_enemyRegionVertices[i], 4, BWAPI::Colors::Green, false);
 			}
 
-			BWAPI::Broodwar->drawTextMap(_enemyRegionVertices[i], "%d", i);
+			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(_enemyRegionVertices[i], "%d", i);
 		}
 	}
 
@@ -753,8 +753,8 @@ void RegionVertices::init(BWTA::BaseLocation *baseLocation)
 				int x2 = (tp.x + 1) * 32 - 2;
 				int y2 = (tp.y + 1) * 32 - 2;
 
-				//BWAPI::Broodwar->drawTextMap(x1 + 3, y1 + 2, "%d", MapTools::Instance().getGroundDistance(BWAPI::Position(tp), basePosition));
-				//BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Green, false);
+				//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(x1 + 3, y1 + 2, "%d", MapTools::Instance().getGroundDistance(BWAPI::Position(tp), basePosition));
+				//if (Config::Debug::Draw) BWAPI::Broodwar->drawBoxMap(x1, y1, x2, y2, BWAPI::Colors::Green, false);
 			}
 
 			unsortedVertices.insert(BWAPI::Position(tp) + BWAPI::Position(16, 16));

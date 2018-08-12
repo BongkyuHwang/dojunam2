@@ -157,8 +157,9 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			//if (BWTA::getRegion(BWAPI::TilePosition(vultureUnit->getPosition())) != InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getRegion())
 			if (BWTA::getRegion(BWAPI::TilePosition(vultureUnit->getPosition()))
 				== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
-				&& order.getPosition().getDistance(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition()) > 100)
+				|| vultureUnit->getPosition().getDistance(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition()) > 100)
 			{
+
 				if (vultureUnit->getSpiderMineCount() == 3)
 					Micro::SmartLaySpiderMine(vultureUnit, vultureUnit->getPosition());
 				else
@@ -173,7 +174,7 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			}
 			else
 			{
-				if (vultureUnit->getDistance(order.getPosition()) > 100)
+				if (vultureUnit->getDistance(order.getPosition()) > 200)
 					vultureUnit->move(order.getPosition());
 			}
 			continue;
@@ -233,45 +234,7 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 						&& !vultureUnit->isStuck() && InformationManager::Instance().rushState == 0)//&& (miningUnit == nullptr || miningUnit == vultureUnit) && !vultureUnit->isStuck())
 					{
 						BWAPI::Position mineSetPosition = vultureUnit->getPosition();
-						//@도주남 김지훈 스파이더마인 설치를 지나가는 패스에 우선적으로 설치한다.
-						//if (chokePointForVulture.size() <= chokePointCount)
-						//	mineSetPosition = chokePointForVulture[(vultureUnit->getID() + vultureUnit->getSpiderMineCount()) % chokePointForVulture.size()];
-						//else
-						//{	
-						//	mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1 - vultureUnit->getID() % 3];
-						//	if (vultureUnit->isUnderAttack())
-						//	{
-						//		chokePointForVulture.pop_back();
-						//		Micro::SmartMove(vultureUnit, order.getPosition());
-						//		continue;
-						//	}
-
-						//	for (auto & ifmine : BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)))
-						//	{
-						//		if (ifmine->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine)
-						//		{
-						//			chokePointForVulture.pop_back();
-						//			break;
-						//		}
-						//	}
-						//}
-
-						//while (!vultureUnit->canUseTechPosition(BWAPI::TechTypes::Spider_Mines, mineSetPosition) || BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)).size() > 1)
-						//{
-						//	if (vultureUnit->getID() % 4 == 0)
-						//		mineSetPosition += BWAPI::Position(1, 1);
-						//	else if (vultureUnit->getID() % 4 == 1)
-						//		mineSetPosition += BWAPI::Position(0, -1);
-						//	else if (vultureUnit->getID() % 4 == 2)
-						//		mineSetPosition += BWAPI::Position(-2, 0);
-						//	else if (vultureUnit->getID() % 4 == 3)
-						//		mineSetPosition += BWAPI::Position(-1, -1);
-						//	if (!mineSetPosition.isValid())
-						//	{
-						//		mineSetPosition = vultureUnit->getPosition();
-						//		//break;
-						//	}
-						//}
+						
 						mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1];
 						// 벌처가 마인을 설치해야 하는 위치중 제일 마지막 위치를 가져오고, 해당위치가 유효 한 경우에만 마인을 설치한다.
 						bool position_invalid = true;
@@ -291,6 +254,8 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 									{
 										mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 2];
 										chokePointForVulture.pop_back();
+										position_invalid = false;
+										break;
 									}
 									else if (chokePointForVulture.size() > 0)
 										chokePointForVulture.pop_back();
@@ -320,7 +285,7 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				if (vultureUnit->getDistance(order.getPosition()) > 100)
 				{
 					// move to it
-					Micro::SmartAttackMove(vultureUnit, order.getPosition());
+					Micro::SmartMove(vultureUnit, order.getPosition());
 				}
 			}
 		}

@@ -100,8 +100,13 @@ void CombatCommander::initializeSquads()
 	int radiusAttack = im.getMapName() == 'H' ? 50 : 30;
 	int radiusScout = 10;
 
-	SquadOrder defcon2Order(SquadOrderTypes::Idle, in_1st_chock_center
-		, BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + radiusAttack, in_1st_chock_side, "DEFCON2");
+	RegionVertices *tmpObj = MapGrid::Instance().getRegionVertices(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self()));
+	BWAPI::Position seedPosition = BWAPI::Positions::None;
+	if (tmpObj != NULL){
+		seedPosition = tmpObj->getSiegeDefence();
+	}
+
+	SquadOrder defcon2Order(SquadOrderTypes::Idle, seedPosition, 400, "DEFCON2");
 	_squadData.addSquad("DEFCON2", Squad("DEFCON2", defcon2Order, IdlePriority));
 
 	//앞마당 중간에서 정찰만
@@ -126,12 +131,6 @@ void CombatCommander::initializeSquads()
 
 	if (InformationManager::Instance().getMapName() != 'H')
 	{
-		RegionVertices *tmpObj = MapGrid::Instance().getRegionVertices(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self()));
-		BWAPI::Position seedPosition = BWAPI::Positions::None;
-		if (tmpObj != NULL){
-			seedPosition = tmpObj->getSiegeDefence();
-		}
-
 		SquadOrder siegeDefenceOrder(SquadOrderTypes::Defend, seedPosition, 400, "S4D");
 		_squadData.addSquad("S4D", Squad("S4D", siegeDefenceOrder, BaseDefensePriority));
 	}
@@ -407,7 +406,7 @@ void CombatCommander::updateDropSquads()
     int transportSpotsRemaining = 8;
     auto & dropUnits = dropSquad.getUnits();
 	BWAPI::Unit dropShipUnit = nullptr;
-
+	
 	for (auto & unit : dropUnits)
 	{
 		if (unit->isFlying() && unit->getType().spaceProvided() > 0)
@@ -418,13 +417,17 @@ void CombatCommander::updateDropSquads()
 
     for (auto & unit : dropUnits)
     {
-        if (unit->isFlying() && unit->getType().spaceProvided() > 0)
+		if (unit->isFlying() && unit->getType().spaceProvided() > 0 && unit->getHitPoints() > 0)
         {
             dropSquadHasTransport = true;
         }
         else
         {
-			if (dropShipUnit)
+			if (dropShipUnit && dropShipUnit->isUnderAttack())
+			{
+				dropShipUnit->unload(unit);
+			}
+			else if (dropShipUnit && dropShipUnit->getSpaceRemaining() != 0)
 			{
 				if (!unit->isLoaded() 
 					&& BWTA::getRegion(BWAPI::TilePosition(unit->getPosition())) 
@@ -432,12 +435,22 @@ void CombatCommander::updateDropSquads()
 					|| unit->getPosition().getDistance(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition()) < 200)
 				{
 					dropShipUnit->load(unit);
+					if (!unit->isFlying())
+					{
+						if (unit->getPosition().getDistance(dropShipUnit->getPosition()) > 10)
+							unit->move(dropShipUnit->getPosition());
+						
+						unit->load(dropShipUnit);
+					}
 				}
 			}
             transportSpotsRemaining -= unit->getType().spaceRequired();
         }
     }
-
+	if (!dropSquadHasTransport)
+	{
+		dropSquad.clear();
+	}
     // if there are still units to be added to the drop squad, do it
 	if ((transportSpotsRemaining > 0 || !dropSquadHasTransport))
     {
@@ -457,23 +470,6 @@ void CombatCommander::updateDropSquads()
                 continue;
             }
 
-            // get every unit of a lower priority and put it into the attack squad
-			
-			//if (InformationManager::Instance().getMapName() == 'L')
-			//{
-			//	if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode
-			//		&& _squadData.canAssignUnitToSquad(unit, dropSquad)
-			//		&& !dropSquad.containsUnit(unit)
-			//		&& BWTA::getRegion(BWAPI::TilePosition(unit->getPosition()))
-			//		== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition())
-			//		&& dropSquadHasTransport
-			//		)
-			//	{
-			//		_squadData.assignUnitToSquad(unit, dropSquad);
-			//		transportSpotsRemaining -= unit->getType().spaceRequired();
-			//	}
-			//}
-			//else
 			{
 				if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture
 					&& _squadData.canAssignUnitToSquad(unit, dropSquad)
