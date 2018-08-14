@@ -16,7 +16,7 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 	
 	for (auto & unit : order.getOrganicUnits())
     {		
-		if (unit->getHitPoints() < unit->getType().maxHitPoints())
+		if (unit->exists() && unit->getHitPoints() < unit->getType().maxHitPoints())
 		{
             medicTargets.insert(unit);
         }

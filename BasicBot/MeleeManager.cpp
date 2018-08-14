@@ -26,7 +26,8 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			!(target->isLifted()) &&
 			!(target->getType() == BWAPI::UnitTypes::Zerg_Larva) &&
 			!(target->getType() == BWAPI::UnitTypes::Zerg_Egg) &&
-			target->isVisible())
+			target->isVisible() 
+			&& target->exists())
 		{
 			meleeUnitTargets.insert(target);
 		}

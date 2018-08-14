@@ -14,7 +14,8 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 	// figure out targets
 	BWAPI::Unitset tankTargets;	
 	cadidateRemoveTarget = nullptr;
-    std::copy_if(targets.begin(), targets.end(), std::inserter(tankTargets, tankTargets.end()), 
+	if (targets.size() > 0 )
+		std::copy_if(targets.begin(), targets.end(), std::inserter(tankTargets, tankTargets.end()), 
                  [](BWAPI::Unit u){ return u->isVisible() && !u->isFlying(); });
 
     int siegeTankRange = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() - 32;

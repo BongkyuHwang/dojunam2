@@ -14,21 +14,35 @@ void MicroManager::setUnits(const BWAPI::Unitset & u)
 
 BWAPI::Position MicroManager::calcCenter() const
 {
-    if (_units.empty())
-    {
-        if (Config::Debug::DrawSquadInfo)
-        {
-            BWAPI::Broodwar->printf("Squad::calcCenter() called on empty squad");
-        }
-        return BWAPI::Position(0,0);
-    }
+	if (_units.empty())
+	{
+		if (Config::Debug::DrawSquadInfo)
+		{
+			BWAPI::Broodwar->printf("Squad::calcCenter() called on empty squad");
+		}
+		return BWAPI::Positions::None;
+	}
 
-	BWAPI::Position accum(0,0);
+	BWAPI::Position accum(0, 0);
+	int sizeUnits = 0;
 	for (auto & unit : _units)
 	{
-		accum += unit->getPosition();
+		if (!unit->isFlying())
+		{
+			sizeUnits++;
+			accum += unit->getPosition();
+		}
+		if (unit->getType() == (BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode) || unit->getType() == (BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode))
+		{
+			accum += unit->getPosition();
+			sizeUnits++;
+		}
+		
+		////std::cout << " BWAPI::Position Squad::calcCenter()   " << accum.x << " / " << accum.y << std::endl;
 	}
-	return BWAPI::Position(accum.x / _units.size(), accum.y / _units.size());
+	if (sizeUnits == 0)
+		return BWAPI::Positions::None;
+	return BWAPI::Position(accum.x / sizeUnits, accum.y / sizeUnits);
 }
 
 void MicroManager::execute(const SquadOrder & inputOrder)
@@ -42,18 +56,21 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 	order = inputOrder;
 	drawOrderText();
 	BWAPI::Position movePosition = order.getPosition();
-	if (order.getStatus() == "DEFCON2" || order.getStatus() == "DEFCON4")
-	{
-		if (order.getLine().first != BWAPI::Positions::None && order.getLine().second != BWAPI::Positions::None)
-			order.setPosition((order.getLine().first + order.getLine().second)/2);
-	}
+	//if (order.getStatus() == "DEFCON2" || order.getStatus() == "DEFCON4")
+	//{
+	//	if (order.getLine().first != BWAPI::Positions::None && order.getLine().second != BWAPI::Positions::None)
+	//		order.setPosition((order.getLine().first + order.getLine().second)/2);
+	//}
 	// Discover enemies within region of interest
 	BWAPI::Unitset nearbyEnemies;
 
 	// if the order is to defend, we only care about units in the radius of the defense
 	if (order.getType() == SquadOrderTypes::Drop)
 	{
-		MapGrid::Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
+		if(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) != nullptr)
+			MapGrid::Instance().getUnitsNear(nearbyEnemies, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition(), 200, false, true);
+		else
+			MapGrid::Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
 	
 	} // otherwise we want to see everything on the way
 	else if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle || order.getType() == SquadOrderTypes::Attack)

@@ -35,7 +35,8 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	
 	// figure out targets
 	BWAPI::Unitset rangedUnitTargets;
-	std::copy_if(targets.begin(), targets.end(), std::inserter(rangedUnitTargets, rangedUnitTargets.end()), [](BWAPI::Unit u){ return u->isVisible(); });
+	if (targets.size() > 0)
+		std::copy_if(targets.begin(), targets.end(), std::inserter(rangedUnitTargets, rangedUnitTargets.end()), [](BWAPI::Unit u){ return u->isVisible(); });
 	
 	for (auto & rangedUnit : rangedUnits)
 	{

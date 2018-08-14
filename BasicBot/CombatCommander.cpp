@@ -1236,7 +1236,7 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			BWAPI::Position tp(t.x * 32, t.y * 32);
 			if (!tp.isValid())
 				continue;
-			if (tp.getDistance(startCP->getCenter()) <= startCP->getWidth())
+			if (tp.getDistance(startCP->getCenter()) <= startCP->getWidth()*32)
 				indexFirstChokePoint_OrderPosition++;
 			firstChokePoint_OrderPositionPath.push_back(tp);
 		}

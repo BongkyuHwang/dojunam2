@@ -197,7 +197,7 @@ void ConstructionManager::assignWorkersToUnassignedBuildings()
 			////std::cout << "set ConstuctionWorker " << workerToAssign->getID() << std::endl;
 
             b.constructionWorker = workerToAssign;
-			
+			//printf("In 200 Worker ID[%d] : %s\n", b.constructionWorker->getID(), b.type.c_str());
 			WorkerManager::Instance().setConstructionWorker(b.constructionWorker, b.type);
 			
 			b.finalPosition = testLocation;
@@ -289,7 +289,7 @@ void ConstructionManager::constructAssignedBuildings()
 
 				// build command 
 				b.constructionWorker->build(b.type, b.finalPosition);
-
+				//printf("In 292 Worker ID[%d] : %s\n", b.constructionWorker->getID(), b.type.c_str());
 				WorkerManager::Instance().setConstructionWorker(b.constructionWorker, b.type);
 
 				// set the buildCommandGiven flag to true
@@ -457,7 +457,7 @@ void ConstructionManager::checkForDeadTerranBuilders()
 						////std::cout << "set ConstuctionWorker " << workerToAssign->getID() << std::endl;
 
 						b.constructionWorker = workerToAssign;
-
+						//printf("In 460 Worker ID[%d] : %s\n", b.constructionWorker->getID(), b.type.c_str());
 						WorkerManager::Instance().setConstructionWorker(b.constructionWorker, b.type);
 					
 						//b.status 는 계속 UnderConstruction 로 둔다. Assigned 로 바꾸면, 결국 Unassigned 가 되어서 새로 짓게 되기 때문이다

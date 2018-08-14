@@ -119,7 +119,8 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	int spiderMineCount = UnitUtils::GetAllUnitCount(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
 	// figure out targets
 	BWAPI::Unitset vultureUnitTargets;
-	std::copy_if(targets.begin(), targets.end(), std::inserter(vultureUnitTargets, vultureUnitTargets.end()), [](BWAPI::Unit u){ return u->isVisible(); });	
+	if (targets.size()>0)
+		std::copy_if(targets.begin(), targets.end(), std::inserter(vultureUnitTargets, vultureUnitTargets.end()), [](BWAPI::Unit u){ return u->isVisible(); });	
 	
 	if (order.getStatus() == "scout")
 	{
