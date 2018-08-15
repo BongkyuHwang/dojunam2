@@ -368,6 +368,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		int goal_num_vultures = numUnits["Vultures"];
 		int goal_num_tanks = numUnits["Tanks"];
 		
+		/*
 		if (numUnits["Factorys"] > 1 && numUnits["Armorys"] == 0 )
 		{
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Armory, 1));
@@ -377,7 +378,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		{
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Academy, 1));
 		}
-
+		*/
 		if (numUnits["Vultures"] > numUnits["Tanks"] && BWAPI::Broodwar->self()->gas() > 90) {
 			goal_num_tanks += 1;
 			goal_num_vultures += 1;
@@ -408,6 +409,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		int goal_num_vultures = numUnits["Vultures"];
 		int goal_num_goliath = numUnits["Goliath"];
 
+		/*
 		if (numUnits["Factorys"] > 1 && numUnits["Academy"] == 0)
 		{
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Academy, 1));
@@ -417,7 +419,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		{
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Armory, 1));
 		}
-
+		*/
 		if (numUnits["Factorys"] > 3)
 		{
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Vehicle_Weapons, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Vehicle_Weapons) + 1));
