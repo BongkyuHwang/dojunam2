@@ -14,6 +14,7 @@ StrategyManager::StrategyManager()
 	isFullScaleAttackStarted = false;
 	isInitialBuildOrderFinished = false;
 	firstChokeBunker = false;
+	buildSeedPositionStrategy = BuildOrderItem::SeedPositionStrategy::MainBaseLocation;
 }
 
 void StrategyManager::onStart()
@@ -496,6 +497,22 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Goliath, goal_num_goliath));
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, goal_num_tanks));
 
+		// 2018.08.16
+		// 황봉규
+		// 저그전일때 bionic_tank에서 Mechanic 으로 바뀌는 동안병력생산 공백을 줄이기 위한로직
+		if (InformationManager::Instance().enemyRace == BWAPI::Races::Zerg && numUnits["Factorys"] < 5) {
+			int goal_num_marines = numUnits["Marines"] + numUnits["Barracks"];
+			int goal_num_tanks = numUnits["Tanks"];
+
+			goal_num_tanks += 1;
+
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Marine, goal_num_marines));
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic, int(numUnits["Marines"] / 4)));
+			//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Firebat, unit_ratio_table["Medics"][goal_num_marines]));
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, goal_num_tanks));
+		}
+		
+
 	}
 	else if (_main_strategy == Strategy::main_strategies::BATTLE) {
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Ship_Weapons, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Ship_Weapons) + 1));
@@ -605,6 +622,8 @@ BuildOrderItem::SeedPositionStrategy StrategyManager::getBuildSeedPositionStrate
 	//}
 	//}
 
+	return buildSeedPositionStrategy;
+	/*
 	//본진 포화되면 다른데가서 짓도록
 	if (!ExpansionManager::Instance().getExpansions().empty() && ExpansionManager::Instance().getExpansions()[0].complexity > 0.25){
 		//std::cout << "build " << type.getName() << " on LowComplexityExpansionLocation" << std::endl;
@@ -612,6 +631,13 @@ BuildOrderItem::SeedPositionStrategy StrategyManager::getBuildSeedPositionStrate
 	}
 
 	return rst;
+	*/
+}
+
+void StrategyManager::setBuildSeedPositionStrategy(BuildOrderItem::SeedPositionStrategy seedPositionStrategy){
+	if (buildSeedPositionStrategy < seedPositionStrategy && buildSeedPositionStrategy != BuildOrderItem::SeedPositionStrategy::SupForWall && buildSeedPositionStrategy != BuildOrderItem::SeedPositionStrategy::BarForWall) {
+		buildSeedPositionStrategy = seedPositionStrategy;
+	}
 }
 
 int StrategyManager::getUnitLimit(MetaType type){
@@ -777,39 +803,38 @@ BWAPI::Position StrategyManager::getPositionForDefenceChokePoint(BWTA::Chokepoin
 
 void StrategyManager::liftBarrackFromWall() {
 
-	if (InformationManager::Instance().nowCombatStatus == InformationManager::combatStatus::DEFCON4 || InformationManager::Instance().nowCombatStatus > InformationManager::combatStatus::MainAttack) {
-		for (auto wallUnit : InformationManager::Instance().getWallUnits()) {
+	for (auto wallUnit : InformationManager::Instance().getWallUnits()) {
 
-			if (wallUnit == nullptr) {
-				continue;
-			}
+		if (wallUnit == nullptr) {
+			continue;
+		}
 
-			if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Barracks && wallUnit->isCompleted() == true) {
-				int maxDist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter());
-				for (auto enemyUnit : BWAPI::Broodwar->enemy()->getUnits()) {
+		if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Barracks && wallUnit->isCompleted() == true) {
+			int maxDist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter());
+			for (auto enemyUnit : BWAPI::Broodwar->enemy()->getUnits()) {
 
-					if (enemyUnit == nullptr) {
-						continue;
-					}
-
-					if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false && enemyUnit->getType().isWorker() == false){
-
-						int dist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), enemyUnit->getPosition());
-						dist = dist < 0 ? 1000000 : dist;
-						if (dist < maxDist && wallUnit->isLifted() == true && wallUnit->canLand() == true) {
-							wallUnit->land(InformationManager::Instance().getWallBarackPosition());
-						}
-						return;
-					}
+				if (enemyUnit == nullptr) {
+					continue;
 				}
 
-				if (wallUnit->isLifted() == false && wallUnit->canLift() == true) {
-					wallUnit->lift();
+				if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false && enemyUnit->getType().isWorker() == false){
+
+					int dist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), enemyUnit->getPosition());
+					dist = dist < 0 ? 1000000 : dist;
+					if (dist < maxDist && wallUnit->isLifted() == true && wallUnit->canLand() == true) {
+						wallUnit->land(InformationManager::Instance().getWallBarackPosition());
+					}
 					return;
 				}
 			}
+
+			if (wallUnit->isLifted() == false && wallUnit->canLift() == true) {
+				wallUnit->lift();
+				return;
+			}
 		}
 	}
+	
 }
 void StrategyManager::liftAndMoveBarrackFromWall() {
 	if (InformationManager::Instance().nowCombatStatus == InformationManager::combatStatus::DEFCON4 || InformationManager::Instance().nowCombatStatus > InformationManager::combatStatus::MainAttack) {

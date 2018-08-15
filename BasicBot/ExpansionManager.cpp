@@ -65,9 +65,11 @@ void ExpansionManager::onUnitComplete(BWAPI::Unit unit){
 				}
 			}
 
+			/*
 			for (auto e : expansions){
-				//std::cout << "current expansion:" << e.cc->getPosition() << "/" << e.complexity << std::endl;
+				std::cout << "=========================== current expansion:" << e.cc->getPosition() << "/" << e.complexity << std::endl;
 			}
+			*/
 		}
 		
 		//아군 건물은 혼잡도 계산을 한다.
@@ -192,24 +194,38 @@ int ExpansionManager::shouldExpandNow()
 }
 
 void ExpansionManager::changeComplexity(BWAPI::Unit unit, bool isAdd){
+
+	for (unsigned i = 0; i < expansions.size(); i++){
+		BWTA::Region *expansion_r = BWTA::getRegion(expansions[i].cc->getPosition());
+
+		if (expansion_r->getPolygon().isInside(unit->getPosition())){
+			if (isAdd)
+				expansions[i].complexity += (unit->getType().width() * unit->getType().height()) / expansion_r->getPolygon().getArea();
+			else
+				expansions[i].complexity -= (unit->getType().width() * unit->getType().height()) / expansion_r->getPolygon().getArea();
+
+			return;
+		}
+	}
+
+	/*
 	Expansion *e = getExpansion(unit);
+	std::cout << "changeComplexity start" << std::endl;
 	if (e != NULL){
+		std::cout << "changeComplexity in" << std::endl;
 		BWTA::Region *expansion_r = BWTA::getRegion(e->cc->getPosition());
 		
 		if (e->complexity > 0.2)
 			//std::cout << "expansion " << e->cc->getID() << " compexity : " << e->complexity << " -> ";
 
 
-		if (isAdd)
-			e->complexity += (unit->getType().width() * unit->getType().height()) / expansion_r->getPolygon().getArea();
-		else
-			e->complexity -= (unit->getType().width() * unit->getType().height()) / expansion_r->getPolygon().getArea();
 
 		//if (e->complexity > 0.2)
 			//std::cout << e->complexity << std::endl;
 	}
+	*/
 }
-
+// complexty 반영을 위해서 포인터로 가져왔을때 정상적으로 반영안되서 사용안함
 Expansion * ExpansionManager::getExpansion(BWAPI::Unit u){
 	Expansion *tmpRst = NULL;
 
@@ -220,7 +236,6 @@ Expansion * ExpansionManager::getExpansion(BWAPI::Unit u){
 			tmpRst = &expansions[i];
 		}
 	}
-
 	return tmpRst;
 }
 

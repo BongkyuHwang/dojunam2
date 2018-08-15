@@ -132,11 +132,12 @@ void BuildManager::consumeBuildQueue(){
 						else {
 							// 건물 가능 위치가 없는 경우는, Protoss_Pylon 가 없거나, Creep 이 없거나, Refinery 가 이미 다 지어져있거나, 정말 지을 공간이 주위에 없는 경우인데,
 							// 대부분의 경우 Pylon 이나 Hatchery가 지어지고 있는 중이므로, 다음 frame 에 건물 지을 공간을 다시 탐색하도록 한다. 
-							//std::cout << "There is no place to construct " << currentItem.metaType.getUnitType().getName().c_str()
-//								<< " strategy " << currentItem.seedLocationStrategy
-//								<< " seedPosition " << currentItem.seedLocation.x << "," << currentItem.seedLocation.y
-//								<< " desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
-
+							/*
+							std::cout << "There is no place to construct " << currentItem.metaType.getUnitType().getName().c_str()
+								<< " strategy " << currentItem.seedLocationStrategy
+								<< " seedPosition " << currentItem.seedLocation.x << "," << currentItem.seedLocation.y
+								<< " desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
+							*/
 							isOkToRemoveQueue = false;
 						}
 					}
@@ -505,7 +506,7 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 	BWAPI::TilePosition desiredPosition = ConstructionPlaceFinder::Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
 
 	/*
-	 //std::cout << "ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
+	 std::cout << "before ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
 		<< unitType.getName().c_str()
 		<< " strategy " << seedPositionStrategy
 		<< " seedPosition " << seedPosition.x << "," << seedPosition.y
@@ -518,10 +519,10 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 
 		switch (seedPositionStrategy) {
 		case BuildOrderItem::SeedPositionStrategy::MainBaseLocation:
-			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::FirstChokePoint;
+			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::MainBaseBackYard;
 			break;
 		case BuildOrderItem::SeedPositionStrategy::MainBaseBackYard:
-			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::FirstChokePoint;
+			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::SecondChokePoint;
 			break;
 		case BuildOrderItem::SeedPositionStrategy::FirstChokePoint:
 			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::FirstExpansionLocation;
@@ -535,6 +536,7 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 			// SecondExpansionLocation에서 찾을 공간이 없어지만 타임아웃 발생하여 LowComplexityExpansionLocation로 변경하는 로직 추가
 		case BuildOrderItem::SeedPositionStrategy::SecondExpansionLocation:
 			seedPositionStrategy = BuildOrderItem::SeedPositionStrategy::LowComplexityExpansionLocation;
+			break;
 		case BuildOrderItem::SeedPositionStrategy::LowComplexityExpansionLocation:
 		case BuildOrderItem::SeedPositionStrategy::SeedPositionSpecified:
 		case BuildOrderItem::SeedPositionStrategy::MainBaseOppositeChock:
@@ -546,12 +548,14 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 		// 다른 곳을 더 찾아본다
 		if (findAnotherPlace) {
 			desiredPosition = ConstructionPlaceFinder::Instance().getBuildLocationWithSeedPositionAndStrategy(unitType, seedPosition, seedPositionStrategy);
+			StrategyManager::Instance().setBuildSeedPositionStrategy(seedPositionStrategy);
 			/*
-			 //std::cout << "ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
+			 std::cout << "after ConstructionPlaceFinder getBuildLocationWithSeedPositionAndStrategy "
 				<< unitType.getName().c_str()
 				<< " strategy " << seedPositionStrategy
 				<< " seedPosition " << seedPosition.x << "," << seedPosition.y
 				<< " desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
+			
 			*/
 		}
 		// 다른 곳을 더 찾아보지 않고, 끝낸다
@@ -559,7 +563,7 @@ BWAPI::TilePosition BuildManager::getDesiredPosition(BWAPI::UnitType unitType, B
 			break;
 		}
 	}
-
+	
 	//std::cout << "desiredPosition : " << desiredPosition.x << ", " << desiredPosition.y << std::endl;
 	return desiredPosition;
 }

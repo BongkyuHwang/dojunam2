@@ -67,6 +67,7 @@ namespace MyBot
 		void initUnitRatioTable();
 		bool obtainNextUpgrade(BWAPI::UpgradeType upgType);
 
+		BuildOrderItem::SeedPositionStrategy buildSeedPositionStrategy;
 	public:
 		bool isInitialBuildOrderFinished;
 		bool isFullScaleAttackStarted;
@@ -86,6 +87,9 @@ namespace MyBot
 		const BuildOrder & getOpeningBookBuildOrder() const;
 		const MetaPairVector getBuildOrderGoal();
 		BuildOrderItem::SeedPositionStrategy getBuildSeedPositionStrategy(MetaType type);
+		// 2018.08.13 황봉규
+		// 건물 짓는 위치 설정을 위한 함수추가
+		void StrategyManager::setBuildSeedPositionStrategy(BuildOrderItem::SeedPositionStrategy);
 		int getUnitLimit(MetaType type);
 		double weightByFrame(double max_weight, int early = 7200); //7200 = 5분
 
