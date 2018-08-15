@@ -50,6 +50,11 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 
 	for (auto & tank : tanks)
 	{
+		bool goHome = false;
+		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(tank->getPosition())
+		> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius() 
+		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+			goHome = true;
 
 		bool tankNearChokepoint = false;
 		for (auto & choke : BWTA::getChokepoints())
@@ -131,7 +136,19 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{				
-				if (tank->getDistance(order.getPosition()) > 100)
+				if (goHome)
+				{
+					if (tank->canUnsiege())
+					{
+						tank->unsiege();
+					}
+					else
+					{
+						Micro::SmartAttackMove(tank, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+						continue;
+					}
+				}
+				else if (tank->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width()*2 )
 				{
 					if (tank->canUnsiege())
 					{
@@ -140,15 +157,13 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 					else
 					{
 						Micro::SmartAttackMove(tank, order.getPosition());
+						continue;
 					}
 				}
-				else
+				if (tank->canSiege() && !tank->isStuck())
 				{
-					if (tank->canSiege() && !tank->isStuck())
-					{
-						tank->siege();
-					}
-				}								
+					tank->siege();
+				}
 			}
 		}
 	}
@@ -312,7 +327,7 @@ BWAPI::Unit TankManager::closestrangedUnit(BWAPI::Unit target, std::set<BWAPI::U
 
 BWAPI::Unit TankManager::closestrangedUnit_kjh(BWAPI::Unit target, BWAPI::Unitset & rangedUnitsToAssign)
 {
-	double minDistance = 0;
+	double minDistance = 999999;
 	BWAPI::Unit closest = nullptr;
 
 	for (auto & rangedUnit : rangedUnitsToAssign)

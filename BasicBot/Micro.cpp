@@ -93,7 +93,7 @@ void Micro::SmartMove(BWAPI::Unit attacker, const BWAPI::Position & targetPositi
 {
 	//UAB_ASSERT(attacker, "SmartAttackMove: Attacker not valid");
 	//UAB_ASSERT(targetPosition.isValid(), "SmartAttackMove: targetPosition not valid");
-
+	
 	if (!attacker || !targetPosition.isValid())
 	{
 		return;
@@ -128,7 +128,7 @@ void Micro::SmartMove(BWAPI::Unit attacker, const BWAPI::Position & targetPositi
 	//
 	attacker->move(targetPosition);
 	TotalCommands++;
-
+	
 	if (Config::Debug::DrawUnitTargetInfo)
 	{
 		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(attacker->getPosition(), dotRadius, BWAPI::Colors::White, true);

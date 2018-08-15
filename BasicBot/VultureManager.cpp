@@ -152,6 +152,12 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 
 	for (auto & vultureUnit : vultureUnits)
 	{
+		bool goHome = false;
+
+		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(vultureUnit->getPosition())
+		> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() )
+			goHome = true;
 
 		if (order.getType() == SquadOrderTypes::Drop)
 		{
@@ -190,13 +196,21 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			{
 				// find the best target for this zealot
 				BWAPI::Unit target = getTarget(vultureUnit, vultureUnitTargets);
+
+				if (order.getCenterPosition().isValid() 
+					&& order.getCenterPosition().getDistance(vultureUnit->getPosition()) >BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() / 2)
+				{
+					Micro::SmartAttackMove(vultureUnit, order.getCenterPosition());
+					continue;
+				}
+
 				////std::cout << " vulture target distance " << target->getDistance(order.getPosition()) << " / order Radius : " << order.getRadius() << std::endl;
 				if (target->getType().isBuilding() && target->getDistance(vultureUnit) > vultureUnit->getType().groundWeapon().maxRange() *0.4)
 				{	
 					if (vultureUnit->getSpiderMineCount() > 0)
 						Micro::SmartLaySpiderMine(vultureUnit, vultureUnit->getPosition());
 					else
-						vultureUnit->move(order.getPosition());
+						vultureUnit->move(target->getPosition());
 					continue;
 				}
 				else if (target->getType().isBuilding())
@@ -217,8 +231,15 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				{
 					if (order.getType() == SquadOrderTypes::Attack)
 					{
-						if (vultureUnit->getDistance(order.getPosition()) > order.getRadius())
+						if (goHome)
 						{
+							//printf("236 go Home \n");
+							Micro::SmartAttackMove(vultureUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+							continue;
+						}
+						if (vultureUnit->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.5 )
+						{
+							//printf("242 SmartAttackMove \n");
 							Micro::SmartAttackMove(vultureUnit, order.getPosition());
 							continue;
 						}
@@ -231,11 +252,11 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 							}
 						}
 					}
-					else if (vultureUnit->getSpiderMineCount() > 0 && chokePointForVulture.size() > 0 
+					else if (vultureUnit->getSpiderMineCount() > 0 && chokePointForVulture.size() > 0
 						&& !vultureUnit->isStuck() && InformationManager::Instance().rushState == 0)//&& (miningUnit == nullptr || miningUnit == vultureUnit) && !vultureUnit->isStuck())
 					{
 						BWAPI::Position mineSetPosition = vultureUnit->getPosition();
-						
+
 						mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1];
 						// 벌처가 마인을 설치해야 하는 위치중 제일 마지막 위치를 가져오고, 해당위치가 유효 한 경우에만 마인을 설치한다.
 						bool position_invalid = true;
@@ -270,7 +291,7 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 						{
 							if (chokePointForVulture.size() > 0)
 								chokePointForVulture.pop_back();
-							Micro::SmartMove(vultureUnit, order.getPosition());
+							Micro::SmartAttackMove(vultureUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
 							position_invalid = true;
 							continue;
 						}
@@ -281,10 +302,11 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 						}
 					}
 				}
-
+				
 				// if we're not near the order position
-				if (vultureUnit->getDistance(order.getPosition()) > 100)
+				if (vultureUnit->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2)
 				{
+					//printf("{%d ]  chokePointForVulture  %d\n", vultureUnit->getID(), chokePointForVulture.size());
 					// move to it
 					Micro::SmartMove(vultureUnit, order.getPosition());
 				}
@@ -392,7 +414,7 @@ int VultureManager::getAttackPriority(BWAPI::Unit vultureUnit, BWAPI::Unit targe
 
 BWAPI::Unit VultureManager::closestvultureUnit(BWAPI::Unit target, std::set<BWAPI::Unit> & vultureUnitsToAssign)
 {
-	double minDistance = 0;
+	double minDistance = 9999999;
 	BWAPI::Unit closest = nullptr;
 
 	for (auto & vultureUnit : vultureUnitsToAssign)

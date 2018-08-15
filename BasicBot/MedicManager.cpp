@@ -27,6 +27,7 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
     // for each target, send the closest medic to heal it
     for (auto & target : medicTargets)
     {
+
         // only one medic can heal a target at a time
 		if (target->isBeingHealed() )//&& countCB > 0)
         {
@@ -62,8 +63,13 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
     // the remaining medics should head to the squad order position
     for (auto & medic : availableMedics)
     {
+		bool goHome = false;
+		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(medic->getPosition())
+			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.8)
+			goHome = true;
 		//@도주남 김지훈 노는 메딕을 마린혹은 파벳 중심으로 보내준다.  아 안되겠다 싶으면 본진쪽 초크포인트로 돌아온다
-		if (order.getOrganicUnits().size() == 0)
+		if (goHome)
 		{			
 			//보류
 			//if (InformationManager::combatStatus::wSecondChokePoint <= InformationManager::Instance().nowCombatStatus)
@@ -71,11 +77,11 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 			//else if (InformationManager::combatStatus::wFirstChokePoint <= InformationManager::Instance().nowCombatStatus)
 			//	Micro::SmartMove(medic, InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getCenter());
 			//else
-			//	Micro::SmartMove(medic, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			Micro::SmartMove(medic, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
 		}
 		else
 		{
-			if (medic->getDistance(order.getPosition()) > 100)
+			if (medic->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2)
 			//{
 			//	if (!medic->isHoldingPosition())
 			//	{

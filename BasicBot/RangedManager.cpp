@@ -40,39 +40,15 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	
 	for (auto & rangedUnit : rangedUnits)
 	{
-		//if ((order.getType() == SquadOrderTypes::Idle || order.getType() == SquadOrderTypes::Defend)
-		//	&& rangedUnit->getType() == BWAPI::UnitTypes::Terran_Marine
-		//	&& rangedUnit->getHitPoints() > 0)
-		//{
-		//	if (bunkerNum > 0)
-		//	{
-		//		if (bunkerUnit->getLoadedUnits().size() < 4)
-		//		{
-		//			rangedUnit->load(bunkerUnit);
-		//			continue;
-		//		}
-		//		else
-		//			bunkerNum = 0;
-		//	}
-		//}
-		// train sub units such as scarabs or interceptors
-		//trainSubUnits(rangedUnit);
-		//bool nearChokepoint = false;
-		//for (auto & choke : BWTA::getChokepoints())
-		//{
-		//	//@도주남 김지훈 64 라는 절대적인 수치 기준으로 , choke point 진입여부를 판단하고 있음 , 다른 getDistance 기준 64 미만의 경우
-		//	// 근접해있다고 판단해도 무방할 것으로 보임
-		//	if ((InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy()) == choke
-		//		|| InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy()) == choke)
-		//		&& choke->getCenter().getDistance(rangedUnit->getPosition()) < 64)
-		//	{
-		//		////std::cout << "choke->getWidth() Tank In Choke Point half " << std::endl;
-		//		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(rangedUnit->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
-		//		nearChokepoint = true;
-		//		break;
-		//	}
-		//}
+		bool goHome = false;
 
+		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(rangedUnit->getPosition())
+			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.9)
+			goHome = true;
+		if (goHome)
+			Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
 		{
@@ -132,12 +108,11 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				//}
 				//else
 					// if we're not near the order position
-					if (rangedUnit->getDistance(order.getPosition()) > 50)
-					{
-						// move to it
-						Micro::SmartAttackMove(rangedUnit, order.getPosition());
-						//Micro::SmartAttackMove2(rangedUnit, order.getCenterPosition(), order.getPosition());
-					}
+				if (rangedUnit->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2 )
+				{
+					// move to it
+					Micro::SmartAttackMove(rangedUnit, order.getPosition());
+				}
 			}
 		}
 	}

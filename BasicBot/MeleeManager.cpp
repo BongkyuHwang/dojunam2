@@ -36,6 +36,14 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	// for each meleeUnit
 	for (auto & meleeUnit : meleeUnits)
 	{
+		bool goHome = false;
+		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(meleeUnit->getPosition())
+			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.9)
+			goHome = true;
+		if (goHome)
+			Micro::SmartAttackMove(meleeUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+
 		bool nearChokepoint = false;
 		for (auto & choke : BWTA::getChokepoints())
 		{
@@ -98,7 +106,7 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				}
 				else
 					// if we're not near the order position
-					if (meleeUnit->getDistance(order.getPosition()) > 100)
+					if (meleeUnit->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2)
 					{
 						// move to it
 						Micro::SmartAttackMove(meleeUnit, order.getPosition());

@@ -106,7 +106,7 @@ void CombatCommander::initializeSquads()
 		seedPosition = tmpObj->getSiegeDefence();
 	}
 
-	SquadOrder defcon2Order(SquadOrderTypes::Idle, seedPosition, 400, "DEFCON2");
+	SquadOrder defcon2Order(SquadOrderTypes::Idle, seedPosition, 150, "DEFCON2");
 	_squadData.addSquad("DEFCON2", Squad("DEFCON2", defcon2Order, IdlePriority));
 
 	//앞마당 중간에서 정찰만
@@ -199,19 +199,9 @@ void CombatCommander::update()
 			BWAPI::Position positionDefcon4 = getPoint_DEFCON4();
 
 			if (positionDefcon4 != BWAPI::Positions::None) {
-				if (positionDefcon4 == im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter())
-				{
-					SquadOrder defcon4Order(SquadOrderTypes::Idle, im.getSecondChokePoint(im.selfPlayer)->getCenter(),
-						BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + 60, im.getSecondChokePoint(im.selfPlayer)->getSides(), "DEFCON4");
-					defcon4Squad.setSquadOrder(defcon4Order);
-				}
-				else
-				{
-
-					SquadOrder defcon4Order(SquadOrderTypes::Idle, positionDefcon4,
-						BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + defcon4Squad.getUnits().size() * 3, "DEFCON4");
-					defcon4Squad.setSquadOrder(defcon4Order);
-				}
+				SquadOrder defcon4Order(SquadOrderTypes::Idle, positionDefcon4,
+					BWAPI::Broodwar->mapWidth() * 8 + defcon4Squad.getUnits().size(), "DEFCON4");
+				defcon4Squad.setSquadOrder(defcon4Order);
 			}
 		}
 		//어택포지션 변경
@@ -726,8 +716,8 @@ BWAPI::Position CombatCommander::getMainAttackLocationForCombat()
 			if (curIndex < mainAttackPath.size())
 			{
 				//@도주남 김지훈 만약 공격 중이다가 우리의 인원수가 줄었다면 뒤로 뺀다 ?
-				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < mainAttackSquad.getUnits().size()*10)
-					curIndex+=2;
+				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < mainAttackSquad.getUnits().size()*20)
+					curIndex+=1;
 				if (curIndex >= mainAttackPath.size())
 					return mainAttackPath[mainAttackPath.size()-1];
 				else
@@ -1212,7 +1202,19 @@ BWAPI::Position CombatCommander::getFirstChokePoint_OrderPosition()
 
 BWAPI::Position CombatCommander::getPoint_DEFCON4()
 {
-	
+	BWTA::Chokepoint * startCP = InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self());
+	BWTA::Chokepoint * endCP = InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy());
+	if (endCP == nullptr || !endCP->getCenter().isValid())
+	{
+		return startCP->getCenter();
+	}
+
+	BWAPI::Position newTargetPosition(
+		(endCP->getCenter()
+		+ startCP->getCenter()
+		+ BWAPI::Position(BWAPI::Broodwar->mapWidth()*16, BWAPI::Broodwar->mapHeight()*16))
+		/ 3);
+
 	if (indexFirstChokePoint_OrderPosition == -1)
 	{
 		BWTA::Chokepoint * startCP = InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self());
@@ -1236,17 +1238,22 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			BWAPI::Position tp(t.x * 32, t.y * 32);
 			if (!tp.isValid())
 				continue;
-			if (tp.getDistance(startCP->getCenter()) <= startCP->getWidth()*32)
-				indexFirstChokePoint_OrderPosition++;
+			/*if (tp.getDistance(startCP->getCenter()) <= startCP->getWidth()*32)
+				indexFirstChokePoint_OrderPosition++;*/
+			indexFirstChokePoint_OrderPosition++;
 			firstChokePoint_OrderPositionPath.push_back(tp);
 		}
 		if (firstChokePoint_OrderPositionPath.size() > 1)
 		{			
-			return firstChokePoint_OrderPositionPath[indexFirstChokePoint_OrderPosition];
+			return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size()-1];
+		}
+		else
+		{
+			return newTargetPosition;
 		}
 	}
 	else{
-		if (InformationManager::Instance().enemyRace == BWAPI::Races::Terran)
+		/*if (InformationManager::Instance().enemyRace == BWAPI::Races::Terran)
 		{
 			Squad & idleSquad = _squadData.getSquad("DEFCON4");
 			if (indexFirstChokePoint_OrderPosition < firstChokePoint_OrderPositionPath.size() -1 )
@@ -1262,15 +1269,15 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 				return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() -1];
 			}
 		}
-		else
+		else*/
 		{
-			return firstChokePoint_OrderPositionPath[indexFirstChokePoint_OrderPosition];
+			return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() - 1];
 		}
 	}
 
 	if (firstChokePoint_OrderPositionPath.size() == 0) {
 		//return BWAPI::Position(-1, -1);
-		return BWAPI::Positions::None;
+		return newTargetPosition;
 	}
 	else {
 		return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() / 2];
