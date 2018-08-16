@@ -236,7 +236,15 @@ BWAPI::TilePosition	ConstructionPlaceFinder::getBuildLocationWithSeedPositionAnd
 				
 			}
 			break;
+		case BuildOrderItem::SeedPositionStrategy::ReservedSupPosion:
+			{
+				desiredPosition = InformationManager::Instance().getReservedSupPositions().front();
+				//freeTiles(desiredPosition, 3, 2);
+				InformationManager::Instance().getReservedSupPositions().pop();
+			}
+			break;
 		}
+
 	}
 
 	return desiredPosition;

@@ -519,7 +519,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 	else if (_main_strategy == Strategy::main_strategies::BATTLE) {
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Ship_Weapons, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Ship_Weapons) + 1));
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Ship_Plating, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Ship_Plating) + 1));
-		
+
 		if (numUnits["Science_Facility"] >= 1) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Vessel, 1));
 		}
@@ -539,7 +539,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 	}
 
 	if (_main_strategy == Strategy::main_strategies::One_Fac || _main_strategy == Strategy::main_strategies::Mechanic || _main_strategy == Strategy::main_strategies::Two_Fac || _main_strategy == Strategy::main_strategies::Mechanic_Goliath) {
-		
+
 		std::pair<int, int> queueResource = BuildManager::Instance().getQueueResource();
 		queueResource.first += BuildManager::Instance().marginResource.first; //약간의 마진을 준다. 너무 타이트하게 여유자원을 사용하지 않기 위해서
 		queueResource.second += BuildManager::Instance().marginResource.second;
@@ -577,7 +577,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 
 	}
 
-	
+
 
 	return goal;
 }
@@ -597,7 +597,7 @@ BuildOrderItem::SeedPositionStrategy StrategyManager::getBuildSeedPositionStrate
 	}
 
 	if (InformationManager::Instance().enemyRace == BWAPI::Races::Protoss || InformationManager::Instance().enemyRace == BWAPI::Races::Terran){
-		
+
 		// if building is destroyed?
 		if (type.getUnitType() == BWAPI::UnitTypes::Terran_Supply_Depot) {
 
@@ -606,13 +606,18 @@ BuildOrderItem::SeedPositionStrategy StrategyManager::getBuildSeedPositionStrate
 			}
 		}
 		else if (type.getUnitType() == BWAPI::UnitTypes::Terran_Barracks) {
-			
+
 			if (InformationManager::Instance().getBarPostionsForWall() != BWAPI::TilePositions::None && UnitUtils::GetAllUnitCount(BWAPI::UnitTypes::Terran_Supply_Depot) == 0) {
 				return BuildOrderItem::SeedPositionStrategy::BarForWall;
 			}
 		}
 	}
 
+	if (type.getUnitType() == BWAPI::UnitTypes::Terran_Supply_Depot) {
+		if (InformationManager::Instance().getReservedSupPositions().size() > 0) {
+			return BuildOrderItem::SeedPositionStrategy::ReservedSupPosion;
+		}
+	}
 	//TODO : 큐 단위 이므로 큐에 있는것까지 고려는 잘 안됨.
 	//서플라이 2개까지만 본진커맨드 주변, 이후 본진과 쵸크포인트 둘다 먼곳
 	//if (InformationManager::Instance().getMapName() != 'H'){
@@ -810,20 +815,31 @@ void StrategyManager::liftBarrackFromWall() {
 		if (wallUnit == nullptr) {
 			continue;
 		}
-
+		/* 드랍이 와서 본진으로 적유닛이 들어오는 경우에 
+		   배럭이 닫히는 것을 막기 위한 로직 추가
+		*/
 		if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Barracks && wallUnit->isCompleted() == true) {
 			int maxDist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter());
+			int wallDistFromMainBase = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(wallUnit->getPosition());
+			maxDist = maxDist < 0 ? 1000000 : maxDist;
+			wallDistFromMainBase = wallDistFromMainBase < 0 ? 1000000 : wallDistFromMainBase;
+
 			for (auto enemyUnit : BWAPI::Broodwar->enemy()->getUnits()) {
 
 				if (enemyUnit == nullptr) {
 					continue;
 				}
 
-				if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false && enemyUnit->getType().isWorker() == false){
-
+				// 일꾼이 올때도 적용하게 변경
+				//if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false && enemyUnit->getType().isWorker() == false){
+				if (enemyUnit->isCompleted() && enemyUnit->getType().isFlyer() == false){
 					int dist = MapTools::Instance().getGroundDistance(wallUnit->getPosition(), enemyUnit->getPosition());
 					dist = dist < 0 ? 1000000 : dist;
-					if (dist < maxDist && wallUnit->isLifted() == true && wallUnit->canLand() == true) {
+
+					int enemyDistFromMainBase = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(enemyUnit->getPosition());
+					enemyDistFromMainBase = enemyDistFromMainBase < 0 ? 1000000 : enemyDistFromMainBase;
+
+					if (dist < maxDist && enemyDistFromMainBase > wallDistFromMainBase && wallUnit->isLifted() == true && wallUnit->canLand() == true) {
 						wallUnit->land(InformationManager::Instance().getWallBarackPosition());
 					}
 					return;

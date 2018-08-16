@@ -932,7 +932,8 @@ bool BuildManager::detectSupplyDeadlock()
 	// 서플라이 건설 중에는 고려하지 않음
 	// 건설큐에 있으면 건설할 것으로 판단
 	// 건물은 isComplete 될때까지 건설큐에 있음
-	if (ConstructionManager::Instance().getConstructionQueueItemCount(BWAPI::UnitTypes::Terran_Supply_Depot) > 0){
+	// 08.17 황봉규 threshold값 변경
+	if (ConstructionManager::Instance().getConstructionQueueItemCount(BWAPI::UnitTypes::Terran_Supply_Depot) > 1){
 		return false;
 	}
 

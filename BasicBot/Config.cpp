@@ -37,7 +37,7 @@ namespace Config
 		bool DrawSquadInfo = false;
 		bool DrawBOSSStateInfo = false;
 		bool PrintModuleTimeout = false;
-		bool createTrackingLog = true;
+		bool createTrackingLog = false;
 
 		std::string ErrorLogFilename = "UAB_ErrorLog.txt";
 		bool LogAssertToErrorFile = false;

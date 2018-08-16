@@ -48,6 +48,8 @@ namespace MyBot
 		//std::vector<BWAPI::Unit> _wallUnits;
 		BWAPI::Unitset _wallUnits;
 		bool _wallStatus;
+		// 고정된위치에 서플라이 건설은 위한 자료구조 추가
+		std::queue<BWAPI::TilePosition> _reservedSupPositions;
 
 		// 다템, 럴커 상대 터렛 위치
 		BWAPI::TilePosition _turretPosition;
@@ -218,6 +220,8 @@ namespace MyBot
 
 		std::queue<BWAPI::TilePosition>& getSupPostionsForWall();
 		BWAPI::TilePosition getBarPostionsForWall();
+		std::queue<BWAPI::TilePosition>& getReservedSupPositions();
+
 		void initPositionsForWall();
 		BWAPI::Position dropTo;
 		BWAPI::Position getDropPosition();

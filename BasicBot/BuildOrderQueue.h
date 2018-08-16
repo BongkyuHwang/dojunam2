@@ -29,7 +29,8 @@ namespace MyBot
 			DefenceChokePoint,
 			MissileTurret,
 			SupForWall,
-			BarForWall
+			BarForWall,
+			ReservedSupPosion
 		};
 		SeedPositionStrategy		seedLocationStrategy;	///< 건설위치 초안 결정 정책
 
