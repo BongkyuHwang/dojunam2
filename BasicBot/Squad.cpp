@@ -59,7 +59,7 @@ void Squad::update()
 	//				if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
 	//				{
 	//					{
-	//						// getWallStatus °¡ trueÀÏ ¶§ getWallPositions È£Ãâ ½Ã ¾Æ¹«°Íµµ ¸®ÅÏÇÏÁö¾ÊÀ½
+	//						// getWallStatus ê°€ trueì¼ ë•Œ getWallPositions í˜¸ì¶œ ì‹œ ì•„ë¬´ê²ƒë„ ë¦¬í„´í•˜ì§€ì•ŠìŒ
 	//						//_order.setPosition(BWAPI::Position(InformationManager::Instance().getWallPositions()[0]));
 	//						_order.setPosition(unitPositions[0]);
 	//					}
@@ -73,7 +73,7 @@ void Squad::update()
 	//				if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
 	//				{
 	//					{
-	//						// getWallStatus °¡ trueÀÏ ¶§ getWallPositions È£Ãâ ½Ã ¾Æ¹«°Íµµ ¸®ÅÏÇÏÁö¾ÊÀ½
+	//						// getWallStatus ê°€ trueì¼ ë•Œ getWallPositions í˜¸ì¶œ ì‹œ ì•„ë¬´ê²ƒë„ ë¦¬í„´í•˜ì§€ì•ŠìŒ
 	//						_order.setPosition(unitPositions[1]);
 	//					}
 	//				}
@@ -96,7 +96,7 @@ void Squad::update()
 	//		_transportManager.update();
 
 	//		//std::cout << "s if 3" << std::endl;
-	//		// unitClosestToEnemy nullptr ¸®ÅÏÇÒ°æ¿ì ¿¹¿ÜÃ³¸®
+	//		// unitClosestToEnemy nullptr ë¦¬í„´í• ê²½ìš° ì˜ˆì™¸ì²˜ë¦¬
 
 	//		BWAPI::Unit cloesetUnit = unitClosestToEnemy();
 	//		if (cloesetUnit != nullptr) {
@@ -167,7 +167,7 @@ void Squad::update()
 		_tankManager.execute(_order);
 		_transportManager.update();
 		//std::cout << "s else 3" << std::endl;
-		// unitClosestToEnemy nullptr ¸®ÅÏÇÒ°æ¿ì ¿¹¿ÜÃ³¸®
+		// unitClosestToEnemy nullptr ë¦¬í„´í• ê²½ìš° ì˜ˆì™¸ì²˜ë¦¬
 		BWAPI::Unit cloesetUnit = unitClosestToEnemy();
 		if (cloesetUnit != nullptr) {
 			_detectorManager.setUnitClosestToEnemy(cloesetUnit);
@@ -215,7 +215,7 @@ void Squad::setAllUnits()
 	// clean up the _units vector just in case one of them died
 	BWAPI::Unitset goodUnits;
 
-	//@µµÁÖ³² ±èÁöÈÆ ¸ŞµñÀÌ Èú¸µÀÌ °¡´ÉÇÑ Ä³¸¯ÅÍ°¡ ¸î¸íÀÎÁö È®ÀÎÇÑ´Ù.  ÀÇ°ßÀ» µé¾îº¸°í Àû¿ë ¿©ºÎ °áÁ¤
+	//@ë„ì£¼ë‚¨ ê¹€ì§€í›ˆ ë©”ë”•ì´ íë§ì´ ê°€ëŠ¥í•œ ìºë¦­í„°ê°€ ëª‡ëª…ì¸ì§€ í™•ì¸í•œë‹¤.  ì˜ê²¬ì„ ë“¤ì–´ë³´ê³  ì ìš© ì—¬ë¶€ ê²°ì •
 	BWAPI::Unitset organicUnits;
 
 	for (auto & unit : _units)
@@ -302,7 +302,7 @@ std::vector<BWAPI::Unitset> Squad::_units_divided(int num){
 			{
 				tankUnits.insert(unit);
 			}
-			//@µµÁÖ³² ±èÁöÈÆ
+			//@ë„ì£¼ë‚¨ ê¹€ì§€í›ˆ
 			else if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture)
 			{
 				vultureUnits.insert(unit);
@@ -387,12 +387,12 @@ void Squad::addUnitsToMicroManagers()
 			{
 				tankUnits.insert(unit);
 			}
-			//@µµÁÖ³² ±èÁöÈÆ
+			//@ë„ì£¼ë‚¨ ê¹€ì§€í›ˆ
 			else if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture)
 			{
 				vultureUnits.insert(unit);
 			}
-			else if (unit->getType().isDetector() && !unit->getType().isBuilding())
+			else if (unit->getType().isDetector() && !unit->getType().isBuilding() || (unit->getType().isBuilding() && unit->isFlying()))
 			{
 				detectorUnits.insert(unit);
 			}
