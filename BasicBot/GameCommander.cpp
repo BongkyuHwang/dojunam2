@@ -386,21 +386,16 @@ void GameCommander::setCombatUnits()
 		if (_scoutUnits.contains(unit) || unit->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine)
 			continue;
 		
-		//임시삭제요망
-		if (unit->getType().isBuilding())
-		{
-			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(BWAPI::Position(unit->getPosition().x, unit->getPosition().y + 25), "Building : (%d, %d)", (unit->getTilePosition().x, unit->getTargetPosition().y));
-		}
-
 		if (UnitUtils::IsValidUnit(unit))
-			if ((InformationManager::Instance().getWallUnits != nullptr && unit->getType().isBuilding() && unit->isFlying() && InformationManager::Instance().getWallUnits != unit) 
-				|| (UnitUtils::IsCombatUnit(unit) && !unit->getType().isWorker()) || unit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel)
+			if ((unit->getType().isBuilding() && unit->isFlying() )
+				|| (UnitUtils::IsCombatUnit(unit) && !unit->getType().isWorker()) || unit->getType() == BWAPI::UnitTypes::Terran_Science_Vessel )
 			{
+				if ((unit->getType().isBuilding() && unit->isFlying()) && unit->getType() == BWAPI::UnitTypes::Terran_Barracks)
+					continue;
 				//unit->getOrder
 				BWAPI::UnitCommand currentCommand(unit->getLastCommand());
 
 				//@도주남 김지훈 일꾼이 아니면 넣는다.
-				//if (currentCommand.getType() == BWAPI::UnitCommandTypes::Attack_Move)
 				{
 					assignUnit(unit, _combatUnits);
 					combatunitCount++;

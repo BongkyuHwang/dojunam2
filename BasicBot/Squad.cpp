@@ -196,8 +196,15 @@ void Squad::setPriority(const size_t & priority)
 void Squad::updateUnits()
 {
 	setAllUnits();
+	if (_vultureManager.miningOn)
+	{
+		if (BWAPI::Broodwar->getFrameCount() - _vultureManager.lastMiniCalFrame > 10000)
+			if (_vultureManager.chokePointCount != 0 && _vultureManager.chokePointForVulture.size() - _vultureManager.chokePointCount <= 0)
+				_vultureManager.miningOn = false;
+	}
 	if (_vultureManager.miningOn == false)
 	{
+		_vultureManager.lastMiniCalFrame = BWAPI::Broodwar->getFrameCount();
 		_vultureManager.miningPositionSetting();
 	}
 	setNearEnemyUnits();

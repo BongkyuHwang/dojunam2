@@ -19,6 +19,7 @@ namespace MyBot
 		std::vector<BWAPI::Position> chokePointForVulture;
 		void VultureManager::miningPositionSetting();
 		bool miningOn = false;
+		int lastMiniCalFrame = 0;
 		VultureManager();
 		void executeMicro(const BWAPI::Unitset & targets);
 		BWAPI::Unit chooseTarget(BWAPI::Unit vultureUnit, const BWAPI::Unitset & targets, std::map<BWAPI::Unit, int> & numTargeting);

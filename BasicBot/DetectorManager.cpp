@@ -40,6 +40,26 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	{
 		BWAPI::Unit target = closestCloakedUnit(detectorUnitTargets, detectorUnit);
 
+		if (target != nullptr && detectorUnit->getType().isBuilding() )
+		{
+			if (target->getPosition().getDistance(detectorUnit->getPosition()) - detectorUnit->getType().width() - 30 < BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+			{
+				if (order.getCenterPosition().isValid())
+				{
+					detectorUnit->move(order.getCenterPosition());
+				}
+				else
+				{
+					detectorUnit->move(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
+				}
+			}
+			else
+			{
+				detectorUnit->move(target->getPosition());
+			}
+			
+		}
+
 		if (detectorUnit->isUnderAttack())
 			detectorUnitInBattle = true;
 
@@ -51,7 +71,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				//detectorUnit->move(order.getCenterPosition());
 				//Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
 				//printf("SmartKiteTarget(detectorUnit \n");
-				if (target->isVisible())
+				if (target->isVisible() && !detectorUnit->getType().isBuilding())
 					Micro::SmartKiteTarget(detectorUnit, target);
 				continue;
 			}
@@ -86,7 +106,14 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				continue;
 			}
 			else if (detectorUnit->canUseTechUnit(BWAPI::TechTypes::Irradiate, target)
-				&& BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Zerg)
+				&& BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Zerg
+				&& (target->getType() ==  BWAPI::UnitTypes::Zerg_Lurker
+				|| target->getType() == BWAPI::UnitTypes::Zerg_Ultralisk
+				|| target->getType() == BWAPI::UnitTypes::Zerg_Guardian
+				|| target->getType() == BWAPI::UnitTypes::Zerg_Mutalisk
+				|| target->getType() == BWAPI::UnitTypes::Zerg_Defiler
+				|| target->getType() == BWAPI::UnitTypes::Zerg_Queen				)
+				)
 			{
 				//printf("Use Tech Irradiate \n");
 				if (target->isVisible() && !detectorUnit->useTech(BWAPI::TechTypes::Irradiate, target))
@@ -101,6 +128,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			&& UnitUtils::GetWeapon(target, detectorUnit) != BWAPI::WeaponTypes::None
 			)
 		{
+
 			Micro::SmartKiteTarget(detectorUnit, target);
 			continue;
 		}

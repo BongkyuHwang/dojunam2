@@ -27,6 +27,16 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
     // for each target, send the closest medic to heal it
     for (auto & target : medicTargets)
     {
+		bool goHome = false;
+		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(target->getPosition())
+		> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
+		+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
+		+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
+			goHome = true;
+
+		if (goHome)
+			continue;
 
         // only one medic can heal a target at a time
 		if (target->isBeingHealed() )//&& countCB > 0)
@@ -66,30 +76,26 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 		bool goHome = false;
 		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(medic->getPosition())
 			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.8)
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
+			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
+			+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
 			goHome = true;
+		if (order.getType() == SquadOrderTypes::Defend)
+			goHome = false;
 		//@도주남 김지훈 노는 메딕을 마린혹은 파벳 중심으로 보내준다.  아 안되겠다 싶으면 본진쪽 초크포인트로 돌아온다
-		if (goHome)
+		if (goHome && order.getType() != SquadOrderTypes::Drop)
 		{			
-			//보류
-			//if (InformationManager::combatStatus::wSecondChokePoint <= InformationManager::Instance().nowCombatStatus)
-			//	Micro::SmartMove(medic, InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter());
-			//else if (InformationManager::combatStatus::wFirstChokePoint <= InformationManager::Instance().nowCombatStatus)
-			//	Micro::SmartMove(medic, InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getCenter());
-			//else
-			Micro::SmartMove(medic, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			if (order.getCenterPosition().isValid())
+			{
+				Micro::SmartMove(medic, order.getCenterPosition());
+			}
+			else
+				Micro::SmartMove(medic, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			continue;
 		}
-		else
+		else if (order.getType() != SquadOrderTypes::Drop)
 		{
-			if (medic->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2)
-			//{
-			//	if (!medic->isHoldingPosition())
-			//	{
-			//		medic->holdPosition();
-			//		//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(medic->getPosition() + BWAPI::Position(0, 30), "%s", "Hold on Position ");
-			//	}
-			//}
-			//else
+			if (medic->getDistance(order.getPosition()) > order.getRadius())
 			{
 				Micro::SmartMove(medic, order.getPosition());
 			}

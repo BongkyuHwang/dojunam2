@@ -39,23 +39,21 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 		bool goHome = false;
 		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(meleeUnit->getPosition())
 			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.9)
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
+//			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
+			+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
 			goHome = true;
-		if (goHome)
-			Micro::SmartAttackMove(meleeUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-
-		bool nearChokepoint = false;
-		for (auto & choke : BWTA::getChokepoints())
+		if (order.getType() == SquadOrderTypes::Defend)
+			goHome = false;
+		if (goHome && order.getType() != SquadOrderTypes::Drop)
 		{
-			//@도주남 김지훈 64 라는 절대적인 수치 기준으로 , choke point 진입여부를 판단하고 있음 , 다른 getDistance 기준 64 미만의 경우
-			// 근접해있다고 판단해도 무방할 것으로 보임
-			if ((InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->enemy()) == choke || InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy()) == choke) && choke->getCenter().getDistance(meleeUnit->getPosition()) < 64)
+			if (order.getCenterPosition().isValid())
 			{
-				////std::cout << "choke->getWidth() Tank In Choke Point half " << std::endl;
-				//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition() + BWAPI::Position(0, 50), "%s", "In Choke Point");
-				nearChokepoint = true;
-				break;
+				Micro::SmartAttackMove(meleeUnit, order.getCenterPosition());
 			}
+			else
+				Micro::SmartAttackMove(meleeUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			continue;
 		}
 
 		// if the order is to attack or defend
@@ -66,15 +64,6 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			{
 				// find the best target for this meleeUnit
 				BWAPI::Unit target = getTarget(meleeUnit, meleeUnitTargets);
-				
-				if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(target->getPosition()) >
-					InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) + order.getRadius() )
-				{
-					//meleeUnit->move(order.getPosition());
-					Micro::SmartMove(meleeUnit, order.getPosition());
-					continue;
-				}
-
 
 				//@도주남 김지훈 스팀팩 사용하기!
 				//Stim_Packs
@@ -86,40 +75,25 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				{
 					meleeUnit->useTech(BWAPI::TechTypes::Stim_Packs);
 				}
-				//if (meleeUnit->getStimTimer() > 0
-				//	&& meleeUnit->getType() == BWAPI::UnitTypes::Terran_Firebat)
-				//{
-				//	if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y + 50, "%s", "stimPacks On");
-				//
-				//}
-				// attack it
 				Micro::SmartAttackUnit(meleeUnit, target);
 			}
 			// if there are no targets
 			else
 			{
 				if (order.getClosestUnit() != nullptr)
-				{
-					//if (Config::Debug::Draw) BWAPI::Broodwar->drawTextMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y + 50, "%s", "Go Near Medic");
+				{	
 					Micro::SmartAttackMove(meleeUnit, order.getClosestUnit()->getPosition());
-					//Micro::SmartAttackMove2(meleeUnit, order.getCenterPosition() , order.getClosestUnit()->getPosition());
 				}
 				else
 					// if we're not near the order position
-					if (meleeUnit->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2)
+					if (meleeUnit->getDistance(order.getPosition()) > order.getRadius())
 					{
 						// move to it
 						Micro::SmartAttackMove(meleeUnit, order.getPosition());
-						//Micro::SmartAttackMove2(meleeUnit, order.getCenterPosition(), order.getPosition());
 					}
 			}
 		}
 
-		//if (Config::Debug::DrawUnitTargetInfo)
-		//{
-		//	if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(meleeUnit->getPosition().x, meleeUnit->getPosition().y,
-		//		meleeUnit->getTargetPosition().x, meleeUnit->getTargetPosition().y, BWAPI::Colors::White);
-		//}
 	}
 }
 

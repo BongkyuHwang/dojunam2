@@ -53,9 +53,10 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 		bool goHome = false;
 		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(tank->getPosition())
 		> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius() 
-		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*1.2)
 			goHome = true;
-
+		if (order.getType() == SquadOrderTypes::Defend)
+			goHome = false;
 		bool tankNearChokepoint = false;
 		for (auto & choke : BWTA::getChokepoints())
 		{
@@ -104,7 +105,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				{
 					tank->unsiege();
 				}
-				else if (tank->getDistance(target) < siegeTankRange && tank->canSiege() && !tankNearChokepoint)
+				else if (tank->getDistance(target) < siegeTankRange && tank->canSiege())
 				{
 					tank->siege();
 				}
@@ -145,10 +146,10 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 					else
 					{
 						Micro::SmartAttackMove(tank, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-						continue;
 					}
+					continue;
 				}
-				else if (tank->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width()*2 )
+				else if (tank->getDistance(order.getPosition()) > order.getRadius() + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() )
 				{
 					if (tank->canUnsiege())
 					{
@@ -157,10 +158,10 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 					else
 					{
 						Micro::SmartAttackMove(tank, order.getPosition());
-						continue;
 					}
+					continue;
 				}
-				if (tank->canSiege() && !tank->isStuck())
+				if (tank->canSiege() && !tankNearChokepoint)
 				{
 					tank->siege();
 				}

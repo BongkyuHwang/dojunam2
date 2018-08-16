@@ -41,13 +41,25 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	for (auto & rangedUnit : rangedUnits)
 	{
 		bool goHome = false;
-
 		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(rangedUnit->getPosition())
 			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 0.9)
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
+			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
+			//+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange()
+			)
 			goHome = true;
+		if (order.getType() == SquadOrderTypes::Defend)
+			goHome = false;
 		if (goHome)
-			Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+		{
+			if (order.getCenterPosition().isValid())
+			{
+				Micro::SmartAttackMove(rangedUnit, order.getCenterPosition());
+			}
+			else
+				Micro::SmartAttackMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			continue;
+		}
 			
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
@@ -76,11 +88,6 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 					continue;
 				}
 
-				//if (target && Config::Debug::DrawUnitTargetInfo)
-				//{
-				//	if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition(), rangedUnit->getTargetPosition(), BWAPI::Colors::Purple);
-				//}
-
 				if (rangedUnit->getStimTimer() == 0
 					&& rangedUnit->getType() == BWAPI::UnitTypes::Terran_Marine
 					&& rangedUnit->getHitPoints() == rangedUnit->getType().maxHitPoints()
@@ -96,19 +103,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				//if (order.getClosestUnit() != nullptr && rangedUnit->getType() == BWAPI::UnitTypes::Terran_Marine)
-				//{
-				//	//rangedUnit->getPosition(InformationManager::Instance().getMainBaseLocation()->getPosition());
-				//	if ( InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(rangedUnit->getPosition())
-				//		< InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getClosestUnit()->getPosition()))
-				//	{
-				//		Micro::SmartAttackMove(rangedUnit, order.getClosestUnit()->getPosition());
-				//	}
-
-				//}
-				//else
-					// if we're not near the order position
-				if (rangedUnit->getDistance(order.getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width() * 2 )
+				if (rangedUnit->getDistance(order.getPosition()) > order.getRadius() )
 				{
 					// move to it
 					Micro::SmartAttackMove(rangedUnit, order.getPosition());
