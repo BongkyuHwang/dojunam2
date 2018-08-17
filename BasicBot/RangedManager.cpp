@@ -48,7 +48,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			//+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange()
 			)
 			goHome = true;
-		if (order.getType() == SquadOrderTypes::Defend)
+		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
 		if (goHome)
 		{
@@ -91,7 +91,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				if (rangedUnit->getStimTimer() == 0
 					&& rangedUnit->getType() == BWAPI::UnitTypes::Terran_Marine
 					&& rangedUnit->getHitPoints() == rangedUnit->getType().maxHitPoints()
-					&& //@µµÁÖ³² ±èÁöÈÆ »ó´ë°¡ °ø°Ý ¹üÀ§¿¡ µé¾î¿À¸é  ½ºÆÀÆÑÀ» »ç¿ëÇÑ´Ù.
+					&& //@ë„ì£¼ë‚¨ ê¹€ì§€í›ˆ ìƒëŒ€ê°€ ê³µê²© ë²”ìœ„ì— ë“¤ì–´ì˜¤ë©´  ìŠ¤íŒ€íŒ©ì„ ì‚¬ìš©í•œë‹¤.
 					target->getPosition().getDistance(rangedUnit->getPosition()) < rangedUnit->getType().groundWeapon().maxRange() + 32)
 				{
 					rangedUnit->useTech(BWAPI::TechTypes::Stim_Packs);
@@ -152,7 +152,7 @@ BWAPI::Unit RangedManager::getTarget(BWAPI::Unit rangedUnit, const BWAPI::Unitse
 		double LTD = UnitUtils::CalculateLTD(target, rangedUnit);
 		int priority = getAttackPriority(rangedUnit, target);
 		bool targetIsThreat = LTD > 0;
-		double t_LTD = UnitUtils::CalculateLTD(rangedUnit, target); // ÇÑ¹æ¿¡ Á×ÀÏ ¼ö ÀÖÀ» °æ¿ì¸¦ Ã¼Å© ÇÏ±â À§ÇÑ ·ÎÁ÷
+		double t_LTD = UnitUtils::CalculateLTD(rangedUnit, target); // í•œë°©ì— ì£½ì¼ ìˆ˜ ìžˆì„ ê²½ìš°ë¥¼ ì²´í¬ í•˜ê¸° ìœ„í•œ ë¡œì§
 		bool CK = target->getHitPoints() <= t_LTD;
 
 		if (!closestTarget || (priority > highPriority) || (priority == highPriority && distance < closestDist) 
