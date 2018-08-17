@@ -50,17 +50,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			goHome = true;
 		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
-		if (goHome)
-		{
-			if (order.getCenterPosition().isValid())
-			{
-				Micro::SmartAttackMove(rangedUnit, order.getCenterPosition());
-			}
-			else
-				Micro::SmartAttackMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-			continue;
-		}
-			
+		
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
 		{
@@ -73,19 +63,20 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Battlecruiser)
 				{
 					if (BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Yamato_Gun) && rangedUnit->canUseTech(BWAPI::TechTypes::Yamato_Gun)){
-						if (rangedUnit->canUseTechUnit(BWAPI::TechTypes::Yamato_Gun, target))
+						if (rangedUnit->canUseTechUnit(BWAPI::TechTypes::Yamato_Gun, target) && target->getHitPoints() >= BWAPI::TechTypes::Yamato_Gun.getWeapon().damageAmount() )
 						{
 							rangedUnit->useTech(BWAPI::TechTypes::Yamato_Gun, target);
 							continue;
 						}
 					}
 				}
-
-				if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(target->getPosition()) >
-					InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) + order.getRadius())
+				if (order.getCenterPosition().isValid() && order.getType() != SquadOrderTypes::Defend)
 				{
-					Micro::SmartMove(rangedUnit, order.getPosition());
-					continue;
+					if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+					{
+						Micro::SmartMove(rangedUnit, order.getCenterPosition());
+						continue;
+					}					
 				}
 
 				if (rangedUnit->getStimTimer() == 0
@@ -103,7 +94,36 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
+				if (goHome)
+				{
+					if (order.getCenterPosition().isValid())
+					{
+						Micro::SmartMove(rangedUnit, order.getCenterPosition());
+					}
+					else
+						Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+					continue;
+				}
+
 				if (rangedUnit->getDistance(order.getPosition()) > order.getRadius() )
+				{
+					// move to it
+					Micro::SmartAttackMove(rangedUnit, order.getPosition());
+				}
+			}
+		}
+		else if (order.getType() == SquadOrderTypes::Drop)
+		{
+			if (BWTA::getRegion(BWAPI::TilePosition(rangedUnit->getPosition()))
+				== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
+				|| BWTA::getRegion(BWAPI::TilePosition(rangedUnit->getPosition()))
+				!= BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getTilePosition()))
+			{
+				Micro::SmartAttackMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition());
+			}
+			else
+			{
+				if (rangedUnit->getDistance(order.getPosition()) > order.getRadius())
 				{
 					// move to it
 					Micro::SmartAttackMove(rangedUnit, order.getPosition());

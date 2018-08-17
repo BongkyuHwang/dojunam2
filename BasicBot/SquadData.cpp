@@ -167,7 +167,7 @@ Squad * SquadData::getUnitSquad(BWAPI::Unit unit)
 
 void SquadData::assignUnitToSquad(BWAPI::Unit unit, Squad & squad)
 {
-    UAB_ASSERT_WARNING(canAssignUnitToSquad(unit, squad), "We shouldn't be re-assigning this unit!");
+    //UAB_ASSERT_WARNING(canAssignUnitToSquad(unit, squad), "We shouldn't be re-assigning this unit!");
 
     Squad * previousSquad = getUnitSquad(unit);
 

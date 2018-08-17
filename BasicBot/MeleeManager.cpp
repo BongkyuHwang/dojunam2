@@ -43,9 +43,10 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 //			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
 			+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
 			goHome = true;
-		if (order.getType() == SquadOrderTypes::Defend)
+		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
-		if (goHome && order.getType() != SquadOrderTypes::Drop)
+
+		if (goHome)
 		{
 			if (order.getCenterPosition().isValid())
 			{
@@ -65,6 +66,15 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				// find the best target for this meleeUnit
 				BWAPI::Unit target = getTarget(meleeUnit, meleeUnitTargets);
 
+				if (order.getCenterPosition().isValid() && order.getType() != SquadOrderTypes::Defend)
+				{
+					if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+					{
+						Micro::SmartMove(meleeUnit, order.getCenterPosition());
+						continue;
+					}
+				}
+
 				//@µµÁÖ³² ±èÁöÈÆ ½ºÆÀÆÑ »ç¿ëÇÏ±â!
 				//Stim_Packs
 				if (meleeUnit->getStimTimer() == 0
@@ -80,17 +90,34 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				if (order.getClosestUnit() != nullptr)
-				{	
-					Micro::SmartAttackMove(meleeUnit, order.getClosestUnit()->getPosition());
+				if (order.getCenterPosition().isValid())
+				{
+					Micro::SmartAttackMove(meleeUnit, order.getCenterPosition());
 				}
-				else
-					// if we're not near the order position
-					if (meleeUnit->getDistance(order.getPosition()) > order.getRadius())
-					{
-						// move to it
-						Micro::SmartAttackMove(meleeUnit, order.getPosition());
-					}
+				// if we're not near the order position
+				else if (meleeUnit->getDistance(order.getPosition()) > order.getRadius())
+				{
+					// move to it
+					Micro::SmartAttackMove(meleeUnit, order.getPosition());
+				}
+			}
+		}
+		else if (order.getType() == SquadOrderTypes::Drop)
+		{
+			if (BWTA::getRegion(BWAPI::TilePosition(meleeUnit->getPosition()))
+				== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
+				|| BWTA::getRegion(BWAPI::TilePosition(meleeUnit->getPosition()))
+				!= BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getTilePosition()))
+			{
+				Micro::SmartAttackMove(meleeUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition());
+			}
+			else
+			{
+				if (meleeUnit->getDistance(order.getPosition()) > order.getRadius())
+				{
+					// move to it
+					Micro::SmartAttackMove(meleeUnit, order.getPosition());
+				}
 			}
 		}
 

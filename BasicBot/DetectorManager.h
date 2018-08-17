@@ -15,6 +15,10 @@ class DetectorManager : public MicroManager
 	bool isAssigned(BWAPI::Unit unit);
 
 	BWAPI::Unit unitClosestToEnemy;
+	std::vector<BWAPI::Position>	_waypoints;
+	void calWayPosition();
+	BWAPI::Position doFullscan();
+	BWAPI::Position toGo;
 
 public:
 
@@ -23,6 +27,7 @@ public:
 
 	void setUnitClosestToEnemy(BWAPI::Unit unit) { unitClosestToEnemy = unit; }
 	void executeMicro(const BWAPI::Unitset & targets);
+	
 
 	BWAPI::Unit closestCloakedUnit(const BWAPI::Unitset & cloakedUnits, BWAPI::Unit detectorUnit);
 };

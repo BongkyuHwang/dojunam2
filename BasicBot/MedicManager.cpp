@@ -80,10 +80,10 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
 			+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
 			goHome = true;
-		if (order.getType() == SquadOrderTypes::Defend)
+		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
 		//@도주남 김지훈 노는 메딕을 마린혹은 파벳 중심으로 보내준다.  아 안되겠다 싶으면 본진쪽 초크포인트로 돌아온다
-		if (goHome && order.getType() != SquadOrderTypes::Drop)
+		if (goHome)
 		{			
 			if (order.getCenterPosition().isValid())
 			{
@@ -95,10 +95,18 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 		}
 		else if (order.getType() != SquadOrderTypes::Drop)
 		{
-			if (medic->getDistance(order.getPosition()) > order.getRadius())
+			if (!(BWTA::getRegion(BWAPI::TilePosition(medic->getPosition()))
+				== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
+				|| BWTA::getRegion(BWAPI::TilePosition(medic->getPosition()))
+				!= BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getTilePosition())))
 			{
-				Micro::SmartMove(medic, order.getPosition());
+				if (medic->getDistance(order.getPosition()) > order.getRadius())
+				{
+					// move to it
+					Micro::SmartMove(medic, order.getPosition());
+				}
 			}
+
 		}
     }
 }

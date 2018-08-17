@@ -40,9 +40,9 @@ void DFBB_BuildOrderStackSearch::search()
         try 
         {
             // search on the initial state
-			std::cout << "b1" << std::endl;
+			//std::cout << "b1" << std::endl;
             DFBB();
-			std::cout << "b1 end" << std::endl;
+			//std::cout << "b1 end" << std::endl;
             _results.timedOut = false;
         }
         catch (int e) 

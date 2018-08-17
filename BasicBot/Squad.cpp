@@ -152,12 +152,12 @@ void Squad::update()
 		// determine whether or not we should regroup
 
 		// draw some debug info
-		if (Config::Debug::DrawSquadInfo && _order.getType() == SquadOrderTypes::Attack)
+		/*if (Config::Debug::DrawSquadInfo && _order.getType() == SquadOrderTypes::Attack)
 		{
 			if (Config::Debug::Draw) BWAPI::Broodwar->drawTextScreen(200, 350, "%s", _regroupStatus.c_str());
 
 			BWAPI::Unit closest = unitClosestToEnemy();
-		}
+		}*/
 
 		// if we do need to regroup, do it
 		_meleeManager.execute(_order);
@@ -238,7 +238,8 @@ void Squad::setAllUnits()
 
 			if (unit->isStuck())//|| unit->isIdle())
 			{
-				unit->move(_order.getPosition());
+				unit->setRallyPoint(_order.getPosition());
+				//unit->move(_order.getPosition());
 			}
 			//else
 			//	if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), 5, BWAPI::Colors::Blue, true);
@@ -399,9 +400,11 @@ void Squad::addUnitsToMicroManagers()
 			{
 				vultureUnits.insert(unit);
 			}
-			else if (unit->getType().isDetector() && !unit->getType().isBuilding() || (unit->getType().isBuilding() && unit->isFlying()))
+			else if (unit->getType().isDetector() && !unit->getType().isBuilding())
 			{
 				detectorUnits.insert(unit);
+				// load 된 유닛 들어오면 유닛셋을 그냥 밀어 넣는다.
+
 			}
 			// select transport _units
 			else if (unit->getType() == BWAPI::UnitTypes::Protoss_Shuttle || unit->getType() == BWAPI::UnitTypes::Terran_Dropship)
@@ -478,9 +481,14 @@ BWAPI::Position Squad::calcCenter()
 
 	BWAPI::Position accum(0, 0);
 	int sizeUnits = 0;
-
+	accum += _order.getPosition();
+	sizeUnits++;
 	for (auto & unit : _units)
 	{
+		if (_order.getPosition().getDistance(unit->getPosition()) > _order.getRadius()*1.1)
+		{
+			continue;
+		}
 		
 		if (unit->getType() == (BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode) || unit->getType() == (BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode))
 		{
@@ -492,7 +500,7 @@ BWAPI::Position Squad::calcCenter()
 			sizeUnits++;
 			accum += unit->getPosition();
 		}
-		////std::cout << " BWAPI::Position Squad::calcCenter()   " << accum.x << " / " << accum.y << std::endl;
+
 	}
 	if (sizeUnits == 0)
 		return BWAPI::Positions::None;

@@ -424,7 +424,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		{
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Vehicle_Weapons, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Vehicle_Weapons) + 1));
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Vehicle_Plating, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Vehicle_Plating) + 1));
-			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Dropship, 1));
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Dropship, InformationManager::Instance().bombDropNum));
 
 		}
 

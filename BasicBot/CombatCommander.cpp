@@ -111,11 +111,17 @@ void CombatCommander::initializeSquads()
 
 	//앞마당 중간에서 정찰만
 	std::vector<BWAPI::TilePosition> expansion2choke = BWTA::getShortestPath(BWAPI::TilePosition(im.getFirstChokePoint(im.selfPlayer)->getCenter()), BWAPI::TilePosition(im.getSecondChokePoint(im.selfPlayer)->getCenter()));
-	SquadOrder defcon3Order(SquadOrderTypes::Idle, BWAPI::Position(expansion2choke[expansion2choke.size() / 2]), radiusScout, "DEFCON3");
+	SquadOrder defcon3Order(SquadOrderTypes::Idle, 
+		BWAPI::Position(expansion2choke[expansion2choke.size() / 2]), 
+		radiusScout, 
+		"DEFCON3");
 	_squadData.addSquad("DEFCON3", Squad("DEFCON3", defcon3Order, IdlePriority));
 
-	SquadOrder defcon4Order(SquadOrderTypes::Idle, im.getSecondChokePoint(im.selfPlayer)->getCenter() + im.getSecondChokePoint(im.selfPlayer)->getCenter() - im.getFirstChokePoint(im.selfPlayer)->getCenter(),
-		BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + radiusAttack, im.getSecondChokePoint(im.selfPlayer)->getSides(), "DEFCON4");
+	SquadOrder defcon4Order(SquadOrderTypes::Idle, 
+		im.getSecondChokePoint(im.selfPlayer)->getCenter() + im.getSecondChokePoint(im.selfPlayer)->getCenter() - im.getFirstChokePoint(im.selfPlayer)->getCenter(),
+		BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + radiusAttack, 
+		//im.getSecondChokePoint(im.selfPlayer)->getSides(), 
+		"DEFCON4");
 	_squadData.addSquad("DEFCON4", Squad("DEFCON4", defcon4Order, IdlePriority));
 	
 	SquadOrder scoutOrder(SquadOrderTypes::Idle, im.getSecondChokePoint(im.selfPlayer)->getSides().first, 70, "scout");
@@ -200,7 +206,7 @@ void CombatCommander::update()
 
 			if (positionDefcon4 != BWAPI::Positions::None) {
 				SquadOrder defcon4Order(SquadOrderTypes::Idle, positionDefcon4,
-					BWAPI::Broodwar->mapWidth() * 8 + defcon4Squad.getUnits().size(), "DEFCON4");
+					BWAPI::Broodwar->mapWidth() * 7 + defcon4Squad.getUnits().size(), "DEFCON4");
 				defcon4Squad.setSquadOrder(defcon4Order);
 			}
 		}
@@ -376,8 +382,8 @@ void CombatCommander::updateAttackSquads()
 	int radi = 410;
 	if (im.nowCombatStatus == InformationManager::combatStatus::CenterAttack)
 	{
-		std::vector<BWAPI::TilePosition> tileList = BWTA::getShortestPath(BWAPI::TilePosition(im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter()), BWAPI::TilePosition(im.getSecondChokePoint(im.enemyPlayer)->getCenter()));
-		SquadOrder _order(SquadOrderTypes::Attack, BWAPI::Position(tileList[tileList.size()/3]), radi, "AttackCenter");
+		std::vector<BWAPI::TilePosition> tileList = BWTA::getShortestPath(BWAPI::TilePosition(im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter()), BWAPI::TilePosition(BWAPI::Broodwar->mapWidth() / 2, BWAPI::Broodwar->mapHeight() / 2) );
+		SquadOrder _order(SquadOrderTypes::Attack, BWAPI::Position(tileList[(int)(tileList.size()*0.7)]), radi, "AttackCenter");
 		mainAttackSquad.setSquadOrder(_order);
 	}
 	else if (im.nowCombatStatus == InformationManager::combatStatus::EnemyBaseAttack)
@@ -390,99 +396,99 @@ void CombatCommander::updateAttackSquads()
 void CombatCommander::updateDropSquads()
 {
 	Squad & dropSquad = _squadData.getSquad("Drop");
-	
+	int numUnits = UnitUtils::GetAllUnitCount(BWAPI::UnitTypes::Terran_Dropship);
+	if (numUnits <= 0)
+		return;
+
     // figure out how many units the drop squad needs
     bool dropSquadHasTransport = false;
-    int transportSpotsRemaining = 8;
-    auto & dropUnits = dropSquad.getUnits();
+    int transportSpotsRemaining = 0;
+	int totalSpaceRemaining = 0;
+	BWAPI::Unitset  dropUnits = dropSquad.getUnits();
 	BWAPI::Unit dropShipUnit = nullptr;
-	
+	BWAPI::Unitset dropShips;
+
 	for (auto & unit : dropUnits)
 	{
-		if (unit->isFlying() && unit->getType().spaceProvided() > 0)
+		if (unit->getType() == BWAPI::UnitTypes::Terran_Dropship && unit->getHitPoints() > 0 && unit->exists() )
 		{
-			dropShipUnit = unit;
+			if (_squadData.canAssignUnitToSquad(unit, dropSquad))
+				_squadData.assignUnitToSquad(unit, dropSquad);
+			if (unit->getSpaceRemaining() > 0)
+			{
+				dropShips.insert(unit);
+			}
 		}
 	}
 
     for (auto & unit : dropUnits)
-    {
-		if (unit->isFlying() && unit->getType().spaceProvided() > 0 && unit->getHitPoints() > 0)
-        {
-            dropSquadHasTransport = true;
-        }
-        else
-        {
-			if (dropShipUnit && dropShipUnit->isUnderAttack())
+    {	
+		if (unit->getType() != BWAPI::UnitTypes::Terran_Dropship &&!unit->isLoaded())
+		{
+			if (BWTA::getRegion(BWAPI::TilePosition(unit->getPosition())) 
+				== BWTA::getRegion(BWAPI::TilePosition(dropSquad.getSquadOrder().getPosition())) )
 			{
-				dropShipUnit->unload(unit);
-			}
-			else if (dropShipUnit && dropShipUnit->getSpaceRemaining() != 0)
-			{
-				if (!unit->isLoaded() 
-					&& BWTA::getRegion(BWAPI::TilePosition(unit->getPosition())) 
-					!= BWTA::getRegion(BWAPI::TilePosition(dropSquad.getSquadOrder().getPosition()))
-					|| unit->getPosition().getDistance(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition()) < 200)
+				for (auto & ship : dropShips)
 				{
-					dropShipUnit->load(unit);
-					if (!unit->isFlying())
+					if (unit->getType().spaceRequired() <= ship->getSpaceRemaining())
 					{
-						if (unit->getPosition().getDistance(dropShipUnit->getPosition()) > 10)
-							unit->move(dropShipUnit->getPosition());
-						
-						unit->load(dropShipUnit);
+						if (!ship->load(unit))
+							ship->move(unit->getPosition());
+						if (!unit->load(ship))
+							unit->move(ship->getPosition());
 					}
 				}
 			}
-            transportSpotsRemaining -= unit->getType().spaceRequired();
-        }
+		}
     }
+
 	if (!dropSquadHasTransport)
 	{
 		dropSquad.clear();
 	}
+	
     // if there are still units to be added to the drop squad, do it
-	if ((transportSpotsRemaining > 0 || !dropSquadHasTransport))
+	//if ((totalSpaceRemaining > 0 || !dropSquadHasTransport))
     {
         // take our first amount of combat units that fill up a transport and add them to the drop squad
         for (auto & unit : _combatUnits)
         {
-            // if this is a transport unit and we don't have one in the squad yet, add it
-            if (!dropSquadHasTransport && (unit->getType().spaceProvided() > 0 && unit->isFlying()))
-            {
-                _squadData.assignUnitToSquad(unit, dropSquad);
-                dropSquadHasTransport = true;
-                continue;
-            }
-
-            if (unit->getType().spaceRequired() > transportSpotsRemaining)
-            {
-                continue;
-            }
-
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Dropship
+				&& _squadData.canAssignUnitToSquad(unit, dropSquad)
+				&& !dropSquad.containsUnit(unit))
 			{
-				if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture
-					&& _squadData.canAssignUnitToSquad(unit, dropSquad)
-					&& !dropSquad.containsUnit(unit)
-					&& BWTA::getRegion(BWAPI::TilePosition(unit->getPosition()))
-					== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition())
-					&& dropSquadHasTransport
-					)
+				_squadData.assignUnitToSquad(unit, dropSquad);
+				continue;
+			}
+
+			if (unit->getType() != BWAPI::UnitTypes::Terran_SCV
+				&& !unit->getType().isBuilding()
+				&& !unit->isFlying()
+				&& _squadData.canAssignUnitToSquad(unit, dropSquad)
+				&& !dropSquad.containsUnit(unit)
+				&& BWTA::getRegion(BWAPI::TilePosition(unit->getPosition()))
+				== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition())
+				)
+			{
+				for (auto & ship : dropShips)
 				{
-					_squadData.assignUnitToSquad(unit, dropSquad);
-					transportSpotsRemaining -= unit->getType().spaceRequired();
+					if (unit->getType().spaceRequired() <= ship->getSpaceRemaining())
+					{
+						if (!ship->load(unit))
+							ship->move(unit->getPosition());
+						if (!unit->load(ship))
+							unit->move(ship->getPosition());
+						_squadData.assignUnitToSquad(unit, dropSquad);
+					}
 				}
 			}
         }
     }
     // otherwise the drop squad is full, so execute the order
-	else if (dropShipUnit && !dropSquadHasTransport)
+	//else if ( !dropSquadHasTransport) //totalSpaceRemaining == 0 &&
     {
-
 		SquadOrder goingDrop(SquadOrderTypes::Drop, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()), 410, "Go Drop");
 		dropSquad.setSquadOrder(goingDrop);
-        //SquadOrder dropOrder(SquadOrderTypes::Drop, getMainAttackLocation(), 800, "Attack Enemy Base");
-        //dropSquad.setSquadOrder(dropOrder);
     }
 
 }
@@ -1504,10 +1510,11 @@ void CombatCommander::updateSmallAttackSquad()
 
 		if (_squadData.canAssignUnitToSquad(unit, smallAttackSquad) && unit->getType() == BWAPI::UnitTypes::Terran_Vulture)
 		{
+
 			_squadData.assignUnitToSquad(unit, smallAttackSquad);
 		}
 	}
 
-	SquadOrder smallAttackOrder(SquadOrderTypes::Attack, attackBaseLocation->getPosition(), 500, "Attack Enemy multi");
+	SquadOrder smallAttackOrder(SquadOrderTypes::Attack, attackBaseLocation->getPosition(), 200, "Attack Enemy multi");
 	smallAttackSquad.setSquadOrder(smallAttackOrder);
 }

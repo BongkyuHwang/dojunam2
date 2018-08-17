@@ -117,109 +117,90 @@ void TransportManager::drawTransportInformation(int x = 0, int y = 0)
 
 void TransportManager::update()
 {
-	if (getUnits().size() == 0)
+	if (getUnits().size() < InformationManager::Instance().bombDropNum)
 	{
 		_transportShip = nullptr;
 		return;
 	}
-    if (!_transportShip && getUnits().size() > 0)
-    {
-        _transportShip = *getUnits().begin();
-    }
+	if (!_transportShip && getUnits().size() > 0)
+	{
+		_transportShip = *getUnits().begin();
+	}
+
+	const BWAPI::Unitset & dropUnits = getUnits();
+	int totalSpaceRemaining = 0;
+	for (auto & dropunit : dropUnits)
+	{
+		totalSpaceRemaining += dropunit->getSpaceRemaining();
+	}
 
 	// calculate enemy region vertices if we haven't yet
 	if (_mapEdgeVertices.empty())
 	{
 		calculateMapEdgeVertices();
 	}
-
-	//for (auto & unit : BWAPI::Broodwar->self()->getUnits())
-	//{
-	//	if (_transportShip != nullptr && _transportShip->getLoadedUnits().size() < 3)
-	//	{
-	//
-	//		if (unit->getType() == BWAPI::UnitTypes::Terran_SCV && unit->isCompleted())
-	//		{
-	//			_transportShip->load(unit, false);
-	//		}
-	//	}
-	//}
-	/*if (_transportShip != nullptr&& _transportShip->getSpaceRemaining() > 0 )
+	if (_transportShip != nullptr && totalSpaceRemaining == 0)
 	{
-		if (_transportShip->isUnderAttack())
+		BWAPI::Player enemy = InformationManager::Instance().enemyPlayer;
+		if (InformationManager::Instance().getMainBaseLocation(enemy) != nullptr)
 		{
-			_transportShip->unloadAll(true);
-			printf("is Under Attak unloading (%d) \n", 8 - _transportShip->getSpaceRemaining() );
+			moveTroops();
+			moveTransport();
 		}
 	}
-	else */
-	if (_transportShip != nullptr && _transportShip->getSpaceRemaining() == 0)
-	{
-		//if (_transportShip->isUnderAttack())
-		//{
-		//	_transportShip->unloadAll();
-		//	_transportShip->unloadAll(true);
-		//	BWAPI::Position unloadPosition = _transportShip->getPosition();
-		//	int closeDistance = 99999;
-		//	for (int dx = -10; dx < 10; dx++)
-		//	{
-		//		for (int dy = -10; dy < 10; dy++)
-		//		{
-		//			BWAPI::Position unloadCandidatePosition(unloadPosition + BWAPI::Position(dx * 32, dy * 32));
-		//			if (_transportShip->getPosition().getDistance(unloadCandidatePosition) < 99999 && _transportShip->canUnloadAtPosition(unloadCandidatePosition))
-		//			{
-		//				closeDistance = _transportShip->getPosition().getDistance(unloadCandidatePosition);
-		//				unloadPosition = unloadCandidatePosition;
-		//			}
-		//		}
-		//	}
-		//	if (unloadPosition == _transportShip->getPosition())
-		//	{
-		//		_transportShip->unloadAll();
-		//		//_transportShip->unloadAll(true);
-		//	}
-		//	BWAPI::Broodwar->drawCircleMap(unloadPosition, 30, BWAPI::Colors::Green, false);
-		//	BWAPI::Broodwar->drawCircleMap(_transportShip->getPosition(), 3, BWAPI::Colors::Red, true);
-		//	_transportShip->unloadAll(unloadPosition);
+	
 
-		//printf("is Under Attak unloading (%d , %d ) (%d) \n", _transportShip->getPosition().x, _transportShip->getPosition().y, 8 - _transportShip->getSpaceRemaining());
-		//	//BWAPI::Broodwar->drawCircleMap(_transportShip->getPosition(), 7, BWAPI::Colors::Green, false);
-		//}
-		//else
+	BWTA::BaseLocation * enemyBaseLocation = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy());
+	
+	for (auto & dropunit : dropUnits)
+	{
+		if (dropunit->getSpaceRemaining() < 8)
 		{
-			BWAPI::Player enemy = InformationManager::Instance().enemyPlayer;
-			if (InformationManager::Instance().getMainBaseLocation(enemy) != nullptr)
+			if ((enemyBaseLocation != nullptr && enemyBaseLocation->getRegion()->getPolygon().isInside( dropunit->getPosition() ))
+				|| (dropunit->isUnderAttack()))
 			{
-						moveTroops();
-						moveTransport();								
+				if (dropunit->canUnloadAllPosition(dropunit->getPosition()))
+				{
+					dropunit->unloadAll();
+					for (auto &unit : dropunit->getLoadedUnits())
+					{
+						unit->unload(dropunit);
+						dropunit->unload(unit);
+					}
+				}
+				else
+				{
+					for (int tx = -5; tx < 5; tx+=3)
+					{
+						for (int ty = -5; ty < 5; ty+=3)
+						{
+							BWAPI::Position add(tx*32, ty*32);
+							if (dropunit->canUnloadAllPosition(dropunit->getPosition() + add))
+							{
+								dropunit->move(dropunit->getPosition() + add);
+								tx = 99;
+								ty = 99;
+							}
+						}
+					}
+				}
 			}
-
+			else
+			{
+				Micro::SmartMove(dropunit, _to);
+			}
 		}
-	}	
-	else if (_transportShip != nullptr && _transportShip->getSpaceRemaining() == 8)
-	{
-		BWAPI::UnitCommand currentCommand(_transportShip->getLastCommand());
-		
-		//if (currentCommand.getType() == BWAPI::UnitCommandTypes::Load)
-		//{
-		//	//do nothing
-		//}
-		//else
-		// if we've already told this unit to unload, wait
-		if (currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All || currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All_Position)
+		else if (dropunit != nullptr && dropunit->getSpaceRemaining() == 8)
 		{
-			Micro::SmartMove(_transportShip, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			BWAPI::UnitCommand currentCommand(dropunit->getLastCommand());
+
+			if (currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All || currentCommand.getType() == BWAPI::UnitCommandTypes::Unload_All_Position)
+			{
+				Micro::SmartMove(dropunit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+			}
 		}
-		//if (BWTA::getRegion(BWAPI::TilePosition(_transportShip->getPosition())) != BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getTilePosition()))
-		//{
-		
-		//	
-		//}
 	}
-	
 
-
-	
 	drawTransportInformation();
 }
 
@@ -325,6 +306,7 @@ void TransportManager::followPerimeter(int clockwise)
 	}
 
 	Micro::SmartMove(_transportShip, goTo);
+	setTo(goTo);
 }
 
 void TransportManager::followPerimeter(BWAPI::Position to, BWAPI::Position from)
@@ -349,6 +331,7 @@ void TransportManager::followPerimeter(BWAPI::Position to, BWAPI::Position from)
 		BWAPI::Broodwar->printf("WAYPOINTS: [%d] - [%d]", wpIDX.first, wpIDX.second);
 
 		Micro::SmartMove(_transportShip, _waypoints[0]);
+		setTo(_waypoints[0]);
 	}
 	else if (_waypoints.size() > 1 && _transportShip->getDistance(_waypoints[0]) < 100)
 	{
@@ -378,6 +361,7 @@ void TransportManager::followPerimeter(BWAPI::Position to, BWAPI::Position from)
 		//if close to second waypoint, go to destination!
 		following = 0;
 		Micro::SmartMove(_transportShip, to);
+		setTo(to);
 	}
 
 }

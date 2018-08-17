@@ -65,6 +65,8 @@ namespace MyBot
 		void                    updateOccupiedRegions(BWTA::Region * region, BWAPI::Player player);
 		char mapName;
 
+		
+
 		std::set<UnitInfo> rushSquad;
 
 	public:
@@ -240,6 +242,9 @@ namespace MyBot
 		BWAPI::TilePosition getTurretPosition();
 		bool getTurretStatus();
 		void setTurretStatus(bool flag);
+
+		//drop 한번에 갈 dropship 갯수 : 지정된 갯수의 드롭쉽이 가득 차면 출발
+		int bombDropNum;
 
 		std::string unitTypeString(int ut){
 			if (ut == BWAPI::UnitTypes::Terran_Marine) return"Terran_Marine";

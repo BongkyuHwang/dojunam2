@@ -4,6 +4,36 @@ using namespace MyBot;
 
 DetectorManager::DetectorManager() : unitClosestToEnemy(nullptr) { }
 
+void DetectorManager::calWayPosition()
+{
+	_waypoints.clear();
+	//printf("calWayPosition \n");
+	for (int tx = 1; tx < BWAPI::Broodwar->mapWidth(); tx += 15)
+	{
+		for (int ty = 1; ty < BWAPI::Broodwar->mapHeight(); ty += 15)
+		{
+			if (BWAPI::TilePosition(tx, ty).isValid())
+				_waypoints.push_back(BWAPI::Position(BWAPI::TilePosition(tx, ty)));
+		}
+	}
+}
+
+BWAPI::Position DetectorManager::doFullscan()
+{
+	//printf("doFullscan \n");
+	if (_waypoints.size() <= 0)
+	{
+		calWayPosition();
+		return _waypoints[_waypoints.size() - 1];
+	}
+	else
+	{
+		BWAPI::Position gogo = _waypoints[_waypoints.size() - 1];
+		_waypoints.pop_back();
+		return gogo;
+	}
+}
+
 void DetectorManager::executeMicro(const BWAPI::Unitset & targets) 
 {
 	const BWAPI::Unitset & detectorUnits = getUnits();
@@ -38,7 +68,34 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	// for each detectorUnit
 	for (auto & detectorUnit : detectorUnits)
 	{
+		
 		BWAPI::Unit target = closestCloakedUnit(detectorUnitTargets, detectorUnit);
+		if (BWAPI::Broodwar->getFrameCount() > 25000 && target ==nullptr)
+		{
+
+			if (toGo.isValid())
+			{
+			
+				if (detectorUnit->getPosition().getDistance(toGo) >= 70)
+				{
+				
+					detectorUnit->move(toGo);
+				}
+				else
+				{
+					toGo = doFullscan();
+					detectorUnit->move(toGo);
+				
+				}
+			}
+			else
+			{
+				toGo = doFullscan();
+		
+			}
+
+			continue;
+		}
 
 		if (target != nullptr && detectorUnit->getType().isBuilding() )
 		{
@@ -57,7 +114,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			{
 				detectorUnit->move(target->getPosition());
 			}
-			
+			continue;
 		}
 
 		if (detectorUnit->isUnderAttack())
@@ -68,9 +125,6 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			double nearLTD = UnitUtils::getNearByLTD(BWAPI::Broodwar->enemy(), detectorUnit, target->getType().airWeapon().maxRange());
 			if (nearLTD >= detectorUnit->getHitPoints())
 			{
-				//detectorUnit->move(order.getCenterPosition());
-				//Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
-				//printf("SmartKiteTarget(detectorUnit \n");
 				if (target->isVisible() && !detectorUnit->getType().isBuilding())
 					Micro::SmartKiteTarget(detectorUnit, target);
 				continue;
@@ -78,7 +132,8 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 		}
 
 		if (unitClosestToEnemy && detectorUnit->canUseTechUnit(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy)
-			&& (unitClosestToEnemy->isAttackFrame() || unitClosestToEnemy->isUnderAttack() || detectorUnit->isUnderAttack()))
+			&& (unitClosestToEnemy->isAttackFrame() || unitClosestToEnemy->isUnderAttack() || detectorUnit->isUnderAttack())
+			&& BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran	)
 		{
 			//printf("Use Tech Defensive_Matrix \n");
 			if (!detectorUnit->useTech(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy))
@@ -116,7 +171,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				)
 			{
 				//printf("Use Tech Irradiate \n");
-				if (target->isVisible() && !detectorUnit->useTech(BWAPI::TechTypes::Irradiate, target))
+				if (!target->isIrradiated() && target->isVisible() && !detectorUnit->useTech(BWAPI::TechTypes::Irradiate, target))
 				{
 					detectorUnit->move(target->getPosition());
 				}

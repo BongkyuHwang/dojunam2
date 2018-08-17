@@ -5,7 +5,7 @@ using namespace MyBot;
 
 InformationManager::InformationManager()
 {
-
+	bombDropNum = 2;
 	selfPlayer = BWAPI::Broodwar->self();
 	enemyPlayer = BWAPI::Broodwar->enemy();
 
