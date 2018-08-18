@@ -1139,12 +1139,31 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(23, 120);
 			_turretPosition = BWAPI::TilePosition(21, 117);
 
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(0, 96));
+			startPoints.push_back(BWAPI::TilePosition(3, 97));
+			startPoints.push_back(BWAPI::TilePosition(6, 99));
+			startPoints.push_back(BWAPI::TilePosition(9, 100));
+			strides.push_back(8);
+			strides.push_back(6);
+			strides.push_back(5);
+			strides.push_back(4);
+			for (int i = 0; i < startPoints.size(); i++) {
+				
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(0, 2 * j);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(0, 96), 8));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(3, 97), 6));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(6, 99), 5));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(9, 100), 4));
-
+			
 			for (auto it = startPoints.begin(); it != startPoints.end(); it++){
 				for (int i = 0; i < it->second; i++) {
 					BWAPI::TilePosition target = it->first + BWAPI::TilePosition(0, 2 * i);
@@ -1152,7 +1171,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
-
+			*/
 			
 		}
 		else if (base->getTilePosition().x == 7 && base->getTilePosition().y == 6) {
@@ -1164,6 +1183,26 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(4, 28);
 			_turretPosition = BWAPI::TilePosition(10, 25);
 
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(20, 0));
+			startPoints.push_back(BWAPI::TilePosition(17, 0));
+			startPoints.push_back(BWAPI::TilePosition(14, 0));
+			startPoints.push_back(BWAPI::TilePosition(23, 10));
+			strides.push_back(6);
+			strides.push_back(6);
+			strides.push_back(6);
+			strides.push_back(4);
+			
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(0, 2 * j);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(20, 0), 6));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(17, 0), 6));
@@ -1177,6 +1216,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
+			*/
 		}
 		else if (base->getTilePosition().x == 117 && base->getTilePosition().y == 117) {
 			// 5
@@ -1187,6 +1227,27 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(114, 101);
 			_turretPosition = BWAPI::TilePosition(119, 98);
 
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(104, 124));
+			startPoints.push_back(BWAPI::TilePosition(104, 122));
+			startPoints.push_back(BWAPI::TilePosition(104, 120));
+			startPoints.push_back(BWAPI::TilePosition(104, 118));
+			startPoints.push_back(BWAPI::TilePosition(104, 116));
+			strides.push_back(6);
+			strides.push_back(5);
+			strides.push_back(3);
+			strides.push_back(3);
+			strides.push_back(3);
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(3 * j, 0);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(104, 124), 6));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(104, 122), 5));
@@ -1201,6 +1262,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
+			*/
 		}
 		else {
 			// 1
@@ -1211,6 +1273,24 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(102, 9);
 			_turretPosition = BWAPI::TilePosition(97, 4);
 
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(125, 30));
+			startPoints.push_back(BWAPI::TilePosition(122, 28));
+			startPoints.push_back(BWAPI::TilePosition(119, 28));
+			strides.push_back(8);
+			strides.push_back(7);
+			strides.push_back(7);
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(0, -2 * j);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(125, 30), 8));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(122, 28), 7));
@@ -1224,6 +1304,7 @@ void InformationManager::initPositionsForWall() {
 
 				}
 			}
+			*/
 		}
 	}
 	else if (getMapName() == 'H') {
@@ -1315,6 +1396,25 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(118, 23);
 			_turretPosition = BWAPI::TilePosition(125, 22);
 
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(97, 0));
+			startPoints.push_back(BWAPI::TilePosition(98, 2));
+			startPoints.push_back(BWAPI::TilePosition(102, 4));
+			startPoints.push_back(BWAPI::TilePosition(105, 6));
+			strides.push_back(7);
+			strides.push_back(7);
+			strides.push_back(3);
+			strides.push_back(2);
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(3 * j, 0);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(97, 0), 7));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(98, 2), 7));
@@ -1328,6 +1428,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
+			*/
 		}
 		// 5
 		else if (base->getTilePosition().x >= 64 && base->getTilePosition().y >= 64) {
@@ -1339,6 +1440,26 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(118, 102);
 			_turretPosition = BWAPI::TilePosition(125, 102);
 
+
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(97, 125));
+			startPoints.push_back(BWAPI::TilePosition(98, 123));
+			startPoints.push_back(BWAPI::TilePosition(102, 121));
+			startPoints.push_back(BWAPI::TilePosition(105, 119));
+			strides.push_back(7);
+			strides.push_back(7);
+			strides.push_back(3);
+			strides.push_back(2);
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(3 * j, 0);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(97, 125), 7));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(98, 123), 7));
@@ -1352,6 +1473,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
+			*/
 		}
 		// 7
 		else if (base->getTilePosition().x < 64 && base->getTilePosition().y >= 64) {
@@ -1363,6 +1485,25 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(0, 101);
 			_turretPosition = BWAPI::TilePosition(7, 103);
 			
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(27, 125));
+			startPoints.push_back(BWAPI::TilePosition(27, 123));
+			startPoints.push_back(BWAPI::TilePosition(23, 121));
+			startPoints.push_back(BWAPI::TilePosition(20, 119));
+			strides.push_back(7);
+			strides.push_back(7);
+			strides.push_back(3);
+			strides.push_back(2);
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(-3 * j, 0);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(27, 125), 7));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(27, 123), 7));
@@ -1376,6 +1517,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
+			*/
 		}
 		// 11
 		else {
@@ -1387,6 +1529,25 @@ void InformationManager::initPositionsForWall() {
 			_barPositionForWall = BWAPI::TilePosition(0, 24);
 			_turretPosition = BWAPI::TilePosition(7, 23);
 
+			std::vector<BWAPI::TilePosition> startPoints;
+			std::vector<int> strides;
+			startPoints.push_back(BWAPI::TilePosition(27, 0));
+			startPoints.push_back(BWAPI::TilePosition(27, 2));
+			startPoints.push_back(BWAPI::TilePosition(23, 4));
+			startPoints.push_back(BWAPI::TilePosition(20, 6));
+			strides.push_back(7);
+			strides.push_back(7);
+			strides.push_back(3);
+			strides.push_back(2);
+			for (int i = 0; i < startPoints.size(); i++) {
+
+				for (int j = 0; j < strides[i]; j++) {
+					BWAPI::TilePosition target = startPoints[i] + BWAPI::TilePosition(-3 * j, 0);
+					_reservedSupPositions.push(target);
+					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
+				}
+			}
+			/*
 			std::map<BWAPI::TilePosition, int> startPoints;
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(27, 0), 7));
 			startPoints.insert(std::make_pair(BWAPI::TilePosition(27, 2), 7));
@@ -1400,6 +1561,7 @@ void InformationManager::initPositionsForWall() {
 					ConstructionPlaceFinder::Instance().reserveTiles(target, 3, 2);
 				}
 			}
+			*/
 		}
 	}
 }

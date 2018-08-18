@@ -665,9 +665,11 @@ int StrategyManager::getUnitLimit(MetaType type){
 	if (type.getUnitType() == BWAPI::UnitTypes::Terran_Factory){
 		if (_main_strategy == Strategy::main_strategies::One_Fac) {
 			return 1;
-		}
-		if (_main_strategy == Strategy::main_strategies::Two_Fac) {
+		} else if (_main_strategy == Strategy::main_strategies::Two_Fac) {
 			return 3;
+		}
+		else if (_main_strategy == Strategy::main_strategies::Bionic_Tank) {
+			return 1;
 		}
 		return 9;
 	}
@@ -683,6 +685,16 @@ int StrategyManager::getUnitLimit(MetaType type){
 
 	if (type.getUnitType() == BWAPI::UnitTypes::Terran_Missile_Turret) {
 		return ExpansionManager::Instance().getExpansions().size() * 3;
+	}
+
+	if (type.getUnitType() == BWAPI::UnitTypes::Terran_Starport){
+		if (_main_strategy == Strategy::main_strategies::BATTLE) {
+			return 7;
+		}
+		else {
+			return 1;
+		}
+		
 	}
 
 	return -1;
@@ -721,7 +733,7 @@ void StrategyManager::initStrategies(){
 	_strategies[Strategy::main_strategies::Bionic_Tank].pre_strategy = Strategy::main_strategies::None;
 	_strategies[Strategy::main_strategies::Bionic_Tank].next_strategy = Strategy::main_strategies::Mechanic;
 	_strategies[Strategy::main_strategies::Bionic_Tank].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV Barracks SCV Barracks SCV SCV SCV Marine Supply_Depot SCV Marine Refinery SCV Marine SCV Marine SCV Marine Supply_Depot SCV Academy";
-	_strategies[Strategy::main_strategies::Bionic_Tank].num_unit_limit["Tanks"] = 5;
+	_strategies[Strategy::main_strategies::Bionic_Tank].num_unit_limit["Tanks"] = 6;
 
 	_strategies[Strategy::main_strategies::One_Fac] = Strategy();
 	_strategies[Strategy::main_strategies::One_Fac].pre_strategy = Strategy::main_strategies::None;
