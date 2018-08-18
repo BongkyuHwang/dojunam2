@@ -15,12 +15,14 @@ void moveAway(BWAPI::Unit unit, BWAPI::TilePosition targetTilePosition)
 {
 	std::vector<BWAPI::TilePosition> tpList = BWTA::getShortestPath(BWAPI::TilePosition(unit->getPosition()), targetTilePosition);
 	//printf("moveAway Start\t\t");
+	BWAPI::UnitFilter uf(BWAPI::Broodwar->self());
+
 	for (auto & t : tpList) {
 		BWAPI::Position tp(t.x * 32, t.y * 32);
 		if (!tp.isValid())
 			continue;
 		if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap( tp , 7, BWAPI::Colors::Red, true);
-		for (auto & onTileUnit : BWAPI::Broodwar->getUnitsOnTile(t))
+		for (auto & onTileUnit : BWAPI::Broodwar->getUnitsOnTile(t, uf))
 		{			
 			if (unit->getDistance(onTileUnit->getPosition()) < 80 && !onTileUnit->isFlying() && !onTileUnit->isMoving() && !onTileUnit->isAttackFrame())
 			{

@@ -55,7 +55,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	BWAPI::Unitset detectorUnitTargets;
 	if(targets.size()>0)
 		std::copy_if(targets.begin(), targets.end(), std::inserter(detectorUnitTargets, detectorUnitTargets.end()), [](BWAPI::Unit u){ return u->isVisible(); });
-
+	BWAPI::Unitset candidateIrradiating;
 	cloakedUnitMap.clear();
 	BWAPI::Unitset cloakedUnits;
 
@@ -70,6 +70,19 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			cloakedUnits.insert(unit);
 			cloakedUnitMap[unit] = false;
 		}
+
+		if (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Zerg
+			&& (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker
+			|| unit->getType() == BWAPI::UnitTypes::Zerg_Ultralisk
+			|| unit->getType() == BWAPI::UnitTypes::Zerg_Guardian
+			|| unit->getType() == BWAPI::UnitTypes::Zerg_Mutalisk
+			|| unit->getType() == BWAPI::UnitTypes::Zerg_Defiler
+			|| unit->getType() == BWAPI::UnitTypes::Zerg_Queen
+			))
+		{
+			candidateIrradiating.insert(unit);
+		}
+
 	}
 
 	bool detectorUnitInBattle = false;
@@ -79,7 +92,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	{
 		
 		BWAPI::Unit target = closestCloakedUnit(detectorUnitTargets, detectorUnit);
-		if (BWAPI::Broodwar->getFrameCount() > 20000 && target ==nullptr)
+		if (BWAPI::Broodwar->getFrameCount() > 25000 && target == nullptr && detectorUnit->getID() % 2 ==0)
 		{
 
 			if (toGo.isValid())
@@ -169,23 +182,19 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				}
 				continue;
 			}
-			else if (detectorUnit->canUseTechUnit(BWAPI::TechTypes::Irradiate, target)
-				&& BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Zerg
-				&& (target->getType() ==  BWAPI::UnitTypes::Zerg_Lurker
-				|| target->getType() == BWAPI::UnitTypes::Zerg_Ultralisk
-				|| target->getType() == BWAPI::UnitTypes::Zerg_Guardian
-				|| target->getType() == BWAPI::UnitTypes::Zerg_Mutalisk
-				|| target->getType() == BWAPI::UnitTypes::Zerg_Defiler
-				|| target->getType() == BWAPI::UnitTypes::Zerg_Queen				)
-				)
+			bool useTech = false;
+			for (auto &itarget : candidateIrradiating)
 			{
-				//printf("Use Tech Irradiate \n");
-				if (!target->isIrradiated() && target->isVisible() && !detectorUnit->useTech(BWAPI::TechTypes::Irradiate, target))
+				if (!itarget->isIrradiated() && itarget->exists()
+				&& BWAPI::TechTypes::Irradiate.getWeapon().maxRange() <= detectorUnit->getDistance(itarget->getPosition()))
 				{
-					detectorUnit->move(target->getPosition());
+					detectorUnit->useTech(BWAPI::TechTypes::Irradiate, itarget);
+					useTech = true;
+					break;
 				}
-				continue;
 			}
+			if (useTech)
+				continue;
 		}
 		else if (target && target->getDistance(detectorUnit->getPosition()) > target->getType().airWeapon().maxRange() - 32
 			&& target->getPosition().isValid()
