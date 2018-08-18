@@ -56,11 +56,7 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 	order = inputOrder;
 	drawOrderText();
 	BWAPI::Position movePosition = order.getPosition();
-	//if (order.getStatus() == "DEFCON2" || order.getStatus() == "DEFCON4")
-	//{
-	//	if (order.getLine().first != BWAPI::Positions::None && order.getLine().second != BWAPI::Positions::None)
-	//		order.setPosition((order.getLine().first + order.getLine().second)/2);
-	//}
+
 	// Discover enemies within region of interest
 	BWAPI::Unitset nearbyEnemies;
 
@@ -70,7 +66,10 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 		if(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) != nullptr)
 			MapGrid::Instance().getUnitsNear(nearbyEnemies, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition(), 200, false, true);
 		else
-			MapGrid::Instance().getUnitsNear(nearbyEnemies, order.getPosition(), order.getRadius(), false, true);
+		{
+			if (order.getCenterPosition().isValid())
+				MapGrid::Instance().getUnitsNear(nearbyEnemies, order.getCenterPosition(), order.getRadius(), false, true);
+		}
 	
 	} // otherwise we want to see everything on the way
 	else if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle || order.getType() == SquadOrderTypes::Attack)
@@ -104,7 +103,7 @@ void MicroManager::execute(const SquadOrder & inputOrder)
         else
         {
             // if this is a defense squad then we care about all units in the area
-			if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
+			if ((order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle) && order.getStatus() != "DEFCON4")
             {
                 executeMicro(nearbyEnemies);
             }
@@ -116,6 +115,18 @@ void MicroManager::execute(const SquadOrder & inputOrder)
 
                 for (auto & enemyUnit : nearbyEnemies) 
 		        {
+					//if (order.getStatus() != "DEFCON4")
+					//{
+					//	for (BWTA::Region * enemyRegion : InformationManager::Instance().getOccupiedRegions(BWAPI::Broodwar->enemy()))
+					//	{
+					//		// only add it if it's in their region
+					//		if (BWTA::getRegion(BWAPI::TilePosition(enemyUnit->getPosition())) != enemyRegion)
+					//		{
+					//			workersRemoved.insert(enemyUnit);
+					//		}
+					//	}
+					//}
+					//else
                     // if its not a worker add it to the targets
 			        if (!enemyUnit->getType().isWorker())
                     {

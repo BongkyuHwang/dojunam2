@@ -275,7 +275,19 @@ void WorkerManager::handleMoveWorkers()
 	for (auto & worker : workerData.getWorkers())
 	{
 		if (!worker) continue;
-
+		BWAPI::Position targetPosition = worker->getTargetPosition();
+		if (targetPosition.x < 80 && targetPosition.y < 80 && worker->getType().isWorker())
+		{
+			/*printf("WM 280 worker [%d] move to ( %d, %d )  \n", worker->getID(), targetPosition.x, targetPosition.y);
+			printf("WM 280 worker [%d] move to ( %d, %d )  \n", worker->getID(), targetPosition.x, targetPosition.y);
+			;
+			BWAPI::UnitCommand currentCommand(worker->getLastCommand());
+			printf("WM 280 worker Command ?  \n");
+			printf("[%d]%s\n", worker->getLastCommandFrame(), currentCommand.getType().c_str());
+			printf("==================================\n");
+			*/
+			worker->stop();
+		}
 		// if it is a move worker
 		if (workerData.getWorkerJob(worker) == WorkerData::Move)
 		{

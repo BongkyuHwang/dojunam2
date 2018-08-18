@@ -78,6 +78,8 @@ void Micro::SmartAttackMove(BWAPI::Unit attacker, const BWAPI::Position & target
 	}
 
 	// if nothing prevents it, attack the targ
+	if (targetPosition.x< 200 && targetPosition.y < 200 && attacker->getType().isWorker())
+		printf("SAM worker [%d] move to ( %d, %d )  ", attacker->getID(), targetPosition.x, targetPosition.y);
 	attacker->attack(targetPosition);
 	TotalCommands++;
 

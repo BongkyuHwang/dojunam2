@@ -8,12 +8,21 @@ void DetectorManager::calWayPosition()
 {
 	_waypoints.clear();
 	//printf("calWayPosition \n");
-	for (int tx = 1; tx < BWAPI::Broodwar->mapWidth(); tx += 15)
+	for (int tx = 1; tx < BWAPI::Broodwar->mapWidth(); tx += 17)
 	{
-		for (int ty = 1; ty < BWAPI::Broodwar->mapHeight(); ty += 15)
+		if (tx%2 == 0)
+			for (int ty = 1; ty < BWAPI::Broodwar->mapHeight(); ty += 15)
+			{
+				if (BWAPI::TilePosition(tx, ty).isValid())
+					_waypoints.push_back(BWAPI::Position(BWAPI::TilePosition(tx, ty)));
+			}
+		else
 		{
-			if (BWAPI::TilePosition(tx, ty).isValid())
-				_waypoints.push_back(BWAPI::Position(BWAPI::TilePosition(tx, ty)));
+			for (int ty = BWAPI::Broodwar->mapHeight(); ty > 1; ty -= 15)
+			{
+				if (BWAPI::TilePosition(tx, ty).isValid())
+					_waypoints.push_back(BWAPI::Position(BWAPI::TilePosition(tx, ty)));
+			}
 		}
 	}
 }
@@ -70,7 +79,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	{
 		
 		BWAPI::Unit target = closestCloakedUnit(detectorUnitTargets, detectorUnit);
-		if (BWAPI::Broodwar->getFrameCount() > 25000 && target ==nullptr)
+		if (BWAPI::Broodwar->getFrameCount() > 20000 && target ==nullptr)
 		{
 
 			if (toGo.isValid())

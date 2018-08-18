@@ -403,8 +403,6 @@ void Squad::addUnitsToMicroManagers()
 			else if (unit->getType().isDetector() && !unit->getType().isBuilding())
 			{
 				detectorUnits.insert(unit);
-				// load 된 유닛 들어오면 유닛셋을 그냥 밀어 넣는다.
-
 			}
 			// select transport _units
 			else if (unit->getType() == BWAPI::UnitTypes::Protoss_Shuttle || unit->getType() == BWAPI::UnitTypes::Terran_Dropship)
@@ -423,7 +421,12 @@ void Squad::addUnitsToMicroManagers()
 			}
 		}
 	}
-
+	for (auto & bD : InformationManager::Instance().buildingDetectors)
+	{
+		// load 된 유닛 들어오면 유닛셋을 그냥 밀어 넣는다.
+		if (bD->isFlying() && bD->getType().isBuilding() )
+			detectorUnits.insert(bD);
+	}
 	_meleeManager.setUnits(meleeUnits);
 	_rangedManager.setUnits(rangedUnits);
 	_detectorManager.setUnits(detectorUnits);

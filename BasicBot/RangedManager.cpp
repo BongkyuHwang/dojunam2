@@ -94,7 +94,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				if (goHome)
+				if (goHome && rangedUnit->getID() % 5 < 3)
 				{
 					if (order.getCenterPosition().isValid())
 					{
@@ -102,6 +102,12 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 					}
 					else
 						Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+					continue;
+				}
+				else if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) != nullptr 
+					&& InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition().getDistance(order.getPosition()) < 100 )
+				{
+					Micro::SmartAttackMove(rangedUnit, order.getPosition());
 					continue;
 				}
 

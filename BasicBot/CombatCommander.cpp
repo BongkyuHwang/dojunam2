@@ -90,10 +90,14 @@ void CombatCommander::initializeSquads()
 	////std::cout << "vecBase2Choke:" << vecBase2Choke.first << "," << vecBase2Choke.second << std::endl;
 	////std::cout << "in_1st_chock_center:" << in_1st_chock_center.x / 32 << "," << in_1st_chock_center.y / 32 << std::endl;
 	////std::cout << "in_1st_chock_side:" << in_1st_chock_side.first.x / 32 << "," << in_1st_chock_side.first.y / 32 << "/" << in_1st_chock_side.second.x / 32 << "," << in_1st_chock_side.second.y / 32 << std::endl;
-	
+	int dfcRadius = 70;
 
+	if (BWAPI::Broodwar->enemy()->getRace() != BWAPI::Races::Zerg)
+	{
+		dfcRadius = rDefence_OrderPosition.getDistance(wFirstChokePoint_OrderPosition);
+	}
 	SquadOrder defcon1Order(SquadOrderTypes::Idle, rDefence_OrderPosition
-		, rDefence_OrderPosition.getDistance(wFirstChokePoint_OrderPosition), "DEFCON1");
+		, dfcRadius, "DEFCON1");
 	_squadData.addSquad("DEFCON1", Squad("DEFCON1", defcon1Order, IdlePriority));
 
 
@@ -206,7 +210,7 @@ void CombatCommander::update()
 
 			if (positionDefcon4 != BWAPI::Positions::None) {
 				SquadOrder defcon4Order(SquadOrderTypes::Idle, positionDefcon4,
-					BWAPI::Broodwar->mapWidth() * 7 + defcon4Squad.getUnits().size(), "DEFCON4");
+					BWAPI::Broodwar->mapWidth() * 6 + defcon4Squad.getUnits().size(), "DEFCON4");
 				defcon4Squad.setSquadOrder(defcon4Order);
 			}
 		}
@@ -722,10 +726,22 @@ BWAPI::Position CombatCommander::getMainAttackLocationForCombat()
 			if (curIndex < mainAttackPath.size())
 			{
 				//@도주남 김지훈 만약 공격 중이다가 우리의 인원수가 줄었다면 뒤로 뺀다 ?
-				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < mainAttackSquad.getUnits().size()*20)
+				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < mainAttackSquad.getSquadOrder().getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
 					curIndex+=1;
+				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange())
+				{
+					if (mainAttackSquad.calcCenter().getDistance(InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter()) 
+						< InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter().getDistance(mainAttackSquad.getSquadOrder().getPosition()))
+					curIndex -=2;
+				}
+
 				if (curIndex >= mainAttackPath.size())
 					return mainAttackPath[mainAttackPath.size()-1];
+				else if (curIndex < mainAttackPath.size() / 2)
+				{
+					curIndex = mainAttackPath.size() / 2;
+					mainAttackPath[curIndex];
+				}
 				else
 					return mainAttackPath[curIndex];
 			}
@@ -1132,6 +1148,7 @@ void CombatCommander::updateComBatStatus(const BWAPI::Unitset & combatUnits)
 
 			// if it's an overlord, don't worry about it for defense, we don't care what they see
 			if (unit->getType() == BWAPI::UnitTypes::Zerg_Overlord) continue;
+			if (unit->getType() == BWAPI::UnitTypes::Protoss_Observer) continue;
 
 			if (BWTA::getRegion(BWAPI::TilePosition(unit->getPosition())) == myRegion)
 			{
@@ -1232,9 +1249,6 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			+ InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition())
 			/ 4);
 
-		//std::cout << "indexFirstChokePoint_OrderPosition : " << indexFirstChokePoint_OrderPosition << ", firstChokePoint_OrderPositionPath" << firstChokePoint_OrderPositionPath.size() << std::endl;
-		//std::cout << endCP->getCenter() << ", " << startCP->getCenter() << ", " << InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() << ", " << InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition() << std::endl;
-			
 		std::vector<BWAPI::TilePosition> tileList =
 			BWTA::getShortestPath(BWAPI::TilePosition(startCP->getCenter())
 			, BWAPI::TilePosition(newTargetPosition));
@@ -1244,8 +1258,7 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 			BWAPI::Position tp(t.x * 32, t.y * 32);
 			if (!tp.isValid())
 				continue;
-			/*if (tp.getDistance(startCP->getCenter()) <= startCP->getWidth()*32)
-				indexFirstChokePoint_OrderPosition++;*/
+
 			indexFirstChokePoint_OrderPosition++;
 			firstChokePoint_OrderPositionPath.push_back(tp);
 		}
@@ -1259,30 +1272,13 @@ BWAPI::Position CombatCommander::getPoint_DEFCON4()
 		}
 	}
 	else{
-		/*if (InformationManager::Instance().enemyRace == BWAPI::Races::Terran)
-		{
-			Squad & idleSquad = _squadData.getSquad("DEFCON4");
-			if (indexFirstChokePoint_OrderPosition < firstChokePoint_OrderPositionPath.size() -1 )
-			{
-				if (firstChokePoint_OrderPositionPath[indexFirstChokePoint_OrderPosition].getDistance(idleSquad.calcCenter())
-					< idleSquad.getUnits().size() * 6)
-					indexFirstChokePoint_OrderPosition += 1;
-
-				return firstChokePoint_OrderPositionPath[indexFirstChokePoint_OrderPosition];
-			}
-			else
-			{
-				return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() -1];
-			}
-		}
-		else*/
+		
 		{
 			return firstChokePoint_OrderPositionPath[firstChokePoint_OrderPositionPath.size() - 1];
 		}
 	}
 
 	if (firstChokePoint_OrderPositionPath.size() == 0) {
-		//return BWAPI::Position(-1, -1);
 		return newTargetPosition;
 	}
 	else {

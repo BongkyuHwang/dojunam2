@@ -51,10 +51,13 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 	for (auto & tank : tanks)
 	{
 		bool goHome = false;
+		int hopeDist = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*1.2;
+
 		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(tank->getPosition())
-		> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius() 
-		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*1.2)
+		> hopeDist)
 			goHome = true;
+
 		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
 		bool tankNearChokepoint = false;
@@ -105,13 +108,13 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				{
 					tank->unsiege();
 				}
-				else if (tank->getDistance(target) < siegeTankRange && tank->canSiege())
+				else if (tank->getDistance(target) - target->getType().width() < siegeTankRange  && tank->canSiege())
 				{
 					tank->siege();
 				}
 				// otherwise unsiege and move in
 				//else if ((!target || (tank->getDistance(target) > siegeTankRange) && tank->canUnsiege()))
-				else if ((nullptr == target || (tank->getDistance(target) > siegeTankRange) && tank->canUnsiege()))
+				else if ((nullptr == target || (tank->getDistance(target) - target->getType().width() > siegeTankRange) && tank->canUnsiege()))
 				{
 					tank->unsiege();
 				}
@@ -147,7 +150,21 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 					{
 						if (order.getCenterPosition().isValid())
 						{
-							Micro::SmartAttackMove(tank, order.getCenterPosition());
+							if (hopeDist > order.getCenterPosition().getDistance(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition()))
+							{
+								if (tank->canSiege())
+								{
+									if (tankNearChokepoint && tank->getID() % 3 == 0)
+										Micro::SmartAttackMove(tank, order.getPosition());
+									else
+										tank->siege();
+								}
+							}
+							else
+							{
+
+								Micro::SmartAttackMove(tank, order.getCenterPosition());
+							}
 						}
 						else
 							Micro::SmartAttackMove(tank, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
@@ -168,7 +185,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				}
 				if (tank->canSiege())
 				{
-					if (tankNearChokepoint)
+					if (tankNearChokepoint && tank->getID()%3 == 0)
 						Micro::SmartAttackMove(tank, order.getPosition());
 					else
 						tank->siege();

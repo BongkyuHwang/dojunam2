@@ -206,12 +206,13 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
 		{
-
 			// if there are targets
 			if (!vultureUnitTargets.empty())
-			{
+			{	
+				// find the best target for this zealot
+				BWAPI::Unit target = getTarget(vultureUnit, vultureUnitTargets);
 
-				if (goHome && vultureUnit->getID() %10 == 0)
+				if (goHome && vultureUnit->getID() % 3 ==0)
 				{
 					if (order.getCenterPosition().isValid())
 					{
@@ -221,10 +222,68 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 						Micro::SmartMove(vultureUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
 					continue;
 				}
-				// find the best target for this zealot
-				BWAPI::Unit target = getTarget(vultureUnit, vultureUnitTargets);
+				else if (order.getStatus() == "DEFCON4")
+				{
+					if (miningOn && vultureUnit->getSpiderMineCount() > 0 && chokePointForVulture.size() > 0
+						&& !vultureUnit->isStuck() && InformationManager::Instance().rushState == 0)//&& (miningUnit == nullptr || miningUnit == vultureUnit) && !vultureUnit->isStuck())
+					{
+						BWAPI::Position mineSetPosition = vultureUnit->getPosition();
+						if (chokePointForVulture.size() > (vultureUnit->getID() % 6) + 1)
+							mineSetPosition = chokePointForVulture[chokePointForVulture.size() - (vultureUnit->getID() % 6)];
+						else
+							mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 1];
+						// 벌처가 마인을 설치해야 하는 위치중 제일 마지막 위치를 가져오고, 해당위치가 유효 한 경우에만 마인을 설치한다.
+						bool position_invalid = true;
+						while (position_invalid)
+						{
+							if (chokePointForVulture.size() <= 0)
+							{
+								position_invalid = true;
+								break;
+							}
+							position_invalid = false;
+							for (auto & ifmine : BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(mineSetPosition)))
+							{
+								if (ifmine->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine || ifmine->getType().isBuilding())
+								{
+									if (chokePointForVulture.size() > 1)
+									{
+										mineSetPosition = chokePointForVulture[chokePointForVulture.size() - 2];
+										chokePointForVulture.pop_back();
+										position_invalid = false;
+										break;
+									}
+									else if (chokePointForVulture.size() > 0)
+										chokePointForVulture.pop_back();
+									position_invalid = true;
+									break;
+								}
+							}
+						}
+						//만약 벌처가 공격을 받고 있으면 // 마인 설치를 포기하고 부대 위치로 복귀한다.
+						if (vultureUnit->isUnderAttack())
+						{
+							if (chokePointForVulture.size() > 0)
+								chokePointForVulture.pop_back();
+							if (order.getCenterPosition().isValid())
+							{
+								Micro::SmartMove(vultureUnit, order.getCenterPosition());
+							}
+							else
+								Micro::SmartMove(vultureUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+							position_invalid = true;
+							continue;
+						}
+						if (!position_invalid)
+						{
+							Micro::SmartLaySpiderMine(vultureUnit, mineSetPosition);
+							continue;
+						}
+					}
+				}
 
-				if (order.getCenterPosition().isValid() 
+				if ((order.getClosestUnit() != nullptr && vultureUnit->getID() == order.getClosestUnit()->getID())
+					&& order.getCenterPosition().isValid()
 					&& order.getCenterPosition().getDistance(vultureUnit->getPosition()) >BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
 				{
 					Micro::SmartMove(vultureUnit, order.getCenterPosition());
