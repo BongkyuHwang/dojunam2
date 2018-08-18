@@ -90,13 +90,13 @@ void CombatCommander::initializeSquads()
 	////std::cout << "vecBase2Choke:" << vecBase2Choke.first << "," << vecBase2Choke.second << std::endl;
 	////std::cout << "in_1st_chock_center:" << in_1st_chock_center.x / 32 << "," << in_1st_chock_center.y / 32 << std::endl;
 	////std::cout << "in_1st_chock_side:" << in_1st_chock_side.first.x / 32 << "," << in_1st_chock_side.first.y / 32 << "/" << in_1st_chock_side.second.x / 32 << "," << in_1st_chock_side.second.y / 32 << std::endl;
-	int dfcRadius = 70;
+	int dfcRadius = BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange();
 
 	if (BWAPI::Broodwar->enemy()->getRace() != BWAPI::Races::Zerg)
 	{
 		dfcRadius = rDefence_OrderPosition.getDistance(wFirstChokePoint_OrderPosition);
 	}
-	SquadOrder defcon1Order(SquadOrderTypes::Idle, rDefence_OrderPosition
+	SquadOrder defcon1Order(SquadOrderTypes::Defend, rDefence_OrderPosition
 		, dfcRadius, "DEFCON1");
 	_squadData.addSquad("DEFCON1", Squad("DEFCON1", defcon1Order, IdlePriority));
 
