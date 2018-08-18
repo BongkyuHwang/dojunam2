@@ -92,7 +92,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	{
 		
 		BWAPI::Unit target = closestCloakedUnit(detectorUnitTargets, detectorUnit);
-		if (BWAPI::Broodwar->getFrameCount() > 25000 && target == nullptr && detectorUnit->getID() % 2 ==0)
+		if (BWAPI::Broodwar->getFrameCount() > 25000 && target == nullptr)
 		{
 
 			if (toGo.isValid())
