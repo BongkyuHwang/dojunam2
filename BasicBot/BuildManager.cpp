@@ -1401,13 +1401,13 @@ void BuildManager::defenceFlyingAndDetect(){
 			int numPerExpansion = 0;
 			int totalNum = 0;
 			if (turret_warning_level > 2){
-				numPerExpansion = 5;
-			}
-			else if (turret_warning_level > 1){
 				numPerExpansion = 3;
 			}
-			else{
+			else if (turret_warning_level > 1){
 				numPerExpansion = 2;
+			}
+			else{
+				numPerExpansion = 1;
 			}
 
 			std::vector<BuildOrderItem::SeedPositionStrategy> seedPositionStrategies;

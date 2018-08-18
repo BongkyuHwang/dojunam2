@@ -246,6 +246,8 @@ namespace MyBot
 		//drop 한번에 갈 dropship 갯수 : 지정된 갯수의 드롭쉽이 가득 차면 출발
 		int bombDropNum;
 		BWAPI::Unitset buildingDetectors;
+		// barack 들 타이밍
+		bool isTimingToLiftBaracks;
 
 		std::string unitTypeString(int ut){
 			if (ut == BWAPI::UnitTypes::Terran_Marine) return"Terran_Marine";

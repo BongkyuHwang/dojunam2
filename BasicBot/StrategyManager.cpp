@@ -396,11 +396,11 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Vulture, goal_num_vultures));
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, goal_num_tanks));
 
-		if (!hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
-			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
-		}
 		if (!hasTech(BWAPI::TechTypes::Spider_Mines)) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Spider_Mines, 1));
+		}
+		if (!hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
 		}
 	}
 	else if (_main_strategy == Strategy::main_strategies::Mechanic || _main_strategy == Strategy::main_strategies::Mechanic_Goliath)
@@ -473,11 +473,19 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		}
 		goal_num_vultures += 1;
 
+		/* 순서변경
 		if (!hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
 		}
 		if (hasTech(BWAPI::TechTypes::Tank_Siege_Mode) && !hasTech(BWAPI::TechTypes::Spider_Mines)) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Spider_Mines, 1));
+		}
+		*/
+		if (!hasTech(BWAPI::TechTypes::Spider_Mines)) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Spider_Mines, 1));
+		}
+		if (hasTech(BWAPI::TechTypes::Spider_Mines) && !hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
 		}
 		if (hasTech(BWAPI::TechTypes::Spider_Mines) && BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Ion_Thrusters) == 0) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Ion_Thrusters, 1));
@@ -502,7 +510,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		// 2018.08.16
 		// 황봉규
 		// 저그전일때 bionic_tank에서 Mechanic 으로 바뀌는 동안병력생산 공백을 줄이기 위한로직
-		if (InformationManager::Instance().enemyRace == BWAPI::Races::Zerg && numUnits["Factorys"] < 5) {
+		if (InformationManager::Instance().isTimingToLiftBaracks == false && InformationManager::Instance().enemyRace == BWAPI::Races::Zerg && numUnits["Factorys"] < 5) {
 			int goal_num_marines = numUnits["Marines"] + numUnits["Barracks"];
 			int goal_num_tanks = numUnits["Tanks"];
 
@@ -512,6 +520,22 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Medic, int(numUnits["Marines"] / 4)));
 			//goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Firebat, unit_ratio_table["Medics"][goal_num_marines]));
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, goal_num_tanks));
+		}
+		else {
+			// 배럭드는 타이밍 설정과 배럭들 유닛셋에 insert
+			if (InformationManager::Instance().isTimingToLiftBaracks == false) {
+				InformationManager::Instance().isTimingToLiftBaracks = true;
+
+				for (auto unit : BWAPI::Broodwar->self()->getUnits()) {
+					if (unit == nullptr) {
+						continue;
+					}
+					if (unit->getType() == BWAPI::UnitTypes::Terran_Barracks && unit->isCompleted() == true && unit->isLifted() == false && unit->canLift() == true) {
+						unit->lift();
+						InformationManager::Instance().buildingDetectors.insert(unit);
+					}
+				}
+			}
 		}
 		
 
@@ -726,7 +750,7 @@ void StrategyManager::initStrategies(){
 	_strategies[Strategy::main_strategies::Bionic].next_strategy = Strategy::main_strategies::Bionic_Tank;
 	_strategies[Strategy::main_strategies::Bionic].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV Barracks SCV Barracks SCV SCV SCV Marine Supply_Depot SCV Marine Refinery SCV Marine SCV Marine SCV Marine Supply_Depot SCV Academy";
 	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Marines"] = 16; //마린18이상이면 테크진화
-	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Barracks"] = 2; //-1은 테크진화에 영향없음
+	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Barracks"] = 4; //-1은 테크진화에 영향없음
 	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Firebats"] = -1;
 
 	_strategies[Strategy::main_strategies::Bionic_Tank] = Strategy();

@@ -49,6 +49,8 @@ InformationManager::InformationManager()
 	_wallStatus = false;
 	// 터렛위치 설치여부
 	_turretStatus = false;
+
+	isTimingToLiftBaracks = false;
 }
 
 //kyj
