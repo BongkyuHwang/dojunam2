@@ -226,7 +226,7 @@ void ConstructionManager::constructAssignedBuildings()
         if (b.status != ConstructionStatus::Assigned)
         {
 			// SCV 앞길을 막는 유닛들은 비켜라!
-			moveAway(b.constructionWorker, b.finalPosition);
+			//moveAway(b.constructionWorker, b.finalPosition);
             continue;
         }
 
