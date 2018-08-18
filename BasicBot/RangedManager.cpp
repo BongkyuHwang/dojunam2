@@ -41,12 +41,8 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	for (auto & rangedUnit : rangedUnits)
 	{
 		bool goHome = false;
-		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(rangedUnit->getPosition())
-			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
-			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
-			//+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange()
-			)
+		BWAPI::Position keepOnPosition = (order.getPosition() + order.getCenterPosition())/2;
+		if (keepOnPosition.getDistance(rangedUnit->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() )
 			goHome = true;
 		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
@@ -72,7 +68,7 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				}
 				if (order.getCenterPosition().isValid() && order.getType() != SquadOrderTypes::Defend)
 				{
-					if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+					if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*2)
 					{
 						Micro::SmartMove(rangedUnit, order.getCenterPosition());
 						continue;

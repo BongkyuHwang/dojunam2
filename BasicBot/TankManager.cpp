@@ -108,13 +108,17 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				{
 					tank->unsiege();
 				}
-				else if (tank->getDistance(target) - target->getType().width() < siegeTankRange  && tank->canSiege())
+				else if (tank->getDistance(target) - target->getType().width()/2 < siegeTankRange  && tank->canSiege() && !target->getType().isBuilding())
+				{
+					tank->siege();
+				}
+				else if (tank->getDistance(target) < tankTankRange + target->getType().width() && tank->canSiege() && target->getType().isBuilding())
 				{
 					tank->siege();
 				}
 				// otherwise unsiege and move in
 				//else if ((!target || (tank->getDistance(target) > siegeTankRange) && tank->canUnsiege()))
-				else if ((nullptr == target || (tank->getDistance(target) - target->getType().width() > siegeTankRange) && tank->canUnsiege()))
+				else if ((nullptr == target || (tank->getDistance(target) > siegeTankRange) && tank->canUnsiege()))
 				{
 					tank->unsiege();
 				}

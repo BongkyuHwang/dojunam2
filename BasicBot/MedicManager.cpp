@@ -27,17 +27,6 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
     // for each target, send the closest medic to heal it
     for (auto & target : medicTargets)
     {
-		bool goHome = false;
-		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(target->getPosition())
-		> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-		+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
-		+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
-		+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
-			goHome = true;
-
-		if (goHome)
-			continue;
-
         // only one medic can heal a target at a time
 		if (target->isBeingHealed() )//&& countCB > 0)
         {
