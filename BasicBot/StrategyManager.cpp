@@ -107,6 +107,7 @@ const BuildOrder & StrategyManager::getOpeningBookBuildOrder() const
 // 일꾼 계속 추가 생산
 void StrategyManager::executeWorkerTraining()
 {
+
 	// InitialBuildOrder 진행중에는 아무것도 하지 않습니다
 	if (isInitialBuildOrderFinished == false) {
 		return;
@@ -557,6 +558,19 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		//BWAPI::Broodwar->printf("Warning: No build order goal for Terran Strategy: %s", Config::Strategy::StrategyName.c_str());
 	}
 
+	if (_main_strategy == Strategy::main_strategies::Bionic || _main_strategy == Strategy::main_strategies::Bionic_Tank) {
+
+		std::pair<int, int> queueResource = BuildManager::Instance().getQueueResource();
+		queueResource.first += BuildManager::Instance().marginResource.first; //약간의 마진을 준다. 너무 타이트하게 여유자원을 사용하지 않기 위해서
+		queueResource.second += BuildManager::Instance().marginResource.second;
+
+		std::pair<int, int> remainingResource(BuildManager::Instance().getAvailableMinerals() - queueResource.first, BuildManager::Instance().getAvailableGas() - queueResource.second);
+
+		if (remainingResource.first > 0 && remainingResource.second > 0) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Barracks, numUnits["Barracks"] + 1));
+		}
+	}
+
 	if (_main_strategy == Strategy::main_strategies::One_Fac || _main_strategy == Strategy::main_strategies::Mechanic || _main_strategy == Strategy::main_strategies::Two_Fac || _main_strategy == Strategy::main_strategies::Mechanic_Goliath) {
 
 		std::pair<int, int> queueResource = BuildManager::Instance().getQueueResource();
@@ -579,7 +593,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		std::pair<int, int> remainingResource(BuildManager::Instance().getAvailableMinerals() - queueResource.first, BuildManager::Instance().getAvailableGas() - queueResource.second);
 
 		if (remainingResource.first > 0 && remainingResource.second > 0) {
-			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Factory, numUnits["Starports"] + 1));
+			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Starport, numUnits["Starports"] + 1));
 		}
 	}
 
