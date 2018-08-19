@@ -544,11 +544,6 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Ship_Weapons, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Ship_Weapons) + 1));
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UpgradeTypes::Terran_Ship_Plating, BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Terran_Ship_Plating) + 1));
 
-		if (numUnits["Science_Facility"] >= 1) {
-			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Vessel, 1));
-		}
-
-
 		int goal_num_battles = numUnits["Battles"] + 6;
 		// 황봉규
 		// 기존에 배틀크루저 생산하는 로직이 없어서
@@ -680,9 +675,12 @@ int StrategyManager::getUnitLimit(MetaType type){
 			return 3;
 		}
 		else if (_main_strategy == Strategy::main_strategies::Bionic_Tank) {
-			return 5;
+			return 7;
 		}
 		else if (_main_strategy == Strategy::main_strategies::One_Fac || _main_strategy == Strategy::main_strategies::Two_Fac) {
+			return 0;
+		}
+		else {
 			return 0;
 		}
 	}
@@ -737,7 +735,7 @@ void StrategyManager::initStrategies(){
 	_strategies[Strategy::main_strategies::BSB].pre_strategy = Strategy::main_strategies::None;
 	_strategies[Strategy::main_strategies::BSB].next_strategy = Strategy::main_strategies::Bionic;
 	_strategies[Strategy::main_strategies::BSB].opening_build_order = "SCV SCV SCV SCV SCV Barracks SCV Supply_Depot Barracks";
-	_strategies[Strategy::main_strategies::BSB].num_unit_limit["Marines"] = 6; //마린18이상이면 테크진화
+	_strategies[Strategy::main_strategies::BSB].num_unit_limit["Marines"] = 6; //마린18이상이면 테크진화w
 
 	_strategies[Strategy::main_strategies::BBS] = Strategy();
 	_strategies[Strategy::main_strategies::BBS].pre_strategy = Strategy::main_strategies::None;
@@ -750,7 +748,7 @@ void StrategyManager::initStrategies(){
 	_strategies[Strategy::main_strategies::Bionic].next_strategy = Strategy::main_strategies::Bionic_Tank;
 	_strategies[Strategy::main_strategies::Bionic].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV Barracks SCV Barracks SCV SCV SCV Marine Supply_Depot SCV Marine Refinery SCV Marine SCV Marine SCV Marine Supply_Depot SCV Academy";
 	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Marines"] = 16; //마린18이상이면 테크진화
-	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Barracks"] = 4; //-1은 테크진화에 영향없음
+	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Barracks"] = 2; //-1은 테크진화에 영향없음
 	_strategies[Strategy::main_strategies::Bionic].num_unit_limit["Firebats"] = -1;
 
 	_strategies[Strategy::main_strategies::Bionic_Tank] = Strategy();
