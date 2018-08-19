@@ -138,7 +138,9 @@ void BuildManager::consumeBuildQueue(){
 								<< " seedPosition " << currentItem.seedLocation.x << "," << currentItem.seedLocation.y
 								<< " desiredPosition " << desiredPosition.x << "," << desiredPosition.y << std::endl;
 							*/
-							isOkToRemoveQueue = false;
+							isOkToRemoveQueue = true;
+							//BWAPI::Broodwar->sendText(().data);
+							std::cout << "No desiredPosition - " + InformationManager::Instance().unitTypeString(t.getUnitType().getID()) << std::endl;
 						}
 					}
 				}
@@ -217,28 +219,20 @@ void BuildManager::consumeBuildQueue(){
 
 void BuildManager::performBuildOrderSearch()
 {
-	/*
-	if (!Config::Modules::UsingBuildOrderSearch || !canPlanBuildOrderNow())
-	{
-		return;
-	}
-	*/
-	////std::cout << "buildOrder.size():";
 	BuildOrder & buildOrder = BOSSManager::Instance().getBuildOrder();
-	////std::cout << buildOrder.size() << std::endl;
 
 	if (buildOrder.size() > 0)
 	{
-		/*
-		//std::cout << "Finished BOSS - ";
+
+		std::cout << "Finished BOSS - ";
 		for (size_t i(0); i < buildOrder.size(); ++i){
-			if (buildOrder[i].getName().find("Terran_")==0)
-				//std::cout << buildOrder[i].getName().replace(0, 7, "") << " ";
+			if (buildOrder[i].getName().find("Terran_") == 0)
+				std::cout << buildOrder[i].getName().replace(0, 7, "") << " ";
 			else
-				//std::cout << buildOrder[i].getName() << " ";
+				std::cout << buildOrder[i].getName() << " ";
 		}
-		//std::cout << std::endl;
-		*/
+		std::cout << std::endl;
+
 		setBuildOrder(buildOrder);
 		BOSSManager::Instance().reset();
 	}
@@ -251,29 +245,29 @@ void BuildManager::performBuildOrderSearch()
 				return;
 			}
 
-			/*
-			//std::cout << "Start BOSS" << std::endl;
+
+			std::cout << "Start BOSS - " << BWAPI::Broodwar->getFrameCount() << std::endl;
 
 			if (!buildQueue.isEmpty()){
-				//std::cout << "Queue list - ";
+				std::cout << "Queue list - ";
 				for (int i = buildQueue.size() - 1; i >= 0; i--){
 					if (buildQueue[i].metaType.getName().find("Terran_") == 0)
-						//std::cout << buildQueue[i].metaType.getName().replace(0, 7, "") << " ";
+						std::cout << buildQueue[i].metaType.getName().replace(0, 7, "") << " ";
 					else
-						//std::cout << buildQueue[i].metaType.getName() << " ";
+						std::cout << buildQueue[i].metaType.getName() << " ";
 				}
-				//std::cout << std::endl;
+				std::cout << std::endl;
 			}
 
-			//std::cout << "Goal list - ";
+			std::cout << "Goal list - ";
 			for (auto &i : goalUnits){
 				if (i.first.getName().find("Terran_") == 0)
-					//std::cout << i.first.getName().replace(0, 7, "") << "(" << i.second << ") ";
+					std::cout << i.first.getName().replace(0, 7, "") << "(" << i.second << ") ";
 				else
-					//std::cout << i.first.getName() << "(" << i.second << ") ";
+					std::cout << i.first.getName() << "(" << i.second << ") ";
 			}
-			//std::cout << std::endl;
-			*/
+			std::cout << std::endl;
+
 			BOSSManager::Instance().startNewSearch(goalUnits);
 		}
 	}
