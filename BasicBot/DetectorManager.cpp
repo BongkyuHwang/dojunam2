@@ -80,7 +80,8 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			|| unit->getType() == BWAPI::UnitTypes::Zerg_Queen
 			))
 		{
-			candidateIrradiating.insert(unit);
+			if (!unit->isIrradiated() < candidateIrradiating.size() < detectorUnits.size())
+				candidateIrradiating.insert(unit);
 		}
 
 	}
@@ -92,12 +93,10 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 	{
 		
 		BWAPI::Unit target = closestCloakedUnit(detectorUnitTargets, detectorUnit);
-		if (BWAPI::Broodwar->getFrameCount() > 25000 && target == nullptr)
+		if (BWAPI::Broodwar->getFrameCount() > 25000 && (target == nullptr || detectorUnitTargets.size() <= 0))
 		{
-
 			if (toGo.isValid())
 			{
-			
 				if (detectorUnit->getPosition().getDistance(toGo) >= 70)
 				{
 				
@@ -115,7 +114,6 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				toGo = doFullscan();
 		
 			}
-
 			continue;
 		}
 
@@ -190,6 +188,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 				{
 					detectorUnit->useTech(BWAPI::TechTypes::Irradiate, itarget);
 					useTech = true;
+					candidateIrradiating.erase(itarget);
 					break;
 				}
 			}

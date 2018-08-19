@@ -391,12 +391,25 @@ void CombatCommander::updateAttackSquads()
 	if (im.nowCombatStatus == InformationManager::combatStatus::CenterAttack)
 	{
 		std::vector<BWAPI::TilePosition> tileList = BWTA::getShortestPath(BWAPI::TilePosition(im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter()), BWAPI::TilePosition(BWAPI::Broodwar->mapWidth() / 2, BWAPI::Broodwar->mapHeight() / 2) );
-		SquadOrder _order(SquadOrderTypes::Attack, BWAPI::Position(tileList[(int)(tileList.size()*0.7)]), radi, "AttackCenter");
+		SquadOrder _order(SquadOrderTypes::Attack, BWAPI::Position(tileList[tileList.size() - 1]), radi, "AttackCenter");
 		mainAttackSquad.setSquadOrder(_order);
 	}
 	else if (im.nowCombatStatus == InformationManager::combatStatus::EnemyBaseAttack)
 	{
-		SquadOrder _order(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), 800, "AttackEnemybase");
+		int addRadi = 0;
+		if (BWAPI::Broodwar->getFrameCount() > 20000)
+		{
+			addRadi += 200;
+		}
+		if (BWAPI::Broodwar->getFrameCount() > 28000)
+		{
+			addRadi += 200;
+		}
+		if (BWAPI::Broodwar->getFrameCount() > 35000)
+		{
+			addRadi += 400;
+		}
+		SquadOrder _order(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), 800+addRadi, "AttackEnemybase");
 		mainAttackSquad.setSquadOrder(_order);
 	}
 }
@@ -555,6 +568,11 @@ void CombatCommander::updateScoutDefenseSquad()
     {
         for (auto & unit : scoutDefenseSquad.getUnits())
         {
+			printf("stoped [%d] %s\n", unit->getID(), unit->getType().c_str());
+			//BWAPI::Broodwar->setScreenPosition(unit->getPosition() - BWAPI::Position(100, 100));
+			//BWAPI::Broodwar->drawBoxMap(unit->getPosition() - BWAPI::Position(unit->getType().width() + 10, unit->getType().height() + 10), unit->getPosition() + BWAPI::Position(unit->getType().width() + 10, unit->getType().height() + 10), BWAPI::Colors::Black, true);
+			//BWAPI::Broodwar->drawBoxMap(unit->getPosition() - BWAPI::Position(unit->getType().width(), unit->getType().height()), unit->getPosition() + BWAPI::Position(unit->getType().width(), unit->getType().height()), BWAPI::Colors::Yellow, true);
+
             unit->stop();
             if (unit->getType().isWorker())
             {
@@ -699,7 +717,7 @@ BWAPI::Position CombatCommander::getMainAttackLocationForCombat()
 {
 	BWTA::BaseLocation * enemyBaseLocation = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy());
 	BWTA::Chokepoint * enemyfirstCP = InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->enemy());
-	
+	BWAPI::TilePosition home = BWAPI::Broodwar->self()->getStartLocation();
 	if (enemyfirstCP)
 	{
 		if (!initMainAttackPath)
@@ -716,11 +734,13 @@ BWAPI::Position CombatCommander::getMainAttackLocationForCombat()
 					continue;
 				if (tp.getDistance(enemyfirstCP->getCenter()) < 100)
 					continue;
-				
+				if (!BWTA::isConnected(t, home))
+				{
+					continue;
+				}
 				mainAttackPath.push_back(tp);
-				
 			}
-			
+
 			initMainAttackPath = true;
 		}
 		else{
@@ -730,14 +750,14 @@ BWAPI::Position CombatCommander::getMainAttackLocationForCombat()
 			if (curIndex < mainAttackPath.size())
 			{
 				//@도주남 김지훈 만약 공격 중이다가 우리의 인원수가 줄었다면 뒤로 뺀다 ?
-				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < mainAttackSquad.getSquadOrder().getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) 
+					< mainAttackSquad.getSquadOrder().getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + mainAttackSquad.getUnits().size()*1.2)
 					curIndex+=1;
-				/*if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) < BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange())
+				else if (mainAttackPath[curIndex].getDistance(BWAPI::Position(home)) < BWAPI::Position(home).getDistance(mainAttackSquad.calcCenter()))
 				{
-					if (mainAttackSquad.calcCenter().getDistance(InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter()) 
-						< InformationManager::Instance().getSecondChokePoint(BWAPI::Broodwar->self())->getCenter().getDistance(mainAttackSquad.getSquadOrder().getPosition()))
-					curIndex -=2;
-				}*/
+					curIndex += 2;
+				}
+
 
 				if (curIndex >= mainAttackPath.size())
 					return mainAttackPath[mainAttackPath.size()-1];

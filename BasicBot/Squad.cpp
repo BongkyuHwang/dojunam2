@@ -209,12 +209,14 @@ void Squad::updateUnits()
 	}
 	setNearEnemyUnits();
 	addUnitsToMicroManagers();
-	if (calcCenter() == BWAPI::Positions::None)
+	BWAPI::Position centerPosition = calcCenter();
+
+	if (centerPosition != BWAPI::Positions::None && BWAPI::Broodwar->getFrameCount() < 25000)
 	{
-		_order.setCenterPosition(_order.getPosition());
+		_order.setCenterPosition(centerPosition);
 	}
 	else
-		_order.setCenterPosition(calcCenter());
+		_order.setCenterPosition(_order.getPosition());
 }
 
 void Squad::setAllUnits()
@@ -238,8 +240,22 @@ void Squad::setAllUnits()
 
 			if (unit->isStuck())//|| unit->isIdle())
 			{
-				unit->setRallyPoint(_order.getPosition());
-				//unit->move(_order.getPosition());
+				//printf("isStuck [%d] %s\n", unit->getID(), unit->getType().c_str());
+				//BWAPI::Broodwar->setScreenPosition(unit->getPosition() - BWAPI::Position(100, 100));
+				//BWAPI::Broodwar->drawBoxMap(unit->getPosition() - BWAPI::Position(unit->getType().width() + 10, unit->getType().height() + 10), unit->getPosition() + BWAPI::Position(unit->getType().width() + 10, unit->getType().height() + 10), BWAPI::Colors::Black, true);
+				//BWAPI::Broodwar->drawBoxMap(unit->getPosition() - BWAPI::Position(unit->getType().width(), unit->getType().height()), unit->getPosition() + BWAPI::Position(unit->getType().width(), unit->getType().height()), BWAPI::Colors::Yellow, true);
+				//unit->setRallyPoint(_order.getPosition());
+				unit->holdPosition();
+				for (BWTA::Chokepoint * chokepoint : BWTA::getChokepoints())
+				{
+					// BWTA::getGroundDistance 연산량이 많아 교체
+					if (MapTools::Instance().getGroundDistance(unit->getPosition(), chokepoint->getCenter()) <= chokepoint->getWidth())
+					{
+						unit->move(BWAPI::Position(BWAPI::Broodwar->mapWidth() * 16, BWAPI::Broodwar->mapHeight() * 16));
+						break;
+					}
+				}
+				continue;
 			}
 			//else
 			//	if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(unit->getPosition(), 5, BWAPI::Colors::Blue, true);
@@ -289,86 +305,86 @@ void Squad::setNearEnemyUnits()
 }
 
 std::vector<BWAPI::Unitset> Squad::_units_divided(int num){
-	BWAPI::Unitset meleeUnits;
-	BWAPI::Unitset rangedUnits;
-	BWAPI::Unitset detectorUnits;
-	BWAPI::Unitset transportUnits;
-	BWAPI::Unitset tankUnits;
-	BWAPI::Unitset medicUnits;
-	BWAPI::Unitset vultureUnits;
-	// add _units to micro managers
-	for (auto & unit : _units)
-	{
-		if (unit->isCompleted() && unit->getHitPoints() > 0 && unit->exists())
-		{
-			// select dector _units
-			if (unit->getType() == BWAPI::UnitTypes::Terran_Medic)
-			{
-				medicUnits.insert(unit);
-			}
-			else if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode || unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
-			{
-				tankUnits.insert(unit);
-			}
-			//@도주남 김지훈
-			else if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture)
-			{
-				vultureUnits.insert(unit);
-			}
-			else if (unit->getType().isDetector() && !unit->getType().isBuilding())
-			{
-				detectorUnits.insert(unit);
-			}
-			// select transport _units
-			else if (unit->getType() == BWAPI::UnitTypes::Protoss_Shuttle || unit->getType() == BWAPI::UnitTypes::Terran_Dropship)
-			{
-				transportUnits.insert(unit);
-			}
-			// select ranged _units
-			else if ((unit->getType().groundWeapon().maxRange() > 32) || (unit->getType() == BWAPI::UnitTypes::Protoss_Reaver) || (unit->getType() == BWAPI::UnitTypes::Zerg_Scourge))
-			{
-				rangedUnits.insert(unit);
-			}
-			// select melee _units
-			else if (unit->getType().groundWeapon().maxRange() <= 32)
-			{
-				meleeUnits.insert(unit);
-			}
-		}
-	}
+	//BWAPI::Unitset meleeUnits;
+	//BWAPI::Unitset rangedUnits;
+	//BWAPI::Unitset detectorUnits;
+	//BWAPI::Unitset transportUnits;
+	//BWAPI::Unitset tankUnits;
+	//BWAPI::Unitset medicUnits;
+	//BWAPI::Unitset vultureUnits;
+	//// add _units to micro managers
+	//for (auto & unit : _units)
+	//{
+	//	if (unit->isCompleted() && unit->getHitPoints() > 0 && unit->exists())
+	//	{
+	//		// select dector _units
+	//		if (unit->getType() == BWAPI::UnitTypes::Terran_Medic)
+	//		{
+	//			medicUnits.insert(unit);
+	//		}
+	//		else if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode || unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
+	//		{
+	//			tankUnits.insert(unit);
+	//		}
+	//		//@도주남 김지훈
+	//		else if (unit->getType() == BWAPI::UnitTypes::Terran_Vulture)
+	//		{
+	//			vultureUnits.insert(unit);
+	//		}
+	//		else if (unit->getType().isDetector() && !unit->getType().isBuilding())
+	//		{
+	//			detectorUnits.insert(unit);
+	//		}
+	//		// select transport _units
+	//		else if (unit->getType() == BWAPI::UnitTypes::Protoss_Shuttle || unit->getType() == BWAPI::UnitTypes::Terran_Dropship)
+	//		{
+	//			transportUnits.insert(unit);
+	//		}
+	//		// select ranged _units
+	//		else if ((unit->getType().groundWeapon().maxRange() > 32) || (unit->getType() == BWAPI::UnitTypes::Protoss_Reaver) || (unit->getType() == BWAPI::UnitTypes::Zerg_Scourge))
+	//		{
+	//			rangedUnits.insert(unit);
+	//		}
+	//		// select melee _units
+	//		else if (unit->getType().groundWeapon().maxRange() <= 32)
+	//		{
+	//			meleeUnits.insert(unit);
+	//		}
+	//	}
+	//}
 
-	std::vector<BWAPI::Unitset> rst;
-	if (num == 2){
-		BWAPI::Unitset half_first;
-		BWAPI::Unitset half_second;
+	//std::vector<BWAPI::Unitset> rst;
+	//if (num == 2){
+	//	BWAPI::Unitset half_first;
+	//	BWAPI::Unitset half_second;
 
-		auto lamb_divide = [](BWAPI::Unitset &u, BWAPI::Unitset & half_first, BWAPI::Unitset &half_second){
-			int half_idx = u.size() / 2;
-			int cnt = 0;
-			for (auto tmpUnit : u){
-				if (cnt < half_idx){
-					half_first.insert(tmpUnit);
-				}
-				else{
-					half_second.insert(tmpUnit);
-				}
-				cnt++;
-			}
-		};
+	//	auto lamb_divide = [](BWAPI::Unitset &u, BWAPI::Unitset & half_first, BWAPI::Unitset &half_second){
+	//		int half_idx = u.size() / 2;
+	//		int cnt = 0;
+	//		for (auto tmpUnit : u){
+	//			if (cnt < half_idx){
+	//				half_first.insert(tmpUnit);
+	//			}
+	//			else{
+	//				half_second.insert(tmpUnit);
+	//			}
+	//			cnt++;
+	//		}
+	//	};
 
-		lamb_divide(meleeUnits, half_first, half_second);
-		lamb_divide(rangedUnits, half_first, half_second);
-		lamb_divide(detectorUnits, half_first, half_second);
-		lamb_divide(transportUnits, half_first, half_second);
-		lamb_divide(tankUnits, half_first, half_second);
-		lamb_divide(medicUnits, half_first, half_second);
-		lamb_divide(vultureUnits, half_first, half_second);
+	//	lamb_divide(meleeUnits, half_first, half_second);
+	//	lamb_divide(rangedUnits, half_first, half_second);
+	//	lamb_divide(detectorUnits, half_first, half_second);
+	//	lamb_divide(transportUnits, half_first, half_second);
+	//	lamb_divide(tankUnits, half_first, half_second);
+	//	lamb_divide(medicUnits, half_first, half_second);
+	//	lamb_divide(vultureUnits, half_first, half_second);
 
-		rst.push_back(half_first);
-		rst.push_back(half_second);
-	}
+	//	rst.push_back(half_first);
+	//	rst.push_back(half_second);
+	//}
 
-	return rst;
+	//return rst;
 }
 
 void Squad::addUnitsToMicroManagers()
@@ -427,6 +443,24 @@ void Squad::addUnitsToMicroManagers()
 		if (bD->isFlying() && bD->getType().isBuilding() )
 			detectorUnits.insert(bD);
 	}
+	if (BWAPI::Broodwar->getFrameCount() > 30000 && detectorUnits.size() <= 0)
+	{
+		for (auto & bD : transportUnits)
+		{
+			detectorUnits.insert(bD);
+			transportUnits.erase(bD);
+			break;
+		}
+		if (detectorUnits.size() <= 0)
+			for (auto & bD : rangedUnits)
+			{
+				detectorUnits.insert(bD);
+				rangedUnits.erase(bD);
+				break;
+			}
+	}
+
+
 	_meleeManager.setUnits(meleeUnits);
 	_rangedManager.setUnits(rangedUnits);
 	_detectorManager.setUnits(detectorUnits);
