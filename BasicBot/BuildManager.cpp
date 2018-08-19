@@ -927,7 +927,7 @@ bool BuildManager::detectSupplyDeadlock()
 	// 건설큐에 있으면 건설할 것으로 판단
 	// 건물은 isComplete 될때까지 건설큐에 있음
 	// 08.17 황봉규 threshold값 변경
-	if (ConstructionManager::Instance().getConstructionQueueItemCount(BWAPI::UnitTypes::Terran_Supply_Depot) > 1){
+	if (ConstructionManager::Instance().getConstructionQueueItemCount(BWAPI::UnitTypes::Terran_Supply_Depot) > 2){
 		return false;
 	}
 
@@ -980,11 +980,8 @@ void BuildManager::executeWorkerTraining(){
 			else if(ExpansionManager::Instance().getExpansions().size() <= 2){
 				weight = 1.3;
 			}
-			else {
-				weight = 1.1;
-			}
 			// 일꾼 최대치 
-			if ((tmpWorkerCnt < (int)(WorkerManager::Instance().getWorkerData().getMineralsNearDepot(e.cc) * 2 * weight)) && (totalWorkerCnt < 71)){
+			if ((tmpWorkerCnt < (int)(WorkerManager::Instance().getWorkerData().getMineralsNearDepot(e.cc) * 1.5 * weight + 3)) && (totalWorkerCnt < 71)){
 				e.cc->train(BWAPI::UnitTypes::Terran_SCV);
 				return;
 			}

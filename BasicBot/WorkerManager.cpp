@@ -189,10 +189,30 @@ void WorkerManager::handleGasWorkers()
 			else if (StrategyManager::Instance().getMainStrategy() == Strategy::BSB || StrategyManager::Instance().getMainStrategy() == Strategy::BBS) {
 				targetNumGasWorker = 0;
 			}
+			else if (StrategyManager::Instance().getMainStrategy() == Strategy::Bionic) {
+				if (BWAPI::Broodwar->self()->gas() >= 300) {
+					targetNumGasWorker = 0;
+				}
+				else if (BWAPI::Broodwar->self()->gas() >= 150 && BWAPI::Broodwar->self()->gas() < 300) {
+					targetNumGasWorker = 1;
+				}
+				else {
+					targetNumGasWorker = 3;
+				}
+				
+			}
+			else if (StrategyManager::Instance().getMainStrategy() == Strategy::Bionic_Tank) {
+				if (BWAPI::Broodwar->self()->gas() >= 300) {
+					targetNumGasWorker = 2;
+				}
+				else {
+					targetNumGasWorker = 3;
+				}
+			}
 			else {
 				targetNumGasWorker = Config::Macro::WorkersPerRefinery;
 			}
-
+			/*
 			int numMineralWorkers = getNumMineralWorkers();
 			if (numMineralWorkers < 7) {
 				targetNumGasWorker = 0;
@@ -206,6 +226,7 @@ void WorkerManager::handleGasWorkers()
 			else {
 				targetNumGasWorker = 3;
 			}
+			*/
 
 			if (numAssigned > targetNumGasWorker) {
 				for (int i = 0; i<(numAssigned - targetNumGasWorker); ++i)
