@@ -912,6 +912,11 @@ void BuildManager::onUnitComplete(BWAPI::Unit unit){
 //큐 제일 위에 있는 것을 서플라이제한으로 못만드는 경우
 bool BuildManager::detectSupplyDeadlock()
 {
+	
+	//초기빌드 이후에만 작업가능
+	if (!StrategyManager::Instance().isInitialBuildOrderFinished) 
+		return false;
+
 	// 빌드큐 비어 있으면 추가하지 않음, 보스에서 해결함
 	if (buildQueue.isEmpty()){
 		return false;

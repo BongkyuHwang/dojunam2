@@ -209,6 +209,19 @@ void WorkerManager::handleGasWorkers()
 					targetNumGasWorker = 3;
 				}
 			}
+			else if (StrategyManager::Instance().getMainStrategy() == Strategy::One_Fac_One_Star) {
+				if (BWAPI::Broodwar->self()->gatheredGas() <= 100) {
+					targetNumGasWorker = 3;
+				}
+				else {
+					if (UnitUtils::GetAllUnitCount(BWAPI::UnitTypes::Terran_Factory) == 0) {
+						targetNumGasWorker = 1;
+					}
+					else {
+						targetNumGasWorker = 3;
+					}
+				}
+			}
 			else {
 				targetNumGasWorker = Config::Macro::WorkersPerRefinery;
 			}

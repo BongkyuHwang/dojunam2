@@ -31,7 +31,7 @@ void StrategyManager::setOpeningBookBuildOrder(){
 
 	//초기 전략 선택
 	if (InformationManager::Instance().enemyRace == BWAPI::Races::Terran){
-		_main_strategy = Strategy::main_strategies::One_Fac;
+		_main_strategy = Strategy::main_strategies::One_Fac_One_Star;
 	}
 	else if (InformationManager::Instance().enemyRace == BWAPI::Races::Zerg){
 		_main_strategy = Strategy::main_strategies::Bionic;
@@ -45,7 +45,7 @@ void StrategyManager::setOpeningBookBuildOrder(){
 	else{
 		_main_strategy = Strategy::main_strategies::Bionic;
 	}
-
+	
 	//초기 빌드 큐에 세팅
 	std::istringstream iss(_strategies[_main_strategy].opening_build_order);
 	std::vector<std::string> vec_build_order{ std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{} };
@@ -164,7 +164,8 @@ void StrategyManager::executeWorkerTraining()
 const MetaPairVector StrategyManager::getBuildOrderGoal()
 {
 	//초기빌드 이후에만 작업가능
-	if (!isInitialBuildOrderFinished) false;
+	if (!isInitialBuildOrderFinished) 
+		return MetaPairVector();
 
 	BWAPI::Race myRace = BWAPI::Broodwar->self()->getRace();
 
@@ -337,20 +338,31 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 			if (!hasTech(BWAPI::TechTypes::Spider_Mines)) {
 				goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Spider_Mines, 1));
 			}
+
+
+			if (numUnits["Vultures"] < 4) {
+				goal_num_vultures += 1;
+			}
+			else {
+				goal_num_vultures += 1;
+				goal_num_tanks += 1;
+			}
 		}
 		else {
 			if (numUnits["Tanks"] > 0 && !hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
 				goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
+
+
+				if (BWAPI::Broodwar->self()->gas() > 90) {
+					goal_num_tanks += 1;
+				}
+				else {
+					goal_num_vultures += 1;
+				}
 			}
 		}
 		
 
-		if (BWAPI::Broodwar->self()->gas() > 90) {
-			goal_num_tanks += 1;
-		}
-		else {
-			goal_num_vultures += 1;
-		}
 
 		if (InformationManager::Instance().getEnemyUnitRatio(BWAPI::UnitTypes::Protoss_Zealot) > 0.9){
 			goal_num_vultures +=1 ;
@@ -628,8 +640,9 @@ BuildOrderItem::SeedPositionStrategy StrategyManager::getBuildSeedPositionStrate
 			return BuildOrderItem::SeedPositionStrategy::SecondChokePoint;
 		}
 	}
-
-	if (InformationManager::Instance().enemyRace == BWAPI::Races::Protoss || InformationManager::Instance().enemyRace == BWAPI::Races::Terran){
+	// 테란 제외
+	//if (InformationManager::Instance().enemyRace == BWAPI::Races::Protoss || InformationManager::Instance().enemyRace == BWAPI::Races::Terran){
+	if (InformationManager::Instance().enemyRace == BWAPI::Races::Protoss ){
 
 		// if building is destroyed?
 		if (type.getUnitType() == BWAPI::UnitTypes::Terran_Supply_Depot) {
@@ -744,7 +757,7 @@ void StrategyManager::initStrategies(){
 	3. 초기빌드 세팅
 	4. 이전/다음 전략 넘어가는 조건 세팅
 	*/
-
+	
 	_strategies[Strategy::main_strategies::BSB] = Strategy();
 	_strategies[Strategy::main_strategies::BSB].pre_strategy = Strategy::main_strategies::None;
 	_strategies[Strategy::main_strategies::BSB].next_strategy = Strategy::main_strategies::Bionic;
@@ -774,9 +787,16 @@ void StrategyManager::initStrategies(){
 	_strategies[Strategy::main_strategies::One_Fac] = Strategy();
 	_strategies[Strategy::main_strategies::One_Fac].pre_strategy = Strategy::main_strategies::None;
 	_strategies[Strategy::main_strategies::One_Fac].next_strategy = Strategy::main_strategies::Two_Fac;
-	_strategies[Strategy::main_strategies::One_Fac].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV SCV Barracks Refinery SCV SCV Factory Supply_Depot";
+	_strategies[Strategy::main_strategies::One_Fac].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV SCV Barracks SCV Refinery SCV Factory Supply_Depot";
 	//_strategies[Strategy::main_strategies::One_Fac].opening_build_order = "SCV SCV SCV SCV SCV Barracks SCV Refinery Supply_Depot SCV Marine Factory SCV Marine Supply_Depot";
 	_strategies[Strategy::main_strategies::One_Fac].num_unit_limit["Tanks"] = 2;
+
+	_strategies[Strategy::main_strategies::One_Fac_One_Star] = Strategy();
+	_strategies[Strategy::main_strategies::One_Fac_One_Star].pre_strategy = Strategy::main_strategies::None;
+	_strategies[Strategy::main_strategies::One_Fac_One_Star].next_strategy = Strategy::main_strategies::Two_Fac;
+	// 29
+	_strategies[Strategy::main_strategies::One_Fac_One_Star].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV SCV Barracks SCV Refinery SCV SCV SCV Supply_Depot Marine SCV Factory Marine SCV SCV SCV Command_Center Vulture Starport SCV Machine_Shop SCV SCV Supply_Depot Siege_Tank_Tank_Mode SCV SCV SCV Control_Tower Refinery Wraith SCV SCV Cloaking_Field Supply_Depot Siege_Tank_Tank_Mode Wraith";
+	_strategies[Strategy::main_strategies::One_Fac_One_Star].num_unit_limit["Tanks"] = 2;
 
 	_strategies[Strategy::main_strategies::Two_Fac] = Strategy();
 	_strategies[Strategy::main_strategies::Two_Fac].pre_strategy = Strategy::main_strategies::None;

@@ -315,6 +315,12 @@ void GameCommander::setScoutUnits()
 		BWAPI::Unit supplyProvider;// = getFirstSupplyProvider();
 
 		bool flag = false;
+
+		if (WorkerManager::Instance().getWorkerData().getNumWorkers() >= 10) {
+			flag = true;
+		}
+		// 정찰 일꾼 출발 시점 변경
+		/*
 		for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 		{
 			if (unit->getType().isBuilding() == true && unit->getType().isResourceDepot() == false)
@@ -324,12 +330,13 @@ void GameCommander::setScoutUnits()
 				break;
 			}
 		}
+		*/
 		// if it exists
 		////std::cout << "error??" << std::endl;
 		if (flag)
 		{
 			// grab the closest worker to the supply provider to send to scout
-			BWAPI::Unit workerScout = WorkerManager::Instance().getClosestMineralWorkerTo(supplyProvider->getPosition());
+			BWAPI::Unit workerScout = WorkerManager::Instance().getClosestMineralWorkerTo(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
 			//	getClosestWorkerToTarget(supplyProvider->getPosition());
 
 			// if we find a worker (which we should) add it to the scout units
