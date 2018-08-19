@@ -380,7 +380,7 @@ void GameCommander::setScoutUnits()
 //@도주남 김지훈 // 전투유닛을 setting 해주는 부분 기존 로직과 다르게 적용함.
 void GameCommander::setCombatUnits()
 {
-	int combatunitCount = 0;
+	//int combatunitCount = 0;
 	for (auto & unit : BWAPI::Broodwar->self()->getUnits())
 	{
 		if (_scoutUnits.contains(unit) || unit->getType() == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine)
@@ -398,12 +398,10 @@ void GameCommander::setCombatUnits()
 				//@도주남 김지훈 일꾼이 아니면 넣는다.
 				{
 					assignUnit(unit, _combatUnits);
-					combatunitCount++;
+					//combatunitCount++;
 				}
 			}
 	}
-	//if (combatunitCount!=0)
-	//	//std::cout << "공격 유닛 [" << combatunitCount  <<"]명 셋팅 !" << std::endl;
 }
 
 

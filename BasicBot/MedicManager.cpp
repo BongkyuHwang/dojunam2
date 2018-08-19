@@ -71,6 +71,10 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 			goHome = true;
 		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
 			goHome = false;
+		if (medicTargets.size() <= 0)
+		{
+			goHome = true;
+		}
 		//@도주남 김지훈 노는 메딕을 마린혹은 파벳 중심으로 보내준다.  아 안되겠다 싶으면 본진쪽 초크포인트로 돌아온다
 		if (goHome)
 		{			
