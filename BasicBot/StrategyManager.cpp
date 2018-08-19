@@ -796,7 +796,7 @@ void StrategyManager::initStrategies(){
 	_strategies[Strategy::main_strategies::One_Fac_One_Star].next_strategy = Strategy::main_strategies::Two_Fac;
 	// 29
 	_strategies[Strategy::main_strategies::One_Fac_One_Star].opening_build_order = "SCV SCV SCV SCV SCV Supply_Depot SCV SCV Barracks SCV Refinery SCV SCV SCV Supply_Depot Marine SCV Factory Marine SCV SCV SCV Command_Center Vulture Starport SCV Machine_Shop SCV SCV Supply_Depot Siege_Tank_Tank_Mode SCV SCV SCV Control_Tower Refinery Wraith SCV SCV Cloaking_Field Supply_Depot Siege_Tank_Tank_Mode Wraith";
-	_strategies[Strategy::main_strategies::One_Fac_One_Star].num_unit_limit["Tanks"] = 2;
+	_strategies[Strategy::main_strategies::One_Fac_One_Star].num_unit_limit["Wraith"] = 2;
 
 	_strategies[Strategy::main_strategies::Two_Fac] = Strategy();
 	_strategies[Strategy::main_strategies::Two_Fac].pre_strategy = Strategy::main_strategies::None;
