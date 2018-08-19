@@ -27,8 +27,12 @@ namespace MyBot
 
 		void setCommandForCombat();
 
+		BWAPI::Position _request_position;
+
 		public:
 			void update();
 			static ComsatManager &	Instance();
+
+			void setRequestPosition(BWAPI::Position pos);
 	};
 }

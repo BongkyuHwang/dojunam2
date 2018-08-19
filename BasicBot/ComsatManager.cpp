@@ -6,6 +6,8 @@ ComsatManager::ComsatManager()
 {
 	clearScanPosition();
 	_next_enable_frame = -1;
+
+	_request_position = BWAPI::Positions::None;
 }
 
 ComsatManager & ComsatManager::Instance()
@@ -134,24 +136,21 @@ void ComsatManager::update(){
 BWAPI::Position ComsatManager::getScanPositionForScout(){
 	BWAPI::Position rst = BWAPI::Positions::None;
 
-	try{	
-		/* 일단은 본진만 뿌리기로
+	try{
+		//디폴트로 적 베이스
 		GridCell &enemy_base = MapGrid::Instance().getCell(InformationManager::Instance().getMainBaseLocation(InformationManager::Instance().enemyPlayer)->getRegion()->getCenter());
-		GridCell &enemy_2nd_chock = MapGrid::Instance().getCell(InformationManager::Instance().getSecondChokePoint(InformationManager::Instance().enemyPlayer)->getCenter());
-
-		if (enemy_base.timeLastOpponentSeen > enemy_2nd_chock.timeLastOpponentSeen){
-			rst = enemy_2nd_chock.center;
-		}
-		else{
+		if (enemy_base.timeLastVisited < BWAPI::Broodwar->getFrameCount() - 10)
 			rst = enemy_base.center;
-		}
-		*/
 
-		GridCell &enemy_base = MapGrid::Instance().getCell(InformationManager::Instance().getMainBaseLocation(InformationManager::Instance().enemyPlayer)->getRegion()->getCenter());
-		
-		//현재 스캔할 지역에 가있는 경우는 제외한다.
-		if (enemy_base.timeLastVisited < BWAPI::Broodwar->getFrameCount() - 10) 
-			rst = enemy_base.center;
+		//입구막은 경우에는 우리 첫번째 쵸크
+		if (InformationManager::Instance().getWallStatus()){
+			rst = InformationManager::Instance().getFirstExpansionLocation(InformationManager::Instance().selfPlayer)->getPosition();
+		}
+		//요청지역
+		else if (_request_position != BWAPI::Positions::None){
+			rst = BWAPI::Position(_request_position.x, _request_position.y);
+			_request_position = BWAPI::Positions::None;
+		}
 	}
 	catch (int e){
 		std::cout << "getScanPositionForScout error:" << e <<  std::endl;
@@ -223,4 +222,8 @@ void ComsatManager::setCommandForCombat(){
 			break;
 		}
 	}
+}
+
+void ComsatManager::setRequestPosition(BWAPI::Position pos){
+	_request_position = pos;
 }
