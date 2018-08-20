@@ -18,7 +18,8 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 		std::copy_if(targets.begin(), targets.end(), std::inserter(tankTargets, tankTargets.end()), 
                  [](BWAPI::Unit u){ return u->isVisible() && !u->isFlying(); });
 
-    int siegeTankRange = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() - 32;
+    int siegeTankRange = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
+	int siegeTankMinRange = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
 	int  tankTankRange = BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode.groundWeapon().maxRange() / 2;
     bool haveSiege = BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode);
 	BWAPI::Position mbase = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition();
@@ -104,15 +105,15 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 
 				BWAPI::Unit target_unSiege_Unit = closestrangedUnit_kjh(tank, tankTargets);
                 
-				if (tank->getDistance(target_unSiege_Unit) < tankTankRange )
+				if (tank->getDistance(target_unSiege_Unit) < siegeTankMinRange)
 				{
 					tank->unsiege();
 				}
-				else if (tank->getDistance(target) - target->getType().width()/2 < siegeTankRange  && tank->canSiege() && !target->getType().isBuilding())
+				else if (tank->getDistance(target) < siegeTankRange  && tank->canSiege() && !target->getType().isBuilding())
 				{
 					tank->siege();
 				}
-				else if (tank->getDistance(target) < tankTankRange + target->getType().width() && tank->canSiege() && target->getType().isBuilding())
+				else if (tank->getDistance(target) < siegeTankMinRange && tank->canSiege() && target->getType().isBuilding())
 				{
 					tank->siege();
 				}
@@ -138,13 +139,12 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 					if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(tank->getPosition(), 3, BWAPI::Colors::White, false);
 				if (Config::Debug::Draw) BWAPI::Broodwar->drawLineMap(tank->getPosition(), target->getPosition(), BWAPI::Colors::White);
 
-				if (cadidateRemoveTarget)
+				if (cadidateRemoveTarget!=nullptr)
 					tankTargets.erase(cadidateRemoveTarget);
 			}
 			// if there are no targets
 			else
-			{				
-				
+			{	
 				if (order.getCenterPosition().isValid())
 				{
 					if (order.getCenterPosition().getDistance(tank->getPosition()) > order.getRadius() - siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
@@ -235,7 +235,7 @@ BWAPI::Unit TankManager::getTarget(BWAPI::Unit tank, const BWAPI::Unitset & targ
 		}
     }
 
-    if (bestTargetThreatInRange)
+    if (bestTargetThreatInRange!=nullptr)
     {	
 		cadidateRemoveTarget = bestTargetThreatInRange;
         return bestTargetThreatInRange;
@@ -245,7 +245,6 @@ BWAPI::Unit TankManager::getTarget(BWAPI::Unit tank, const BWAPI::Unitset & targ
 }
 
 //@도주남 김지훈 시즈모드 풀기위한 가장 가까운 유닛찾기
-
 // get the attack priority of a type in relation to a zergling
 int TankManager::getAttackPriority(BWAPI::Unit rangedUnit, BWAPI::Unit target) 
 {
@@ -277,6 +276,15 @@ int TankManager::getAttackPriority(BWAPI::Unit rangedUnit, BWAPI::Unit target)
     }
 
 	if (rangedUnit->isSieged() && targetType == BWAPI::UnitTypes::Protoss_Dragoon)
+	{
+		return 20;
+	}
+	if (rangedUnit->isSieged() && (targetType == BWAPI::UnitTypes::Zerg_Hydralisk 
+		|| targetType == BWAPI::UnitTypes::Zerg_Lurker
+		|| targetType == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode
+		|| targetType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode
+		)
+		)
 	{
 		return 20;
 	}
