@@ -251,7 +251,7 @@ void Squad::setAllUnits()
 					// BWTA::getGroundDistance 연산량이 많아 교체
 					if (MapTools::Instance().getGroundDistance(unit->getPosition(), chokepoint->getCenter()) <= chokepoint->getWidth())
 					{
-						unit->move(BWAPI::Position(BWAPI::Broodwar->mapWidth() * 16, BWAPI::Broodwar->mapHeight() * 16));
+						Micro::SmartMove(unit, BWAPI::Position(BWAPI::Broodwar->mapWidth() * 16, BWAPI::Broodwar->mapHeight() * 16));
 						break;
 					}
 				}

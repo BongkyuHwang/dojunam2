@@ -35,7 +35,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				if (tank->isSieged())
 					tank->unsiege();
 				else
-					tank->move(order.getPosition());
+					Micro::SmartMove(tank, order.getPosition());
 			}
 			else
 			{
@@ -154,7 +154,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 							tank->unsiege();
 						}
 						else
-							tank->move(order.getCenterPosition());
+							Micro::SmartMove(tank, order.getCenterPosition());
 					}
 					else if (tank->canSiege())
 						tank->siege();
@@ -169,7 +169,7 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 							tank->unsiege();
 						}
 						else
-							tank->move(order.getPosition());
+							Micro::SmartMove(tank, order.getPosition());
 					}
 					else if (tank->canSiege())
 						tank->siege();
