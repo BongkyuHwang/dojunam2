@@ -51,16 +51,16 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 
 	for (auto & tank : tanks)
 	{
-		bool goHome = false;
-		int hopeDist = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*1.2;
-
-		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(tank->getPosition())
-		> hopeDist)
-			goHome = true;
-
-		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
-			goHome = false;
+		//bool goHome = false;
+		//int hopeDist = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
+		//	+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*1.2;
+		//
+		//if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(tank->getPosition())
+		//> hopeDist)
+		//	goHome = true;
+		//
+		//if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
+		//	goHome = false;
 		bool tankNearChokepoint = false;
 		for (auto & choke : BWTA::getChokepoints())
 		{
@@ -145,22 +145,22 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{	
-				if (order.getCenterPosition().isValid())
-				{
-					if (order.getCenterPosition().getDistance(tank->getPosition()) > order.getRadius() - siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
-					{
-						if (tank->isSieged())
-						{
-							tank->unsiege();
-						}
-						else
-							Micro::SmartMove(tank, order.getCenterPosition());
-					}
-					else if (tank->canSiege())
-						tank->siege();
-
-				}
-				else
+				//if (order.getCenterPosition().isValid())
+				//{
+				//	if (order.getCenterPosition().getDistance(tank->getPosition()) > order.getRadius() - siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
+				//	{
+				//		if (tank->isSieged())
+				//		{
+				//			tank->unsiege();
+				//		}
+				//		else
+				//			Micro::SmartMove(tank, order.getCenterPosition());
+				//	}
+				//	else if (tank->canSiege())
+				//		tank->siege();
+				//
+				//}
+				//else
 				{
 					if (order.getPosition().getDistance(tank->getPosition()) > order.getRadius() - siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
 					{

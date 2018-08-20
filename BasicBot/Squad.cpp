@@ -210,7 +210,7 @@ void Squad::updateUnits()
 	setNearEnemyUnits();
 	addUnitsToMicroManagers();
 	BWAPI::Position centerPosition = calcCenter();
-
+	if(Config::Debug::Draw)BWAPI::Broodwar->drawCircleMap(centerPosition, 6, BWAPI::Colors::Purple, true);
 	if (centerPosition != BWAPI::Positions::None && BWAPI::Broodwar->getFrameCount() < 25000)
 	{
 		_order.setCenterPosition(centerPosition);
@@ -522,25 +522,41 @@ BWAPI::Position Squad::calcCenter()
 	sizeUnits++;
 	for (auto & unit : _units)
 	{
-		if (_order.getPosition().getDistance(unit->getPosition()) > _order.getRadius()*1.1)
+		if (_order.getPosition().getDistance(unit->getPosition()) > _order.getRadius())
 		{
 			continue;
 		}
-		
+		if (unit->isFlying())
+			continue;
+
 		if (unit->getType() == (BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode) || unit->getType() == (BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode))
 		{
 			accum += unit->getPosition();
 			sizeUnits++;
 		}
-		if (!unit->isFlying())
-		{
-			sizeUnits++;
-			accum += unit->getPosition();
-		}
-
 	}
 	if (sizeUnits == 0)
 		return BWAPI::Positions::None;
+	if (accum == _order.getPosition())
+	{
+		BWAPI::Position fleeVec(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() - accum);
+		double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+		int dist = _order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
+		if (dist <= 0)
+			dist = _order.getRadius();
+		fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+		return accum + fleeVec;
+	}
+	else
+	{
+		BWAPI::Position fleeVec(accum - _order.getPosition());
+		double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+		int dist = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
+		if (dist <= 0)
+			dist = _order.getRadius();
+		fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+		return accum + fleeVec;
+	}
 	return BWAPI::Position(accum.x / sizeUnits, accum.y / sizeUnits);
 }
 

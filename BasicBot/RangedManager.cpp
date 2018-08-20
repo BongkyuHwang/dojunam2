@@ -40,12 +40,12 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	
 	for (auto & rangedUnit : rangedUnits)
 	{
-		bool goHome = false;
-		BWAPI::Position keepOnPosition = (order.getPosition() + order.getCenterPosition())/2;
-		if (keepOnPosition.getDistance(rangedUnit->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() )
-			goHome = true;
-		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
-			goHome = false;
+		//bool goHome = false;
+		//BWAPI::Position keepOnPosition = (order.getPosition() + order.getCenterPosition())/2;
+		//if (keepOnPosition.getDistance(rangedUnit->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() )
+		//	goHome = true;
+		//if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
+		//	goHome = false;
 		
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
@@ -90,28 +90,23 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			// if there are no targets
 			else
 			{
-				if (goHome && rangedUnit->getID() % 5 < 3)
-				{
-					if (order.getCenterPosition().isValid())
-					{
-						Micro::SmartMove(rangedUnit, order.getCenterPosition());
-					}
-					else
-						Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-					continue;
-				}
-				else if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) != nullptr 
-					&& InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition().getDistance(order.getPosition()) < 100 )
+				if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) != nullptr
+					&& InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition().getDistance(order.getPosition()) < 100
+					&& BWTA::getRegion(BWAPI::TilePosition(rangedUnit->getPosition()) ) == BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
+					)
 				{
 					Micro::SmartAttackMove(rangedUnit, order.getPosition());
 					continue;
 				}
 
-				if (rangedUnit->getDistance(order.getPosition()) > order.getRadius() )
+				if (order.getCenterPosition().isValid())
 				{
-					// move to it
-					Micro::SmartAttackMove(rangedUnit, order.getPosition());
+					Micro::SmartMove(rangedUnit, order.getCenterPosition());
 				}
+				else
+					Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+				continue;
+				
 			}
 		}
 		else if (order.getType() == SquadOrderTypes::Drop)
