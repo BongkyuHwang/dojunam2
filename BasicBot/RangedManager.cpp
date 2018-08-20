@@ -103,8 +103,8 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				{
 					Micro::SmartMove(rangedUnit, order.getCenterPosition());
 				}
-				else
-					Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+				//else
+				//	Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
 				continue;
 				
 			}

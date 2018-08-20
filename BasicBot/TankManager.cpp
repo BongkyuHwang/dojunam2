@@ -147,14 +147,14 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 			{	
 				//if (order.getCenterPosition().isValid())
 				//{
-				//	if (order.getCenterPosition().getDistance(tank->getPosition()) > order.getRadius() - siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
+				//	if (order.getCenterPosition().getDistance(tank->getPosition()) > siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
 				//	{
 				//		if (tank->isSieged())
 				//		{
 				//			tank->unsiege();
 				//		}
 				//		else
-				//			Micro::SmartMove(tank, order.getCenterPosition());
+				//			Micro::SmartAttackMove(tank, order.getCenterPosition());
 				//	}
 				//	else if (tank->canSiege())
 				//		tank->siege();
@@ -162,14 +162,21 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				//}
 				//else
 				{
-					if (order.getPosition().getDistance(tank->getPosition()) > order.getRadius() - siegeTankRange + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.width())
+					BWAPI::Position fleeVec(order.getPosition() - InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition()  );
+					double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+					int dist = -BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
+
+					fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+					BWAPI::Position newDest = order.getPosition() + fleeVec;
+					//BWAPI::Broodwar->drawCircleMap(newDest, 20, BWAPI::Colors::Blue, true);
+					if (newDest.getDistance(tank->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*0.8)
 					{
 						if (tank->isSieged())
 						{
 							tank->unsiege();
 						}
 						else
-							Micro::SmartMove(tank, order.getPosition());
+							Micro::SmartAttackMove(tank, newDest);
 					}
 					else if (tank->canSiege())
 						tank->siege();

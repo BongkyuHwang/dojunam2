@@ -28,88 +28,6 @@ Squad::~Squad()
 
 void Squad::update()
 {
-	//if (_name == "DEFCON2" || _name == "DEFCON4"){
-	//	
-	//	if (_units.size() == 0){
-	//		return;
-	//	}
-	//	// update all necessary unit information within this squad
-	//	_order.setCenterPosition(BWAPI::Positions::Invalid);
-	//	
-	//	if (Config::Debug::Draw) BWAPI::Broodwar->drawCircleMap(_order.getPosition(), _order.getRadius(), BWAPI::Colors::Cyan, false);
-
-	//	std::vector<BWAPI::Unitset> ud = _units_divided(2);
-	//	int tmpCnt = 0;
-	//	BWAPI::Unitset bak_units = _units;
-
-	//	std::vector<BWAPI::Position> unitPositions;
-
-	//	for (auto wallUnit : InformationManager::Instance().getWallUnits()) {
-	//		if (wallUnit->getType() == BWAPI::UnitTypes::Terran_Supply_Depot) {
-	//			unitPositions.push_back(wallUnit->getPosition());
-	//		}
-	//	}
-	//	for (auto u : ud)
-	//	{
-	//		_units = u;
-
-	//		if (tmpCnt == 0){
-	//			
-	//			if (_order.getLine().first != BWAPI::Positions::None){
-	//				if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
-	//				{
-	//					{
-	//						// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
-	//						//_order.setPosition(BWAPI::Position(InformationManager::Instance().getWallPositions()[0]));
-	//						_order.setPosition(unitPositions[0]);
-	//					}
-	//				}
-	//				else
-	//				_order.setPosition(_order.getLine().first);
-	//			}
-	//		}
-	//		else{
-	//			if (_order.getLine().second != BWAPI::Positions::None){
-	//				if (_name == "DEFCON2" && InformationManager::Instance().getWallStatus())
-	//				{
-	//					{
-	//						// getWallStatus 가 true일 때 getWallPositions 호출 시 아무것도 리턴하지않음
-	//						_order.setPosition(unitPositions[1]);
-	//					}
-	//				}
-	//				else
-	//					_order.setPosition(_order.getLine().second);
-	//			}
-	//		}
-
-	//		tmpCnt++;
-	//		updateUnits();
-	//		// determine whether or not we should regroup
-	//		// if we do need to regroup, do it
-
-	//		_meleeManager.execute(_order);
-	//		_rangedManager.execute(_order);
-	//		_vultureManager.execute(_order);
-	//		_medicManager.execute(_order);
-	//		_tankManager.execute(_order);
-
-	//		_transportManager.update();
-
-	//		//std::cout << "s if 3" << std::endl;
-	//		// unitClosestToEnemy nullptr 리턴할경우 예외처리
-
-	//		BWAPI::Unit cloesetUnit = unitClosestToEnemy();
-	//		if (cloesetUnit != nullptr) {
-	//			_detectorManager.setUnitClosestToEnemy(unitClosestToEnemy());
-	//			_detectorManager.execute(_order);
-	//		}
-
-	//		//std::cout << "s if 4" << std::endl;
-	//	}
-
-	//	_units = bak_units;
-	//}
-	//else 
 	if (_name == "bunker"){
 		//if (order.getStatus() == "bunker")
 		{
@@ -160,6 +78,10 @@ void Squad::update()
 		}*/
 
 		// if we do need to regroup, do it
+		//BWAPI::Unit cloesetUnit = unitClosestToEnemy();
+		//if (cloesetUnit != nullptr) {
+		//	_order.setClosestUnit(cloesetUnit);
+		//}
 		_meleeManager.execute(_order);
 		_rangedManager.execute(_order);
 		_vultureManager.execute(_order);
@@ -169,7 +91,7 @@ void Squad::update()
 		//std::cout << "s else 3" << std::endl;
 		// unitClosestToEnemy nullptr 리턴할경우 예외처리
 		BWAPI::Unit cloesetUnit = unitClosestToEnemy();
-		if (cloesetUnit != nullptr) {
+		if (cloesetUnit != nullptr) {		
 			_detectorManager.setUnitClosestToEnemy(cloesetUnit);
 			_detectorManager.execute(_order);
 		}
@@ -210,8 +132,11 @@ void Squad::updateUnits()
 	setNearEnemyUnits();
 	addUnitsToMicroManagers();
 	BWAPI::Position centerPosition = calcCenter();
-	if(Config::Debug::Draw)BWAPI::Broodwar->drawCircleMap(centerPosition, 6, BWAPI::Colors::Purple, true);
-	if (centerPosition != BWAPI::Positions::None && BWAPI::Broodwar->getFrameCount() < 25000)
+	//BWAPI::Broodwar->drawCircleMap(centerPosition, 20, BWAPI::Colors::Purple, true);
+	//BWAPI::Broodwar->drawLineMap(BWAPI::Position(0,0) ,centerPosition, BWAPI::Colors::Purple);
+	//BWAPI::Broodwar->setScreenPosition(centerPosition - BWAPI::Position(10, 10));	
+	//BWAPI::Broodwar->drawBoxMap(centerPosition.x - 10, centerPosition.y - 10, centerPosition.x + 10, centerPosition.y + 10, BWAPI::Colors::Yellow, true);
+	if (centerPosition != BWAPI::Positions::None)
 	{
 		_order.setCenterPosition(centerPosition);
 	}
@@ -543,20 +468,22 @@ BWAPI::Position Squad::calcCenter()
 		double fleeAngle = atan2(fleeVec.y, fleeVec.x);
 		int dist = _order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
 		if (dist <= 0)
-			dist = _order.getRadius();
+			dist = _order.getRadius() *0.8;
 		fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
 		return accum + fleeVec;
 	}
-	else
-	{
-		BWAPI::Position fleeVec(accum - _order.getPosition());
-		double fleeAngle = atan2(fleeVec.y, fleeVec.x);
-		int dist = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();
-		if (dist <= 0)
-			dist = _order.getRadius();
-		fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
-		return accum + fleeVec;
-	}
+	//else
+	////if (accum != _order.getPosition())
+	//{
+	//	BWAPI::Position fleeVec(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() - accum);
+	//	double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+	//	int dist = BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
+	//	
+	//	//if (dist <= 0)
+	//	//	dist = _order.getRadius();
+	//	fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+	//	return accum + fleeVec;
+	//}
 	return BWAPI::Position(accum.x / sizeUnits, accum.y / sizeUnits);
 }
 
