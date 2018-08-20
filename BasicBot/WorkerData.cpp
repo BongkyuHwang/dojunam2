@@ -244,7 +244,7 @@ void WorkerData::setWorkerJob(BWAPI::Unit unit, enum WorkerJob job, BWAPI::Unit 
     }
 	else if (job == ScoutCombat) {
 		workerScoutCombatMap[unit] = jobUnit;
-		Micro::SmartAttackMove(unit, jobUnit->getPosition());
+		Micro::SmartAttackUnit(unit, jobUnit);
 	}
 	else if (job == BunkerReapir)
 	{

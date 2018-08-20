@@ -26,12 +26,13 @@ namespace MyBot
 			Bionic_Tank,
 			Mechanic,
 			One_Fac,
+			One_Fac_One_Star,
 			Two_Fac,
 			Mechanic_Goliath,
 			Mechanic_Vessel,
 			BSB,
 			BBS,
-			BATTLE
+			BATTLE,
 		};
 
 		main_strategies next_strategy;
