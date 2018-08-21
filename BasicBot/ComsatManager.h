@@ -28,6 +28,9 @@ namespace MyBot
 		void setCommandForCombat();
 
 		BWAPI::Position _request_position;
+		std::queue<BWAPI::Position> _full_scan_positions;
+
+		int energy_buffer = 200;
 
 		public:
 			void update();
