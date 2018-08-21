@@ -132,10 +132,10 @@ void CombatCommander::initializeSquads()
 	_squadData.addSquad("scout", Squad("scout", scoutOrder, ScoutPriority));
 
     // the main attack squad that will pressure the enemy's closest base location
-	SquadOrder mainAttackOrder(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), 500, "AttackEnemyBase");
+	SquadOrder mainAttackOrder(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange() *1.2, "AttackEnemyBase");
 	_squadData.addSquad("MainAttack", Squad("MainAttack", mainAttackOrder, AttackPriority));
 
-	SquadOrder smallAttackOrder(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), 250, "AttackEnemymulti");
+	SquadOrder smallAttackOrder(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange() *1.2, "AttackEnemymulti");
 	_squadData.addSquad("SMALLATTACK", Squad("SMALLATTACK", smallAttackOrder, AttackPriority));
 
 
@@ -161,6 +161,9 @@ bool CombatCommander::isSquadUpdateFrame()
 
 void CombatCommander::update()
 {
+	if(_combatUnits.size()==0) return ;
+	if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) ==nullptr )
+		return;
     //if (!Config::Modules::UsingCombatCommander)
     //{
     //    return;
@@ -221,7 +224,7 @@ void CombatCommander::update()
 		//어택포지션 변경
 		else if (im.nowCombatStatus == InformationManager::combatStatus::EnemyBaseAttack){
 			Squad & mainAttackSquad = _squadData.getSquad("MainAttack");
-			SquadOrder _order(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), mainAttackSquad.getSquadOrder().getRadius(), "AttackEnemybase");
+			SquadOrder _order(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange() *1.2, "AttackEnemybase");
 			mainAttackSquad.setSquadOrder(_order);
 		}
 		//방어부대는 계속 편성해야함
@@ -391,25 +394,12 @@ void CombatCommander::updateAttackSquads()
 	if (im.nowCombatStatus == InformationManager::combatStatus::CenterAttack)
 	{
 		std::vector<BWAPI::TilePosition> tileList = BWTA::getShortestPath(BWAPI::TilePosition(im.getSecondChokePoint(BWAPI::Broodwar->self())->getCenter()), BWAPI::TilePosition(BWAPI::Broodwar->mapWidth() / 2, BWAPI::Broodwar->mapHeight() / 2) );
-		SquadOrder _order(SquadOrderTypes::Attack, BWAPI::Position(tileList[tileList.size() - 1]), radi, "AttackCenter");
+		SquadOrder _order(SquadOrderTypes::Attack, BWAPI::Position(tileList[tileList.size() - 1]), BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange(), "AttackCenter");
 		mainAttackSquad.setSquadOrder(_order);
 	}
 	else if (im.nowCombatStatus == InformationManager::combatStatus::EnemyBaseAttack)
 	{
-		int addRadi = 0;
-		if (BWAPI::Broodwar->getFrameCount() > 20000)
-		{
-			addRadi += 200;
-		}
-		if (BWAPI::Broodwar->getFrameCount() > 28000)
-		{
-			addRadi += 200;
-		}
-		if (BWAPI::Broodwar->getFrameCount() > 35000)
-		{
-			addRadi += 400;
-		}
-		SquadOrder _order(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), 800+addRadi, "AttackEnemybase");
+		SquadOrder _order(SquadOrderTypes::Attack, getMainAttackLocationForCombat(), BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange(), "AttackEnemybase");
 		mainAttackSquad.setSquadOrder(_order);
 	}
 }
@@ -423,7 +413,7 @@ void CombatCommander::updateDropSquads()
 
     // figure out how many units the drop squad needs
     bool dropSquadHasTransport = false;
-    int transportSpotsRemaining = 0;
+	int transportSpotsRemaining = numUnits*8;
 	int totalSpaceRemaining = 0;
 	BWAPI::Unitset  dropUnits = dropSquad.getUnits();
 	BWAPI::Unit dropShipUnit = nullptr;
@@ -431,7 +421,7 @@ void CombatCommander::updateDropSquads()
 
 	for (auto & unit : dropUnits)
 	{
-		if (unit->getType() == BWAPI::UnitTypes::Terran_Dropship && unit->getHitPoints() > 0 && unit->exists() )
+		if (unit->getType() == BWAPI::UnitTypes::Terran_Dropship && unit->getHitPoints() > 0 && unit->exists())
 		{
 			if (_squadData.canAssignUnitToSquad(unit, dropSquad))
 				_squadData.assignUnitToSquad(unit, dropSquad);
@@ -440,6 +430,8 @@ void CombatCommander::updateDropSquads()
 				dropShips.insert(unit);
 			}
 		}
+		else if (unit->getHitPoints() > 0 && unit->exists() && unit->isLoaded())
+			transportSpotsRemaining -= unit->getType().spaceRequired();
 	}
 
     for (auto & unit : dropUnits)
@@ -457,6 +449,8 @@ void CombatCommander::updateDropSquads()
 							Micro::SmartMove(ship, unit->getPosition());
 						if (!unit->load(ship))
 							Micro::SmartMove(unit, ship->getPosition());
+						transportSpotsRemaining -= unit->getType().spaceRequired();
+						break;
 					}
 				}
 			}
@@ -468,6 +462,12 @@ void CombatCommander::updateDropSquads()
 		dropSquad.clear();
 	}
 	
+	if (transportSpotsRemaining <= 0)
+	{
+		SquadOrder goingDrop(SquadOrderTypes::Drop, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()), 410, "Go Drop");
+		dropSquad.setSquadOrder(goingDrop);
+		return;
+	}
     // if there are still units to be added to the drop squad, do it
 	//if ((totalSpaceRemaining > 0 || !dropSquadHasTransport))
     {
@@ -477,9 +477,15 @@ void CombatCommander::updateDropSquads()
 			if (unit->getType() == BWAPI::UnitTypes::Terran_Dropship
 				&& _squadData.canAssignUnitToSquad(unit, dropSquad)
 				&& !dropSquad.containsUnit(unit))
-			{
+			{	
 				_squadData.assignUnitToSquad(unit, dropSquad);
 				continue;
+			}
+			if (transportSpotsRemaining <= 0)
+			{
+				SquadOrder goingDrop(SquadOrderTypes::Drop, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()), 410, "Go Drop");
+				dropSquad.setSquadOrder(goingDrop);
+				return;
 			}
 
 			if (unit->getType() != BWAPI::UnitTypes::Terran_SCV
@@ -500,6 +506,8 @@ void CombatCommander::updateDropSquads()
 						if (!unit->load(ship))
 							Micro::SmartMove(unit, ship->getPosition());
 						_squadData.assignUnitToSquad(unit, dropSquad);
+						transportSpotsRemaining -= unit->getType().spaceRequired();
+						break;
 					}
 				}
 			}
@@ -745,26 +753,23 @@ BWAPI::Position CombatCommander::getMainAttackLocationForCombat()
 		}
 		else{
 			Squad & mainAttackSquad = _squadData.getSquad("MainAttack");
-			if (curIndex < mainAttackPath.size() / 2)
-				curIndex = mainAttackPath.size() / 2;
+			if (curIndex < mainAttackPath.size() / 3)
+				curIndex = mainAttackPath.size() / 3;
 			if (curIndex < mainAttackPath.size())
 			{
 				//@도주남 김지훈 만약 공격 중이다가 우리의 인원수가 줄었다면 뒤로 뺀다 ?
-				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter()) 
-					< mainAttackSquad.getSquadOrder().getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + mainAttackSquad.getUnits().size()*1.2)
-					curIndex+=1;
-				else if (mainAttackPath[curIndex].getDistance(BWAPI::Position(home)) < BWAPI::Position(home).getDistance(mainAttackSquad.calcCenter()))
+				if (mainAttackPath[curIndex].getDistance(mainAttackSquad.calcCenter())
+					< BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange() *1.1)
 				{
-					curIndex += 2;
+					curIndex+=1;
 				}
-
 
 				if (curIndex >= mainAttackPath.size())
 					return mainAttackPath[mainAttackPath.size()-1];
-				else if (curIndex < mainAttackPath.size() / 2)
+				else if (curIndex < mainAttackPath.size() / 3)
 				{
-					curIndex = mainAttackPath.size() / 2;
-					mainAttackPath[curIndex];
+					curIndex = mainAttackPath.size() / 3;
+					return mainAttackPath[curIndex];
 				}
 				else
 					return mainAttackPath[curIndex];
@@ -964,6 +969,9 @@ void CombatCommander::updateComBatStatus(const BWAPI::Unitset & combatUnits)
 	_combatUnits = combatUnits;
 	
 	int totalUnits = _combatUnits.size();
+	if (totalUnits == 0)
+		return;
+
 	InformationManager &im = InformationManager::Instance();
 
 	if (StrategyManager::Instance().getMainStrategy() == Strategy::main_strategies::Bionic)

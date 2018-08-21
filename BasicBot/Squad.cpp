@@ -133,11 +133,12 @@ void Squad::updateUnits()
 	setNearEnemyUnits();
 	addUnitsToMicroManagers();
 	BWAPI::Position centerPosition = calcCenter();
-	//BWAPI::Broodwar->drawCircleMap(centerPosition, 20, BWAPI::Colors::Purple, true);
+	BWAPI::Broodwar->drawCircleMap(centerPosition, 20, BWAPI::Colors::Purple, false);
+	BWAPI::Broodwar->drawCircleMap(centerPosition, 2, BWAPI::Colors::Purple, true);
 	//BWAPI::Broodwar->drawLineMap(BWAPI::Position(0,0) ,centerPosition, BWAPI::Colors::Purple);
 	//BWAPI::Broodwar->setScreenPosition(centerPosition - BWAPI::Position(10, 10));	
 	//BWAPI::Broodwar->drawBoxMap(centerPosition.x - 10, centerPosition.y - 10, centerPosition.x + 10, centerPosition.y + 10, BWAPI::Colors::Yellow, true);
-	if (centerPosition != BWAPI::Positions::None)
+	if (centerPosition != BWAPI::Positions::None && BWAPI::Broodwar->getFrameCount() < 45000)
 	{
 		_order.setCenterPosition(centerPosition);
 	}
@@ -444,8 +445,8 @@ BWAPI::Position Squad::calcCenter()
 
 	BWAPI::Position accum(0, 0);
 	int sizeUnits = 0;
-	accum += _order.getPosition();
-	sizeUnits++;
+	//accum += _order.getPosition();
+	//sizeUnits++;
 	for (auto & unit : _units)
 	{
 		if (_order.getPosition().getDistance(unit->getPosition()) > _order.getRadius())
@@ -461,10 +462,11 @@ BWAPI::Position Squad::calcCenter()
 			sizeUnits++;
 		}
 	}
-	if (sizeUnits == 0)
-		return BWAPI::Positions::None;
-	if (accum == _order.getPosition())
+	//if (sizeUnits == 0)
+	//	return BWAPI::Positions::None;
+	if (accum == _order.getPosition() || sizeUnits <= 2)
 	{
+		accum = _order.getPosition();
 		BWAPI::Position fleeVec(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() - accum);
 		double fleeAngle = atan2(fleeVec.y, fleeVec.x);
 		int dist = _order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange();

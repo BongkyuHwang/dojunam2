@@ -109,7 +109,11 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 				{
 					tank->unsiege();
 				}
-				else if (tank->getDistance(target) < siegeTankRange  && tank->canSiege() && !target->getType().isBuilding())
+				else if (tank->getDistance(target) <= siegeTankRange  && tank->canSiege() && !target->getType().isBuilding())
+				{
+					tank->siege();
+				}
+				else if (tank->getDistance(target) <= siegeTankRange  && tank->canSiege() && target->getType().isBuilding() && target->canAttackUnit())
 				{
 					tank->siege();
 				}
@@ -168,8 +172,10 @@ void TankManager::executeMicro(const BWAPI::Unitset & targets)
 
 					fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
 					BWAPI::Position newDest = order.getPosition() + fleeVec;
-					//BWAPI::Broodwar->drawCircleMap(newDest, 20, BWAPI::Colors::Blue, true);
-					if (newDest.getDistance(tank->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*0.8)
+					BWAPI::Broodwar->drawCircleMap(newDest, 20, BWAPI::Colors::Blue, false);
+					BWAPI::Broodwar->drawCircleMap(newDest, 2, BWAPI::Colors::Blue, true);
+					BWAPI::Broodwar->drawLineMap(order.getPosition(), newDest, BWAPI::Colors::Blue);
+					if (newDest.getDistance(tank->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
 					{
 						if (tank->isSieged())
 						{

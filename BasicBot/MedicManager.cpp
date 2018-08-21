@@ -52,7 +52,6 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
             closestMedic->useTech(BWAPI::TechTypes::Healing, target);
             availableMedics.erase(closestMedic);
         }
-        // otherwise we didn't find a medic which means they're all in use so break
         else
         {
             break;
@@ -62,31 +61,7 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
     // the remaining medics should head to the squad order position
     for (auto & medic : availableMedics)
     {
-		bool goHome = false;
-		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(medic->getPosition())
-			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
-			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
-			+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
-			goHome = true;
-		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
-			goHome = false;
-		if (medicTargets.size() <= 0)
-		{
-			goHome = true;
-		}
-		//@도주남 김지훈 노는 메딕을 마린혹은 파벳 중심으로 보내준다.  아 안되겠다 싶으면 본진쪽 초크포인트로 돌아온다
-		if (goHome)
-		{			
-			if (order.getCenterPosition().isValid())
-			{
-				Micro::SmartMove(medic, order.getCenterPosition());
-			}
-			else
-				Micro::SmartMove(medic, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-			continue;
-		}
-		else if (order.getType() != SquadOrderTypes::Drop)
+		if (order.getType() != SquadOrderTypes::Drop)
 		{
 			if (!(BWTA::getRegion(BWAPI::TilePosition(medic->getPosition()))
 				== BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
@@ -99,7 +74,19 @@ void MedicManager::executeMicro(const BWAPI::Unitset & targets)
 					Micro::SmartMove(medic, order.getPosition());
 				}
 			}
-
+			continue;
 		}
+
+		//@도주남 김지훈 노는 메딕을 마린혹은 파벳 중심으로 보내준다.  아 안되겠다 싶으면 본진쪽 초크포인트로 돌아온다
+		//if (goHome)
+		{			
+			if (order.getCenterPosition().isValid())
+			{
+				Micro::SmartMove(medic, order.getCenterPosition());
+			}
+			else if (order.getPosition().getDistance(medic->getPosition()) > order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange() )
+				Micro::SmartMove(medic, order.getPosition());
+			continue;
+		}		
     }
 }

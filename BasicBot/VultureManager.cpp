@@ -330,6 +330,7 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 								Micro::SmartAttackMove(vultureUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
 							continue;
 						}
+
 						if (vultureUnit->getDistance(order.getPosition()) > order.getRadius() )
 						{
 
@@ -338,10 +339,9 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 						}
 						else
 						{
-							if (vultureUnit->getSpiderMineCount() > 1)
+							if (vultureUnit->getSpiderMineCount() > 1 )
 							{
 								Micro::SmartLaySpiderMine(vultureUnit, vultureUnit->getPosition());
-								continue;
 							}
 						}
 					}

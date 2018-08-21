@@ -56,6 +56,19 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 				// find the best target for this zealot
 				BWAPI::Unit target = getTarget(rangedUnit, rangedUnitTargets);
 
+				if (target->getType() == BWAPI::UnitTypes::Zerg_Lurker 
+					&& target->isBurrowed()
+					&& rangedUnit->getType() == BWAPI::UnitTypes::Terran_Marine
+					&& target->getDistance(rangedUnit->getPosition()) < BWAPI::UnitTypes::Zerg_Lurker.groundWeapon().maxRange()+36 )
+				{
+					BWAPI::Position fleePosition(rangedUnit->getPosition() - target->getPosition() + rangedUnit->getPosition());
+					if (fleePosition.isValid())
+						Micro::SmartMove(rangedUnit, fleePosition);
+					else
+						Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+					continue;
+				}
+
 				if (rangedUnit->getType() == BWAPI::UnitTypes::Terran_Battlecruiser)
 				{
 					if (BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Yamato_Gun) && rangedUnit->canUseTech(BWAPI::TechTypes::Yamato_Gun)){
@@ -65,14 +78,6 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 							continue;
 						}
 					}
-				}
-				if (order.getCenterPosition().isValid() && order.getType() != SquadOrderTypes::Defend)
-				{
-					if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*2)
-					{
-						Micro::SmartMove(rangedUnit, order.getCenterPosition());
-						continue;
-					}					
 				}
 
 				if (rangedUnit->getStimTimer() == 0
@@ -84,29 +89,57 @@ void RangedManager::assignTargetsOld(const BWAPI::Unitset & targets)
 					rangedUnit->useTech(BWAPI::TechTypes::Stim_Packs);
 				}
 
+				//방어부대가 아니면서 부대의 중심이 유효 할때
+				if (order.getCenterPosition().isValid() && order.getType() != SquadOrderTypes::Defend && rangedUnit->getStimTimer()==0)
+				{
+					// target이 탱크 사정거리 밖에 있고 공격 받고 있지 않으면
+					if (!rangedUnit->isUnderAttack())
+					{
+						// 부대의 중심으로 이동한다.
+						if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange())
+							Micro::SmartAttackMove(rangedUnit, order.getCenterPosition());
+						else if (target->getPosition().getDistance(order.getCenterPosition()) 
+					> BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() + rangedUnit->getType().groundWeapon().maxRange())
+							Micro::SmartMove(rangedUnit, order.getCenterPosition());
+
+						BWAPI::Broodwar->drawLineMap(rangedUnit->getPosition(), order.getCenterPosition() , BWAPI::Colors::Yellow);
+						continue;
+					}					
+				}			
+
 				// attack it
 				Micro::SmartKiteTarget(rangedUnit, target);
 			}
 			// if there are no targets
 			else
 			{
-				if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy()) != nullptr
-					&& InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getPosition().getDistance(order.getPosition()) < 100
-					&& BWTA::getRegion(BWAPI::TilePosition(rangedUnit->getPosition()) ) == BWTA::getRegion(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->enemy())->getTilePosition())
-					)
-				{
-					Micro::SmartAttackMove(rangedUnit, order.getPosition());
-					continue;
-				}
-
-				if (order.getCenterPosition().isValid())
-				{
-					Micro::SmartMove(rangedUnit, order.getCenterPosition());
-				}
+				//if (order.getCenterPosition().isValid())
+				//{
+				//	Micro::SmartAttackMove(rangedUnit, order.getCenterPosition());
+				//}
+				//// if we're not near the order position
 				//else
-				//	Micro::SmartMove(rangedUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-				continue;
-				
+				//{
+				//	BWAPI::Position fleeVec(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() - order.getPosition());
+				//	double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+				//	int dist = order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
+				//	if (dist <= 0)
+				//		dist = order.getRadius() *0.8;
+				//	fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+				//	fleeVec -= order.getPosition();
+				//
+				//	if (fleeVec.isValid())
+				//		Micro::SmartAttackMove(rangedUnit, fleeVec);
+				//}
+				BWAPI::Position fleeVec(order.getPosition() - InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
+				double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+				int dist = -BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*0.75;
+				fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+				BWAPI::Position newDest = order.getPosition() + fleeVec;
+				if (newDest.getDistance(rangedUnit->getPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange()*0.8)
+				{
+					Micro::SmartAttackMove(rangedUnit, newDest);
+				}
 			}
 		}
 		else if (order.getType() == SquadOrderTypes::Drop)

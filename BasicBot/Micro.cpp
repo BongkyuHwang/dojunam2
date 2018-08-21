@@ -333,7 +333,7 @@ void Micro::SmartKiteTarget(BWAPI::Unit rangedUnit, BWAPI::Unit target)
 			BWAPI::Position ourBasePosition = InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition();
 			fleePosition = ourBasePosition;
 		}
-		rangedUnit->move(fleePosition);
+		//rangedUnit->move(fleePosition);
 		Micro::SmartMove(rangedUnit, fleePosition);
 	}
 	// otherwise shoot
@@ -392,7 +392,7 @@ void Micro::MutaDanceTarget(BWAPI::Unit muta, BWAPI::Unit target)
 		}
 		else
 		{//@도주남 김지훈 만약 뒤에가 벽이면 걍 집 방향으로 ㅌㅌ
-			muta->move(ourBasePosition);
+			//muta->move(ourBasePosition);
 			Micro::SmartMove(muta, ourBasePosition);
 		}
 	}

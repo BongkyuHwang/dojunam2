@@ -114,26 +114,27 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			}
 			continue;
 		}
-
-		if (target != nullptr && detectorUnit->getType().isBuilding() )
+		if (detectorUnit->getType().isBuilding())
 		{
-			if (target->getPosition().getDistance(detectorUnit->getPosition()) - detectorUnit->getType().width() - 30 < BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
+			if (detectorUnit->isUnderAttack())
 			{
-				if (order.getCenterPosition().isValid())
-				{
-					Micro::SmartMove(detectorUnit, order.getCenterPosition());
-				}
-				else
-				{
-					Micro::SmartMove(detectorUnit, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
-				}
+				Micro::SmartMove(detectorUnit, BWAPI::Position((BWAPI::Broodwar->mapWidth() * 16), BWAPI::Broodwar->mapHeight() * 16));
+			}
+			else if (target != nullptr)
+			{
+				if (target->isVisible())
+					Micro::SmartKiteTarget(detectorUnit, target);
 			}
 			else
 			{
-				Micro::SmartMove(detectorUnit, target->getPosition());
+				if (unitClosestToEnemy != nullptr)
+				{					
+					Micro::SmartMove(detectorUnit, unitClosestToEnemy->getPosition());
+				}
 			}
-			continue;
+			continue;			
 		}
+		
 
 		if (detectorUnit->isUnderAttack())
 			detectorUnitInBattle = true;

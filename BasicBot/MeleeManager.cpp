@@ -36,27 +36,6 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 	// for each meleeUnit
 	for (auto & meleeUnit : meleeUnits)
 	{
-		bool goHome = false;
-		if (InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(meleeUnit->getPosition())
-			> InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition().getDistance(order.getPosition()) - order.getRadius()
-			+ BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange() * 1.2
-//			+ BWAPI::UnitTypes::Terran_Firebat.groundWeapon().maxRange()
-			+ BWAPI::UnitTypes::Terran_Vulture.groundWeapon().maxRange())
-			goHome = true;
-		if (order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Drop)
-			goHome = false;
-
-		if (goHome)
-		{
-			if (order.getCenterPosition().isValid())
-			{
-				Micro::SmartAttackMove(meleeUnit, order.getCenterPosition());
-			}
-			else
-				Micro::SmartAttackMove(meleeUnit, InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition());
-			continue;
-		}
-
 		// if the order is to attack or defend
 		if (order.getType() == SquadOrderTypes::Attack || order.getType() == SquadOrderTypes::Defend || order.getType() == SquadOrderTypes::Idle)
 		{
@@ -65,7 +44,7 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			{
 				// find the best target for this meleeUnit
 				BWAPI::Unit target = getTarget(meleeUnit, meleeUnitTargets);
-
+				
 				if (order.getCenterPosition().isValid() && order.getType() != SquadOrderTypes::Defend)
 				{
 					if (target->getPosition().getDistance(order.getCenterPosition()) > BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().maxRange())
@@ -92,13 +71,21 @@ void MeleeManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			{
 				if (order.getCenterPosition().isValid())
 				{
-					Micro::SmartAttackMove(meleeUnit, order.getCenterPosition());
+					Micro::SmartAttackMove(meleeUnit, order.getCenterPosition() );
 				}
 				// if we're not near the order position
-				else if (meleeUnit->getDistance(order.getPosition()) > order.getRadius())
+				else
 				{
-					// move to it
-					Micro::SmartAttackMove(meleeUnit, order.getPosition());
+					BWAPI::Position fleeVec(InformationManager::Instance().getMainBaseLocation(BWAPI::Broodwar->self())->getPosition() - order.getPosition());
+					double fleeAngle = atan2(fleeVec.y, fleeVec.x);
+					int dist = order.getRadius() - BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode.groundWeapon().minRange();
+					if (dist <= 0)
+						dist = order.getRadius() *0.8;
+					fleeVec = BWAPI::Position(static_cast<int>(dist * cos(fleeAngle)), static_cast<int>(dist * sin(fleeAngle)));
+					fleeVec -= order.getPosition();
+
+					if (fleeVec.isValid())
+						Micro::SmartAttackMove(meleeUnit, fleeVec);
 				}
 			}
 		}
