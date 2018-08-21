@@ -1436,18 +1436,7 @@ void CombatCommander::updateBunkertSquads()
 		return;
 	}
 	BWAPI::Unit bunker =
-		UnitUtils::GetFarUnitTypeToTarget(BWAPI::UnitTypes::Terran_Bunker, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
-	if (lastBunker == nullptr || !lastBunker->exists())
-	{
-		lastBunker = bunker;
-	}
-	else if (lastBunker != bunker)
-	{
-		for (auto & inUnit : lastBunker->getLoadedUnits())
-		{
-			inUnit->unload(lastBunker);
-		}
-	}
+		UnitUtils::GetFarUnitTypeToTarget(BWAPI::UnitTypes::Terran_Bunker, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));	
 
 	SquadOrder bunkerOrder(SquadOrderTypes::Idle, bunker->getPosition(), 300, std::make_pair(bunker->getPosition(), bunker->getPosition()), "bunker");
 	if (!_squadData.squadExists("bunker"))

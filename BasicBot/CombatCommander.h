@@ -33,8 +33,6 @@ class CombatCommander
 	BWAPI::Position getDefendLocation();
     BWAPI::Position getMainAttackLocation();
 	BWAPI::Position getPositionForDefenceChokePoint(BWTA::Chokepoint * chokepoint);
-
-	BWAPI::Unit lastBunker;
 	
 	//@도주남 김지훈
 	BWAPI::Position getMainAttackLocationForCombat();
