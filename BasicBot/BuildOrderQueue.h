@@ -30,7 +30,8 @@ namespace MyBot
 			MissileTurret,
 			SupForWall,
 			BarForWall,
-			ReservedSupPosion
+			ReservedSupPosion,
+			Bunker
 		};
 		SeedPositionStrategy		seedLocationStrategy;	///< 건설위치 초안 결정 정책
 

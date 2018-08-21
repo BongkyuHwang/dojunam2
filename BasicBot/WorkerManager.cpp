@@ -222,6 +222,14 @@ void WorkerManager::handleGasWorkers()
 					}
 				}
 			}
+			else if (StrategyManager::Instance().getMainStrategy() == Strategy::One_Barrack_Double) {
+				if (BWAPI::Broodwar->self()->gas() > BWAPI::Broodwar->self()->minerals() + 500) {
+					targetNumGasWorker = 2;
+				}
+				else {
+					targetNumGasWorker = 3;
+				}
+			}
 			else {
 				targetNumGasWorker = Config::Macro::WorkersPerRefinery;
 			}

@@ -54,6 +54,8 @@ namespace MyBot
 		// 다템, 럴커 상대 터렛 위치
 		BWAPI::TilePosition _turretPosition;
 		bool _turretStatus;
+		// 벙커위치
+		BWAPI::TilePosition _bunkerPosition;
 
 		/// 전체 unit 의 정보를 업데이트 합니다 (UnitType, lastPosition, HitPoint 등)
 		void                    updateUnitsInfo();
@@ -242,6 +244,8 @@ namespace MyBot
 		BWAPI::TilePosition getTurretPosition();
 		bool getTurretStatus();
 		void setTurretStatus(bool flag);
+		// 벙커위치 리턴
+		BWAPI::TilePosition getBunkerPosition();
 
 		//drop 한번에 갈 dropship 갯수 : 지정된 갯수의 드롭쉽이 가득 차면 출발
 		int bombDropNum;

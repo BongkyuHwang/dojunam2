@@ -24,6 +24,7 @@ namespace MyBot
 			None,
 			Bionic,
 			Bionic_Tank,
+			One_Barrack_Double,
 			Mechanic,
 			One_Fac,
 			One_Fac_One_Star,

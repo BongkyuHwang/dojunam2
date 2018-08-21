@@ -43,6 +43,9 @@ BWAPI::TilePosition	ConstructionPlaceFinder::getBuildLocationWithSeedPositionAnd
 		switch (seedPositionStrategy) {
 		//v18 김유진
 		//터렛도 일단은 MainBaseLocation 타도록 추가
+		case BuildOrderItem::SeedPositionStrategy::Bunker:
+			desiredPosition = getBuildLocationNear(buildingType, InformationManager::Instance().getBunkerPosition());
+			break;
 		case BuildOrderItem::SeedPositionStrategy::MissileTurret:
 			if (InformationManager::Instance().getTurretStatus() == false) {
 				InformationManager::Instance().setTurretStatus(true);

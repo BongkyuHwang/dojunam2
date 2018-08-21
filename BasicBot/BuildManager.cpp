@@ -980,13 +980,13 @@ void BuildManager::executeWorkerTraining(){
 		if (tmpWorkerCnt > -1){
 			double weight = 1.0;
 			if(ExpansionManager::Instance().getExpansions().size() == 1){
-				weight = 1.5;
-			}
-			else if(ExpansionManager::Instance().getExpansions().size() <= 2){
 				weight = 1.3;
 			}
+			else if(ExpansionManager::Instance().getExpansions().size() <= 2){
+				weight = 1.1;
+			}
 			// 일꾼 최대치 
-			if ((tmpWorkerCnt < (int)(WorkerManager::Instance().getWorkerData().getMineralsNearDepot(e.cc) * 1.5 * weight + 3)) && (totalWorkerCnt < 71)){
+			if ((tmpWorkerCnt < (int)(WorkerManager::Instance().getWorkerData().getMineralsNearDepot(e.cc) * 1.5 * weight + 3)) && (totalWorkerCnt < 60)){
 				e.cc->train(BWAPI::UnitTypes::Terran_SCV);
 				return;
 			}
