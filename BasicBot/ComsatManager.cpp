@@ -110,7 +110,7 @@ void ComsatManager::update(){
 	if (!TimeManager::Instance().isMyTurn("ComsatManager_update", 6)) return;
 
 	//적이 발견된 지역 스켄
-	//또는 200되면 한번씩
+	//또는 energy_buffer (초기값 200)되면 한번씩
 	if (BWAPI::Broodwar->getFrameCount() > _next_enable_frame){
 		clearScanPosition();
 		setScanPosition();
@@ -137,10 +137,39 @@ BWAPI::Position ComsatManager::getScanPositionForScout(){
 	BWAPI::Position rst = BWAPI::Positions::None;
 
 	try{
-		//디폴트로 적 베이스
-		GridCell &enemy_base = MapGrid::Instance().getCell(InformationManager::Instance().getMainBaseLocation(InformationManager::Instance().enemyPlayer)->getRegion()->getCenter());
-		if (enemy_base.timeLastVisited < BWAPI::Broodwar->getFrameCount() - 10)
-			rst = enemy_base.center;
+		//디폴트로 적 resource depot 중 랜덤
+		std::vector<BWAPI::Position> enemy_base;
+		for (const auto & kv : InformationManager::Instance().getUnitAndUnitInfoMap(InformationManager::Instance().enemyPlayer))
+		{
+			if (kv.second.type.isResourceDepot()){
+				enemy_base.push_back(kv.second.lastPosition);
+			}
+		}
+
+		if (!enemy_base.empty()){
+			rst = enemy_base[rand() % enemy_base.size()];
+		}
+		else{
+			energy_buffer = 100;
+			if (_full_scan_positions.empty()){
+				int width = 4096;
+				int num_step = 6;
+				int step_size = (int) (width / num_step);
+				int tmp_x;
+				int tmp_y;
+				for (int i = 0; i < num_step; i++){
+					tmp_x = (int)(i*step_size + step_size / 2);
+					for (int j = 0; j < num_step; j++){
+						tmp_y = (int)(j*step_size + step_size / 2);
+						_full_scan_positions.push(BWAPI::Position(tmp_x, tmp_y));
+					}
+				}
+			}
+
+			rst = BWAPI::Position(_full_scan_positions.front());
+			_full_scan_positions.pop();
+			
+		}
 
 		//입구막은 경우에는 우리 첫번째 쵸크
 		if (InformationManager::Instance().getWallStatus()){
@@ -163,7 +192,7 @@ BWAPI::Position ComsatManager::getScanPositionForScout(){
 void ComsatManager::setCommandForScout(){
 	BWAPI::Unitset us;
 	for (auto &u : BWAPI::Broodwar->self()->getUnits()){
-		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station && u->getEnergy() == 200){
+		if (u->getType() == BWAPI::UnitTypes::Terran_Comsat_Station && u->getEnergy() >= energy_buffer){
 			us.insert(u);
 		}
 	}
