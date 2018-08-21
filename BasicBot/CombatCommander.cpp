@@ -241,8 +241,8 @@ void CombatCommander::update()
 			}
 		}
 		updateScoutSquads();
-		if (im.nowCombatStatus < InformationManager::combatStatus::DEFCON4)//초반에만 벙커를 설치한다고 가정하고,
-			updateBunkertSquads();
+		//if (im.nowCombatStatus < InformationManager::combatStatus::DEFCON4)//초반에만 벙커를 설치한다고 가정하고,
+		updateBunkertSquads();
 		updateSmallAttackSquad();
 		updateDropSquads();
 	}
@@ -1437,6 +1437,17 @@ void CombatCommander::updateBunkertSquads()
 	}
 	BWAPI::Unit bunker =
 		UnitUtils::GetFarUnitTypeToTarget(BWAPI::UnitTypes::Terran_Bunker, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
+	if (lastBunker == nullptr || !lastBunker->exists())
+	{
+		lastBunker = bunker;
+	}
+	else if (lastBunker != bunker)
+	{
+		for (auto & inUnit : lastBunker->getLoadedUnits())
+		{
+			inUnit->unload(lastBunker);
+		}
+	}
 
 	SquadOrder bunkerOrder(SquadOrderTypes::Idle, bunker->getPosition(), 300, std::make_pair(bunker->getPosition(), bunker->getPosition()), "bunker");
 	if (!_squadData.squadExists("bunker"))
@@ -1448,15 +1459,13 @@ void CombatCommander::updateBunkertSquads()
 
 	Squad & defcon1Squad = _squadData.getSquad("DEFCON1");
 	Squad & defcon2Squad = _squadData.getSquad("DEFCON2");
-	//Squad & defcon3Squad = _squadData.getSquad("DEFCON3");
-	//Squad & defcon4Squad = _squadData.getSquad("DEFCON4");
 
 
-	SquadOrder saveBunker(SquadOrderTypes::Idle, bunker->getPosition()
-		, BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + 10, "SAVEBUNKER");
-	
-	defcon1Squad.setSquadOrder(saveBunker);
-	defcon2Squad.setSquadOrder(saveBunker);
+	//SquadOrder saveBunker(SquadOrderTypes::Idle, bunker->getPosition()
+	//	, BWAPI::UnitTypes::Terran_Marine.groundWeapon().maxRange() + 10, "SAVEBUNKER");
+	//
+	//defcon1Squad.setSquadOrder(saveBunker);
+	//defcon2Squad.setSquadOrder(saveBunker);
 	//defcon3Squad.setSquadOrder(saveBunker);
 	//defcon4Squad.setSquadOrder(saveBunker);
 
