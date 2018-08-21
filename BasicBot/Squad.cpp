@@ -37,6 +37,7 @@ void Squad::update()
 				if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 				{
 					maybeBunker = unit;
+					break;
 				}
 			}
 			for (auto & rangedUnit : _units)
