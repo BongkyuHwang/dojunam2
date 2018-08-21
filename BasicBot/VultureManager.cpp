@@ -147,7 +147,8 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			}			
 			else
 			{
-				vultureUnit->attack(target);
+				Micro::SmartAttackUnit(vultureUnit, target);
+				//vultureUnit->attack(target);
 			}
 			//if (vultureUnit->getHitPoints() < vultureUnit->getType().maxHitPoints())
 			//{
@@ -198,7 +199,8 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 			else
 			{
 				if (vultureUnit->getDistance(order.getPosition()) > 200)
-					vultureUnit->move(order.getPosition());
+					//vultureUnit->move(order.getPosition());
+					Micro::SmartMove(vultureUnit, order.getPosition());
 			}
 			continue;
 		}
@@ -296,7 +298,8 @@ void VultureManager::assignTargetsOld(const BWAPI::Unitset & targets)
 					if (vultureUnit->getSpiderMineCount() > 0)
 						Micro::SmartLaySpiderMine(vultureUnit, vultureUnit->getPosition());
 					else
-						vultureUnit->move(target->getPosition());
+						Micro::SmartMove(vultureUnit, target->getPosition());
+						//vultureUnit->move(target->getPosition());
 					continue;
 				}
 				else if (target->getType().isBuilding())
@@ -682,7 +685,8 @@ void VultureManager::getScoutRegions(BWAPI::Unit unit)
 		setScoutRegions();
 		if (scoutRegions.size() <= 0)
 		{
-			unit->move(InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getSides().first);
+			Micro::SmartMove(unit, InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getSides().first);
+			//unit->move(InformationManager::Instance().getFirstChokePoint(BWAPI::Broodwar->self())->getSides().first);
 		}
 	}
 
@@ -706,7 +710,8 @@ void VultureManager::getScoutRegions(BWAPI::Unit unit)
 	}
 	else
 	{
-		unit->move(scoutRegions[scoutRegions.size() - 1]);
+		Micro::SmartMove(unit, scoutRegions[scoutRegions.size() - 1]);
+		//unit->move(scoutRegions[scoutRegions.size() - 1]);
 	}
 
 }

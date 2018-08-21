@@ -454,9 +454,9 @@ void CombatCommander::updateDropSquads()
 					if (unit->getType().spaceRequired() <= ship->getSpaceRemaining())
 					{
 						if (!ship->load(unit))
-							ship->move(unit->getPosition());
+							Micro::SmartMove(ship, unit->getPosition());
 						if (!unit->load(ship))
-							unit->move(ship->getPosition());
+							Micro::SmartMove(unit, ship->getPosition());
 					}
 				}
 			}
@@ -496,9 +496,9 @@ void CombatCommander::updateDropSquads()
 					if (unit->getType().spaceRequired() <= ship->getSpaceRemaining())
 					{
 						if (!ship->load(unit))
-							ship->move(unit->getPosition());
+							Micro::SmartMove(ship, unit->getPosition());
 						if (!unit->load(ship))
-							unit->move(ship->getPosition());
+							Micro::SmartMove(unit, ship->getPosition());
 						_squadData.assignUnitToSquad(unit, dropSquad);
 					}
 				}

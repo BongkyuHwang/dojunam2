@@ -99,14 +99,12 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			{
 				if (detectorUnit->getPosition().getDistance(toGo) >= 70)
 				{
-				
-					detectorUnit->move(toGo);
+					Micro::SmartMove(detectorUnit, toGo);
 				}
 				else
 				{
 					toGo = doFullscan();
-					detectorUnit->move(toGo);
-				
+					Micro::SmartMove(detectorUnit, toGo);
 				}
 			}
 			else
@@ -123,16 +121,16 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			{
 				if (order.getCenterPosition().isValid())
 				{
-					detectorUnit->move(order.getCenterPosition());
+					Micro::SmartMove(detectorUnit, order.getCenterPosition());
 				}
 				else
 				{
-					detectorUnit->move(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
+					Micro::SmartMove(detectorUnit, BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
 				}
 			}
 			else
 			{
-				detectorUnit->move(target->getPosition());
+				Micro::SmartMove(detectorUnit, target->getPosition());
 			}
 			continue;
 		}
@@ -158,7 +156,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			//printf("Use Tech Defensive_Matrix \n");
 			if (!detectorUnit->useTech(BWAPI::TechTypes::Defensive_Matrix, unitClosestToEnemy))
 			{
-				detectorUnit->move(order.getClosestUnit()->getPosition());
+				Micro::SmartMove(detectorUnit, order.getClosestUnit()->getPosition());
 				//printf("go ClosestUnit UnitID[%d] \n", detectorUnit->getID());
 				continue;
 			}
@@ -176,7 +174,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			{
 				if (target->isVisible() && !detectorUnit->useTech(BWAPI::TechTypes::EMP_Shockwave, target))
 				{
-					detectorUnit->move(target->getPosition());
+					Micro::SmartMove(detectorUnit, target->getPosition());
 				}
 				continue;
 			}
@@ -227,8 +225,7 @@ void DetectorManager::executeMicro(const BWAPI::Unitset & targets)
 			}
 		}
 		//printf("getCenterPosition UnitID[%d] \n", detectorUnit->getID());
-		detectorUnit->move(order.getCenterPosition());
-		
+		Micro::SmartMove(detectorUnit, order.getCenterPosition());
 	}
 }
 

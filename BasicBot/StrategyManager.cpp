@@ -351,14 +351,12 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		else {
 			if (numUnits["Tanks"] > 0 && !hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
 				goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
-
-
-				if (BWAPI::Broodwar->self()->gas() > 90) {
-					goal_num_tanks += 1;
-				}
-				else {
-					goal_num_vultures += 1;
-				}
+			}
+			if (BWAPI::Broodwar->self()->gas() > 90) {
+				goal_num_tanks += 1;
+			}
+			else {
+				goal_num_vultures += 1;
 			}
 		}
 		
@@ -409,12 +407,14 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Vulture, goal_num_vultures));
 		goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, goal_num_tanks));
 
-		if (!hasTech(BWAPI::TechTypes::Spider_Mines)) {
-			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Spider_Mines, 1));
-		}
 		if (!hasTech(BWAPI::TechTypes::Tank_Siege_Mode)) {
 			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Tank_Siege_Mode, 1));
 		}
+
+		if (hasTech(BWAPI::TechTypes::Tank_Siege_Mode) && !hasTech(BWAPI::TechTypes::Spider_Mines)) {
+			goal.push_back(std::pair<MetaType, int>(BWAPI::TechTypes::Spider_Mines, 1));
+		}
+
 	}
 	else if (_main_strategy == Strategy::main_strategies::Mechanic || _main_strategy == Strategy::main_strategies::Mechanic_Goliath)
 	{
@@ -445,45 +445,76 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 			goal.push_back(std::pair<MetaType, int>(BWAPI::UnitTypes::Terran_Science_Facility, 1));
 		}
 
-		if (_main_strategy == Strategy::main_strategies::Mechanic) {
-			if (BWAPI::Broodwar->self()->gas() < 500) {
-				goal_num_vultures += numUnits["Factorys"];
-			}
-			else {
-				if (goal_num_tanks > goal_num_vultures){
-					goal_num_vultures += (goal_num_tanks - goal_num_vultures > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_tanks - goal_num_vultures);
-					goal_num_tanks += ((numUnits["Factorys"] - (goal_num_tanks - goal_num_vultures)) > 0 ? (numUnits["Factorys"] - (goal_num_tanks - goal_num_vultures)) : 0);
+		if (InformationManager::Instance().enemyRace == BWAPI::Races::Terran) {
+			if (_main_strategy == Strategy::main_strategies::Mechanic) {
+				if (BWAPI::Broodwar->self()->gas() < 500) {
+					goal_num_vultures += numUnits["Factorys"];
 				}
 				else {
-					goal_num_tanks += (goal_num_vultures - goal_num_tanks > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_vultures - goal_num_tanks);
-					goal_num_vultures += ((numUnits["Factorys"] - (goal_num_vultures - goal_num_tanks)) > 0 ? (numUnits["Factorys"] - (goal_num_vultures - goal_num_tanks)) : 0);
+						goal_num_vultures += 2;
+						goal_num_tanks += numUnits["Factorys"];
 				}
+			}
+			else {
+				if (BWAPI::Broodwar->self()->gas() < 500) {
+					goal_num_vultures += numUnits["Factorys"];
+				}
+				else{
+					if (BWAPI::Broodwar->enemy()->allUnitCount(BWAPI::UnitTypes::Terran_Battlecruiser) > 0) {
+						goal_num_tanks += 1;
+						goal_num_goliath += numUnits["Factorys"];
+					}
+					else {
+						goal_num_goliath += 2;
+						goal_num_tanks += numUnits["Factorys"];
+					}
 
+					goal_num_vultures += 1;
+				}
 			}
 		}
 		else {
-			if (BWAPI::Broodwar->self()->gas() < 500) {
-				goal_num_vultures += numUnits["Factorys"];
-			}
-			else{
-				if (BWAPI::Broodwar->enemy()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk) > 0 || BWAPI::Broodwar->enemy()->allUnitCount(BWAPI::UnitTypes::Protoss_Carrier) > 0) {
-					goal_num_tanks += 1;
-					goal_num_goliath += numUnits["Factorys"];
+			if (_main_strategy == Strategy::main_strategies::Mechanic) {
+				if (BWAPI::Broodwar->self()->gas() < 500) {
+					goal_num_vultures += numUnits["Factorys"];
 				}
 				else {
-					if (goal_num_tanks > goal_num_goliath){
-						goal_num_goliath += (goal_num_tanks - goal_num_goliath > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_tanks - goal_num_goliath);
-						goal_num_tanks += ((numUnits["Factorys"] - (goal_num_tanks - goal_num_goliath)) > 0 ? (numUnits["Factorys"] - (goal_num_tanks - goal_num_goliath)) : 0);
+					if (goal_num_tanks > goal_num_vultures){
+						goal_num_vultures += (goal_num_tanks - goal_num_vultures > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_tanks - goal_num_vultures);
+						goal_num_tanks += ((numUnits["Factorys"] - (goal_num_tanks - goal_num_vultures)) > 0 ? (numUnits["Factorys"] - (goal_num_tanks - goal_num_vultures)) : 0);
 					}
 					else {
-						goal_num_tanks += (goal_num_goliath - goal_num_tanks > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_goliath - goal_num_tanks);
-						goal_num_goliath += ((numUnits["Factorys"] - (goal_num_goliath - goal_num_tanks)) > 0 ? (numUnits["Factorys"] - (goal_num_goliath - goal_num_tanks)) : 0);
+						goal_num_tanks += (goal_num_vultures - goal_num_tanks > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_vultures - goal_num_tanks);
+						goal_num_vultures += ((numUnits["Factorys"] - (goal_num_vultures - goal_num_tanks)) > 0 ? (numUnits["Factorys"] - (goal_num_vultures - goal_num_tanks)) : 0);
 					}
-				}
 
-				goal_num_vultures += 1;
+				}
+			}
+			else {
+				if (BWAPI::Broodwar->self()->gas() < 500) {
+					goal_num_vultures += numUnits["Factorys"];
+				}
+				else{
+					if (BWAPI::Broodwar->enemy()->allUnitCount(BWAPI::UnitTypes::Zerg_Mutalisk) > 0 || BWAPI::Broodwar->enemy()->allUnitCount(BWAPI::UnitTypes::Protoss_Carrier) > 0) {
+						goal_num_tanks += 1;
+						goal_num_goliath += numUnits["Factorys"];
+					}
+					else {
+						if (goal_num_tanks > goal_num_goliath){
+							goal_num_goliath += (goal_num_tanks - goal_num_goliath > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_tanks - goal_num_goliath);
+							goal_num_tanks += ((numUnits["Factorys"] - (goal_num_tanks - goal_num_goliath)) > 0 ? (numUnits["Factorys"] - (goal_num_tanks - goal_num_goliath)) : 0);
+						}
+						else {
+							goal_num_tanks += (goal_num_goliath - goal_num_tanks > numUnits["Factorys"] ? numUnits["Factorys"] : goal_num_goliath - goal_num_tanks);
+							goal_num_goliath += ((numUnits["Factorys"] - (goal_num_goliath - goal_num_tanks)) > 0 ? (numUnits["Factorys"] - (goal_num_goliath - goal_num_tanks)) : 0);
+						}
+					}
+
+					goal_num_vultures += 1;
+				}
 			}
 		}
+		
 		goal_num_vultures += 1;
 
 		/* 순서변경
@@ -536,7 +567,7 @@ const MetaPairVector StrategyManager::getTerranBuildOrderGoal()
 		}
 		else {
 			// 배럭드는 타이밍 설정과 배럭들 유닛셋에 insert
-			if (InformationManager::Instance().isTimingToLiftBaracks == false) {
+			if (InformationManager::Instance().isTimingToLiftBaracks == false && InformationManager::Instance().enemyRace == BWAPI::Races::Zerg) {
 				InformationManager::Instance().isTimingToLiftBaracks = true;
 
 				for (auto unit : BWAPI::Broodwar->self()->getUnits()) {

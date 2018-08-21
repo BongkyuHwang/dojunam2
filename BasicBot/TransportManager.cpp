@@ -177,7 +177,7 @@ void TransportManager::update()
 							BWAPI::Position add(tx*32, ty*32);
 							if (dropunit->canUnloadAllPosition(dropunit->getPosition() + add))
 							{
-								dropunit->move(dropunit->getPosition() + add);
+								Micro::SmartMove(dropunit, dropunit->getPosition() + add);
 								tx = 99;
 								ty = 99;
 							}
